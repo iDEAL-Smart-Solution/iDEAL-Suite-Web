@@ -23,50 +23,31 @@ const ExpiryWarningBanner = ({ expiryDate }: ExpiryWarningBannerProps) => {
 
   return (
     <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        padding: "12px 16px",
-        marginBottom: "24px",
-        borderRadius: "8px",
-        backgroundColor: isAlert ? "#fee2e2" : "#fef3c7",
-        border: `1px solid ${isAlert ? "#fca5a5" : "#fde047"}`,
-      }}
+      className={`flex items-center gap-3 p-4 mb-6 rounded-lg border ${
+        isAlert
+          ? "bg-red-500/10 border-red-500/30"
+          : "bg-yellow-500/10 border-yellow-500/30"
+      }`}
     >
       <AlertTriangle
         size={20}
-        style={{ color: isAlert ? "#991b1b" : "#92400e", flexShrink: 0 }}
+        className={isAlert ? "text-red-400 flex-shrink-0" : "text-yellow-400 flex-shrink-0"}
       />
-      <div style={{ flex: 1 }}>
-        <strong style={{ color: isAlert ? "#991b1b" : "#92400e" }}>
+      <div className="flex-1">
+        <strong className={isAlert ? "text-red-400" : "text-yellow-400"}>
           Your subscription expires in {daysUntilExpiry} day
           {daysUntilExpiry !== 1 ? "s" : ""}
         </strong>
-        <p
-          style={{
-            margin: "4px 0 0 0",
-            fontSize: "14px",
-            color: isAlert ? "#991b1b" : "#92400e",
-          }}
-        >
+        <p className={`text-sm mt-1 ${isAlert ? "text-red-400" : "text-yellow-400"}`}>
           Renew now to avoid interruption.
         </p>
       </div>
       <button
         onClick={() => setDismissed(true)}
-        style={{
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          padding: "4px",
-          display: "flex",
-          alignItems: "center",
-          flexShrink: 0,
-        }}
+        className={`bg-transparent border-none cursor-pointer p-1 flex items-center flex-shrink-0 hover:opacity-75 transition-opacity`}
         aria-label="Dismiss warning"
       >
-        <X size={18} style={{ color: isAlert ? "#991b1b" : "#92400e" }} />
+        <X size={18} className={isAlert ? "text-red-400" : "text-yellow-400"} />
       </button>
     </div>
   );

@@ -1,9 +1,8 @@
-import "./skeleton.css";
-
 interface SkeletonProps {
   width?: string;
   height?: string;
   borderRadius?: string;
+  style?: React.CSSProperties;
 }
 
 const Skeleton = ({

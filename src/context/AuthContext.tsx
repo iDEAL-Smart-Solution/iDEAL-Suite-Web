@@ -7,7 +7,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   demoLogin: () => void;
-  demoRegisterSchool: () => { schoolId: string };
   demoCreateAdmin: (schoolId: string) => void;
 }
 
@@ -24,27 +23,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const demoLogin = () => {
     const demoUser = {
+      userId: "demo-user-001",
+      firstName: "Demo",
+      lastName: "Admin",
       role: 1,
-      name: "Demo Admin",
       email: "demo@ideal-suite.com",
+      schoolId: "demo-school-001",
+      schoolName: "Demo Academy",
     };
 
-    localStorage.setItem("token", "demo-token");
-    localStorage.setItem("user", JSON.stringify(demoUser));
+    localStorage.setItem("ideal_token", "demo-token");
+    localStorage.setItem("ideal_user", JSON.stringify(demoUser));
 
     setUser(demoUser);
     setToken("demo-token");
-  };
-
-  const demoRegisterSchool = () => {
-    const demoSchool = {
-      schoolId: "demo-school-001",
-      name: "Demo Academy",
-      email: "demo-school@ideal-suite.com",
-    };
-
-    localStorage.setItem("demoSchool", JSON.stringify(demoSchool));
-    return { schoolId: demoSchool.schoolId };
   };
 
   const demoCreateAdmin = (schoolId: string) => {
@@ -55,8 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       schoolId,
     };
 
-    localStorage.setItem("token", "demo-token");
-    localStorage.setItem("user", JSON.stringify(demoAdminUser));
+    localStorage.setItem("ideal_token", "demo-token");
+    localStorage.setItem("ideal_user", JSON.stringify(demoAdminUser));
 
     setUser(demoAdminUser);
     setToken("demo-token");
@@ -65,6 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     logoutService();
     setUser(null);
+    setToken(null);
   };
 
   return (
@@ -75,7 +68,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         logout,
         demoLogin,
-        demoRegisterSchool,
         demoCreateAdmin,
       }}
     >

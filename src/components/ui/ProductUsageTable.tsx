@@ -25,28 +25,23 @@ const ProductUsageTable = ({ products }: ProductUsageTableProps) => {
   };
 
   return (
-    <div className="product-usage-table">
-      <h3>Product Usage Overview</h3>
+    <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 shadow-md">
+      <h3 className="text-lg font-bold text-slate-50 mb-4">Product Usage Overview</h3>
 
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="overflow-x-auto">
+        <table className="w-full">
           <thead>
-            <tr
-              style={{
-                borderBottom: "1px solid var(--border)",
-                backgroundColor: "var(--bg)",
-              }}
-            >
-              <th style={{ textAlign: "left", padding: "12px", fontWeight: 600 }}>
+            <tr className="border-b border-slate-700 bg-slate-900">
+              <th className="text-left px-4 py-3 font-semibold text-slate-400">
                 Product Name
               </th>
-              <th style={{ textAlign: "center", padding: "12px", fontWeight: 600 }}>
+              <th className="text-center px-4 py-3 font-semibold text-slate-400">
                 Usage Count
               </th>
-              <th style={{ textAlign: "center", padding: "12px", fontWeight: 600 }}>
+              <th className="text-center px-4 py-3 font-semibold text-slate-400">
                 Last Used
               </th>
-              <th style={{ textAlign: "center", padding: "12px", fontWeight: 600 }}>
+              <th className="text-center px-4 py-3 font-semibold text-slate-400">
                 Status
               </th>
             </tr>
@@ -55,25 +50,15 @@ const ProductUsageTable = ({ products }: ProductUsageTableProps) => {
             {products.map((product) => (
               <tr
                 key={product.id}
-                style={{
-                  borderBottom: "1px solid var(--border)",
-                  transition: "background-color 0.2s ease",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--card)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }}
+                className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors cursor-pointer"
               >
-                <td style={{ padding: "12px" }}>
-                  <strong>{product.name}</strong>
+                <td className="px-4 py-3">
+                  <strong className="text-slate-50">{product.name}</strong>
                 </td>
-                <td style={{ padding: "12px", textAlign: "center" }}>
+                <td className="px-4 py-3 text-center text-slate-400">
                   {product.usageCount}
                 </td>
-                <td style={{ padding: "12px", textAlign: "center" }}>
+                <td className="px-4 py-3 text-center text-slate-400">
                   {product.lastUsed ? (
                     new Date(product.lastUsed).toLocaleDateString("en-US", {
                       year: "numeric",
@@ -81,10 +66,10 @@ const ProductUsageTable = ({ products }: ProductUsageTableProps) => {
                       day: "numeric",
                     })
                   ) : (
-                    <span style={{ color: "var(--text-secondary)" }}>Never</span>
+                    <span className="text-slate-500">Never</span>
                   )}
                 </td>
-                <td style={{ padding: "12px", textAlign: "center" }}>
+                <td className="px-4 py-3 text-center">
                   {getStatusBadge(product.status)}
                 </td>
               </tr>

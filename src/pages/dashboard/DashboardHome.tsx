@@ -53,14 +53,14 @@ const DashboardHome = () => {
     fetchStats();
   }, [isDemo]);
 
-  //  Loading skeletons
+  // Loading skeletons
   if (loading) {
     return (
-      <div>
+      <div className="p-8">
         <Skeleton width="250px" height="28px" />
         <Skeleton width="350px" height="16px" style={{ marginTop: "8px" }} />
 
-        <div className="metrics-grid" style={{ marginTop: "24px" }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
           <MetricCardSkeleton />
           <MetricCardSkeleton />
           <MetricCardSkeleton />
@@ -70,33 +70,37 @@ const DashboardHome = () => {
     );
   }
 
-  //  Error state
-  if (error) return <p className="error">{error}</p>;
+  // Error state
+  if (error) return <p className="text-red-400 p-8">{error}</p>;
 
-  if (!stats) return <p className="error">No data available</p>;
+  if (!stats) return <p className="text-red-400 p-8">No data available</p>;
 
   const slotsUsagePercent = Math.round(
     (stats.totalRegisteredStudents / stats.subscribedSlots) * 100
   );
 
   return (
-    <div className="dashboard-home">
-      {/*  EXPIRY WARNING */}
+    <div className="p-8 space-y-8">
+      {/* EXPIRY WARNING */}
       {stats && (
         <ExpiryWarningBanner expiryDate={stats.expiryDate} />
       )}
 
-      {/*  WELCOME SECTION */}
-      <div className="welcome-section">
-        <h2>Welcome back, {user.name}! </h2>
-        <p className="school-name">{stats.schoolName}</p>
-        <p className="muted">
+      {/* WELCOME SECTION */}
+      <div>
+        <h1 className="text-4xl font-bold text-white mb-2">
+          Welcome back, {user.name}!
+        </h1>
+        <p className="text-xl font-semibold text-cyan-400 mb-2">
+          {stats.schoolName}
+        </p>
+        <p className="text-slate-400">
           Here's a quick overview of your school system.
         </p>
       </div>
 
-      {/*  METRICS GRID */}
-      <div className="metrics-grid">
+      {/* METRICS GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
           title="Total Users"
           value={stats.totalUsers}
@@ -125,8 +129,8 @@ const DashboardHome = () => {
         />
       </div>
 
-      {/*  SUBSCRIPTION & PRODUCTS SECTION */}
-      <div className="dashboard-grid" style={{ marginTop: "32px" }}>
+      {/* SUBSCRIPTION & PRODUCTS SECTION */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SUBSCRIPTION STATUS */}
         <SubscriptionStatusCard
           planType={stats.planType}
@@ -136,8 +140,8 @@ const DashboardHome = () => {
         />
       </div>
 
-      {/*  CHARTS */}
-      <div className="dashboard-grid" style={{ marginTop: "32px" }}>
+      {/* CHARTS */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <StudentsGrowthChart
           data={isDemo ? mockStudentGrowth : []}
         />
@@ -146,8 +150,8 @@ const DashboardHome = () => {
         />
       </div>
 
-      {/*  PRODUCTS TABLE */}
-      <div style={{ marginTop: "32px" }}>
+      {/* PRODUCTS TABLE */}
+      <div>
         <ProductUsageTable products={stats.products} />
       </div>
     </div>

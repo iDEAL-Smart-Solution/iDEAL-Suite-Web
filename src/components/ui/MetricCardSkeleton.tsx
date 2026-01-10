@@ -1,5 +1,4 @@
 import Skeleton from "./Skeleton";
-import  "./metric-card.css";
 
 const MetricCardSkeleton = () => {
   return (
