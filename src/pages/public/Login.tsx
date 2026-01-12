@@ -117,7 +117,7 @@ const Login = () => {
                 {/* Footer */}
                 <div className="mt-8 pt-6 border-t border-slate-700 text-center text-sm text-slate-400">
                     <p>
-                        New admin user?{" "}
+                        New admin user?
                         <Link
                             to="/create-admin"
                             className="text-cyan-400 font-semibold hover:text-cyan-300 transition-colors"

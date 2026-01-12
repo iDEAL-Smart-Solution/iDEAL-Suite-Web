@@ -24,11 +24,11 @@ const CreateAdmin = () => {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
 
-  useEffect(() => {
-    if (!schoolId) {
-      navigate("/login");
-    }
-  }, [schoolId, navigate]);
+  // useEffect(() => {
+  //   if (!schoolId) {
+  //     navigate("/login");
+  //   }
+  // }, [schoolId, navigate]);
 
   const validate = () => {
     const e: Record<string, string> = {};
