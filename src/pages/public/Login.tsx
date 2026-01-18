@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock, LogIn, Users, GraduationCap, Shield } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { isEmailValid } from "../../utils/validators";
 
 const Login = () => {
-    const { login, demoLogin } = useAuth();
+    const { login, demoLogin, demoLoginAsDev, demoLoginAsStaff, demoLoginAsStudent } = useAuth();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
@@ -31,9 +31,20 @@ const Login = () => {
         }
     };
 
-    const handleDemoLogin = () => {
-        demoLogin();
-        navigate("/dashboard");
+    const handleDemoLogin = (role: string) => {
+        if (role === 'dev') {
+            demoLoginAsDev();
+            navigate("/dev/dashboard");
+        } else if (role === 'admin') {
+            demoLogin();
+            navigate("/dashboard");
+        } else if (role === 'staff') {
+            demoLoginAsStaff();
+            navigate("/dashboard");
+        } else if (role === 'student') {
+            demoLoginAsStudent();
+            navigate("/dashboard");
+        }
     };
 
     return (
@@ -105,29 +116,55 @@ const Login = () => {
 
                 {/* Demo Login */}
                 <button
-                    onClick={handleDemoLogin}
-                    className="w-full mt-4 px-6 py-3 border-2 border-cyan-500 text-cyan-400 font-semibold rounded-lg hover:bg-cyan-500/10 transition-all duration-300 hover:-translate-y-0.5"
+                    onClick={() => handleDemoLogin('dev')}
+                    className="w-full mt-4 px-6 py-3 border-2 border-purple-500 text-purple-400 font-semibold rounded-lg hover:bg-purple-500/10 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
                 >
-                    Try Demo Account
+                    <Shield className="w-5 h-5" />
+                    Demo Platform Admin
                 </button>
-                <p className="text-center text-xs text-slate-400 mt-3">
-                    No account needed - explore the dashboard instantly
-                </p>
 
-                {/* Footer */}
-                <div className="mt-8 pt-6 border-t border-slate-700 text-center text-sm text-slate-400">
-                    <p>
-                        New admin user?
-                        <Link
-                            to="/create-admin"
-                            className="text-cyan-400 font-semibold hover:text-cyan-300 transition-colors"
-                        >
-                            Create Admin Account
-                        </Link>
-                    </p>
-                </div>
+                <button
+                    onClick={() => handleDemoLogin('admin')}
+                    className="w-full px-6 py-3 border-2 border-cyan-500 text-cyan-400 font-semibold rounded-lg hover:bg-cyan-500/10 transition-all duration-300 hover:-translate-y-0.5"
+                >
+                    Try Demo Account (School Admin)
+                </button>
+
+                <button
+                    onClick={() => handleDemoLogin('staff')}
+                    className="w-full px-6 py-3 border-2 border-teal-500 text-teal-400 font-semibold rounded-lg hover:bg-teal-500/10 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                >
+                    <Users className="w-5 h-5" />
+                    Demo Staff
+                </button>
+
+                <button
+                    onClick={() => handleDemoLogin('student')}
+                    className="w-full px-6 py-3 border-2 border-pink-500 text-pink-400 font-semibold rounded-lg hover:bg-pink-500/10 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                >
+                    <GraduationCap className="w-5 h-5" />
+                    Demo Student
+                </button>
+            
+
+            <p className="text-center text-xs text-slate-400 mt-3">
+                No account needed - explore the dashboard instantly
+            </p>
+
+            {/* Footer */}
+            <div className="mt-8 pt-6 border-t border-slate-700 text-center text-sm text-slate-400">
+                <p>
+                    New admin user?
+                    <Link
+                        to="/create-admin"
+                        className="text-cyan-400 font-semibold hover:text-cyan-300 transition-colors"
+                    >
+                        Create Admin Account
+                    </Link>
+                </p>
             </div>
         </div>
+        </div >
     );
 };
 

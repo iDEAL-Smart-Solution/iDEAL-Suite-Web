@@ -69,9 +69,9 @@ const CreateAdmin = () => {
     }
   };
 
-  const handleDemoCreateAdmin = () => {
+  const handleDemoCreateAdmin = async () => {
     if (schoolId) {
-      demoCreateAdmin(schoolId);
+     await demoCreateAdmin(schoolId);
       navigate("/dashboard");
     }
   };

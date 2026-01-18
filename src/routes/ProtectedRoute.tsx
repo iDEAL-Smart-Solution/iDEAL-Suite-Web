@@ -15,8 +15,8 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // 🧪 Demo account: allow access without role checks
-  if (token === "demo-token") {
+  // 🧪 Demo account: allow access without role checks (both demo tokens)
+  if (token === "demo-token" || token === "dev-demo-token") {
     return children;
   }
 
