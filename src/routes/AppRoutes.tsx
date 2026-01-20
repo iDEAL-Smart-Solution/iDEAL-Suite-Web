@@ -1,10 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "../pages/public/Landing";
 import Login from "../pages/public/Login";
 import SchoolRegistration from "../pages/public/SchoolRegistration";
 import CreateAdmin from "../pages/public/CreateAdmin";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import DevDashboardLayout from "../components/layout/DevDashboardLayout";
 import DashboardHome from "../pages/dashboard/DashboardHome";
+import DevDashboardHome from "../pages/dashboard/DevDashboardHome";
+import SchoolsManagement from "../pages/dashboard/SchoolsManagement";
+import ProductsManagement from "../pages/dashboard/ProductsManagement";
+import SubscriptionsManagement from "../pages/dashboard/SubscriptionsManagement";
 import UserManagement from "../pages/dashboard/UserManagement";
 import SubscriptionManagement from "../pages/dashboard/SubscriptionManagement";
 import ProductMonitoring from "../pages/dashboard/ProductMonitoring";
@@ -15,16 +20,67 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Root redirect to landing */}
         <Route path="/" element={<Landing />} />
-
-        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register-school" element={<SchoolRegistration />} />
         <Route path="/signup" element={<SchoolRegistration />} />
         <Route path="/create-admin" element={<CreateAdmin />} />
 
-        {/* Protected Routes */}
+        <Route
+          path="/dev/dashboard"
+          element={
+            <ProtectedRoute>
+              <DevDashboardLayout>
+                <DevDashboardHome />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dev/schools"
+          element={
+            <ProtectedRoute>
+              <DevDashboardLayout>
+                <SchoolsManagement />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dev/subscriptions"
+          element={
+            <ProtectedRoute>
+              <DevDashboardLayout>
+                <SubscriptionsManagement />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dev/products"
+          element={
+            <ProtectedRoute>
+              <DevDashboardLayout>
+                <ProductsManagement />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dev/settings"
+          element={
+            <ProtectedRoute>
+              <DevDashboardLayout>
+                <ProfileSettings />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/dashboard"
           element={
