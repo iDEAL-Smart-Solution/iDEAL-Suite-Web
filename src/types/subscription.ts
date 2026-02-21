@@ -55,3 +55,35 @@ export type SubscriptionHistoryResponse = {
   page: number;
   limit: number;
 };
+
+/* ── Payment types ─────────────────────────────── */
+
+export type InitializePaymentRequest = {
+  subscriptionId: string;
+  schoolId: string;
+  amount: number;
+  email: string;
+  callbackUrl?: string;
+};
+
+export type InitializePaymentResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    authorizationUrl: string;
+    accessCode: string;
+    reference: string;
+  };
+};
+
+export type PaymentRecord = {
+  id: string;
+  subscriptionId: string;
+  schoolId: string;
+  amount: number;
+  reference: string;
+  status: "pending" | "success" | "failed";
+  paymentMethod: string;
+  paidAt?: string;
+  createdAt: string;
+};

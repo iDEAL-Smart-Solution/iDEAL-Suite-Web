@@ -25,6 +25,14 @@ export type GetProductsResponse = {
   total?: number;
 };
 
+export type CreateProductRequest = {
+  productName: string;
+  productCode: string;
+  description: string;
+  requiresSubscription: boolean;
+  category?: string;
+};
+
 export type UpdateProductStatusRequest = {
   productId: string;
   isActive: boolean;

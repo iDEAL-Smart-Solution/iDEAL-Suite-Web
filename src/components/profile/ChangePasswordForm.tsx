@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "../../lib/utils";
 import type { PasswordStrength } from "../../types/profile";
 
 interface ChangePasswordFormProps {
@@ -91,12 +92,12 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
   };
 
   return (
-    <form className="profile-form" onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label className="form-label">Current Password *</label>
+    <form className="space-y-5" onSubmit={handleSubmit}>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">Current Password *</label>
         <input
           type="password"
-          className="input"
+          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.currentPassword}
           onChange={(e) =>
             setFormData({ ...formData, currentPassword: e.target.value })
@@ -105,15 +106,15 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
           placeholder="Enter your current password"
         />
         {errors.currentPassword && (
-          <span className="error-text">{errors.currentPassword}</span>
+          <span className="text-xs font-medium text-red-400">{errors.currentPassword}</span>
         )}
       </div>
 
-      <div className="form-group">
-        <label className="form-label">New Password *</label>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">New Password *</label>
         <input
           type="password"
-          className="input"
+          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.newPassword}
           onChange={(e) => handleNewPasswordChange(e.target.value)}
           disabled={isLoading}
@@ -122,11 +123,25 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
 
         {/* Password Strength Indicator */}
         {formData.newPassword && (
-          <div className="password-strength-container">
-            <div
-              className={`password-strength-bar strength-${passwordStrength}`}
-            ></div>
-            <span className={`password-strength-text ${passwordStrength}`}>
+          <div className="mt-2 space-y-1">
+            <div className="w-full h-1.5 bg-surface-700 rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  passwordStrength === "weak" && "w-1/3 bg-red-500",
+                  passwordStrength === "medium" && "w-2/3 bg-yellow-500",
+                  passwordStrength === "strong" && "w-full bg-emerald-500"
+                )}
+              />
+            </div>
+            <span
+              className={cn(
+                "text-xs",
+                passwordStrength === "weak" && "text-red-400",
+                passwordStrength === "medium" && "text-yellow-400",
+                passwordStrength === "strong" && "text-emerald-400"
+              )}
+            >
               {passwordStrength === "weak" && "Weak password"}
               {passwordStrength === "medium" && "Medium strength"}
               {passwordStrength === "strong" && "Strong password"}
@@ -136,24 +151,24 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
 
         {/* Password Requirements */}
         {formData.newPassword && (
-          <div className="password-requirements">
-            <p className="requirements-title">Requirements:</p>
-            <ul className="requirements-list">
+          <div className="mt-3 space-y-1">
+            <p className="text-xs font-medium text-slate-400">Requirements:</p>
+            <ul className="space-y-1 text-xs">
               <li
-                className={
-                  formData.newPassword.length >= 8 ? "met" : "not-met"
-                }
+                className={cn(
+                  formData.newPassword.length >= 8 ? "text-emerald-400" : "text-slate-500"
+                )}
               >
                 {formData.newPassword.length >= 8 ? "✓" : "○"} At least 8
                 characters
               </li>
               <li
-                className={
+                className={cn(
                   /[a-z]/.test(formData.newPassword) &&
                   /[A-Z]/.test(formData.newPassword)
-                    ? "met"
-                    : "not-met"
-                }
+                    ? "text-emerald-400"
+                    : "text-slate-500"
+                )}
               >
                 {/[a-z]/.test(formData.newPassword) &&
                 /[A-Z]/.test(formData.newPassword)
@@ -161,9 +176,9 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
                   : "○"} Mixed case letters (a-z, A-Z)
               </li>
               <li
-                className={
-                  /[0-9]/.test(formData.newPassword) ? "met" : "not-met"
-                }
+                className={cn(
+                  /[0-9]/.test(formData.newPassword) ? "text-emerald-400" : "text-slate-500"
+                )}
               >
                 {/[0-9]/.test(formData.newPassword) ? "✓" : "○"} Contains numbers
               </li>
@@ -172,15 +187,15 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         )}
 
         {errors.newPassword && (
-          <span className="error-text">{errors.newPassword}</span>
+          <span className="text-xs font-medium text-red-400">{errors.newPassword}</span>
         )}
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Confirm Password *</label>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">Confirm Password *</label>
         <input
           type="password"
-          className="input"
+          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.confirmPassword}
           onChange={(e) =>
             setFormData({ ...formData, confirmPassword: e.target.value })
@@ -189,13 +204,13 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
           placeholder="Confirm your new password"
         />
         {errors.confirmPassword && (
-          <span className="error-text">{errors.confirmPassword}</span>
+          <span className="text-xs font-medium text-red-400">{errors.confirmPassword}</span>
         )}
       </div>
 
       <button
         type="submit"
-        className="btn btn-primary form-submit-btn"
+        className="w-full h-10 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50"
         disabled={isLoading}
       >
         {isLoading ? "Changing..." : "Change Password"}

@@ -1,19 +1,30 @@
 import type { ReactNode } from "react";
+import { cn } from "../../lib/utils";
 
 interface CardProps {
-  icon: ReactNode;
+  icon?: ReactNode;
   title: string;
-  description: string;
+  description?: string;
+  children?: ReactNode;
+  className?: string;
 }
 
-const Card = ({ icon, title, description }: CardProps) => {
-  return (
-    <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 text-center shadow-md hover:shadow-lg hover:-translate-y-1 transition-all">
-      <div className="text-blue-400 mb-4 flex justify-center">{icon}</div>
-      <h3 className="text-lg font-bold text-slate-50 mb-2">{title}</h3>
-      <p className="text-sm text-slate-400">{description}</p>
-    </div>
-  );
-};
+const Card = ({ icon, title, description, children, className }: CardProps) => (
+  <div
+    className={cn(
+      "bg-surface-800 border border-surface-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200",
+      className
+    )}
+  >
+    {icon && (
+      <div className="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-400 flex items-center justify-center mb-4">
+        {icon}
+      </div>
+    )}
+    <h3 className="text-base font-semibold text-white mb-1">{title}</h3>
+    {description && <p className="text-sm text-slate-400 leading-relaxed">{description}</p>}
+    {children}
+  </div>
+);
 
 export default Card;

@@ -1,78 +1,91 @@
 @import "tailwindcss";
 
+/* ── Design tokens ─────────────────────────────────────────── */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --color-brand-50: oklch(0.97 0.02 200);
+  --color-brand-100: oklch(0.93 0.04 200);
+  --color-brand-200: oklch(0.86 0.07 200);
+  --color-brand-300: oklch(0.76 0.11 200);
+  --color-brand-400: oklch(0.66 0.14 195);
+  --color-brand-500: oklch(0.55 0.15 195);
+  --color-brand-600: oklch(0.48 0.14 200);
+  --color-brand-700: oklch(0.42 0.12 200);
+
+  --color-surface-950: oklch(0.13 0.02 260);
+  --color-surface-900: oklch(0.17 0.02 260);
+  --color-surface-800: oklch(0.22 0.02 260);
+  --color-surface-700: oklch(0.30 0.02 260);
+  --color-surface-600: oklch(0.38 0.015 260);
+
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --radius-badge: 6px;
+}
+
+/* ── Base layer ────────────────────────────────────────────── */
 @layer base {
   :root {
     color-scheme: dark;
-  }
-
-  body {
-    @apply bg-slate-950 text-slate-50 antialiased;
   }
 
   html {
     @apply scroll-smooth;
   }
 
-  a {
-    @apply text-cyan-500 font-semibold transition-colors duration-300 hover:text-cyan-400;
+  body {
+    @apply bg-surface-950 text-slate-100 antialiased font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
-  }
-
+  /* Typography scale */
   h1 {
-    @apply text-4xl;
+    @apply text-3xl font-bold tracking-tight sm:text-4xl;
   }
-
   h2 {
-    @apply text-3xl;
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  h3 {
+    @apply text-xl font-semibold;
+  }
+  h4 {
+    @apply text-lg font-semibold;
   }
 
-  h3 {
-    @apply text-2xl;
+  /* Focus ring */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-400;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-600 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-surface-700;
   }
 }
 
+/* ── Component layer ───────────────────────────────────────── */
 @layer components {
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-lg transition-all duration-300 cursor-pointer border-0;
+  /* Skeleton animation */
+  .skeleton {
+    @apply rounded-lg bg-surface-700 animate-pulse;
   }
+}
 
-  .btn-primary {
-    @apply bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5;
-  }
-
-  .btn-secondary {
-    @apply bg-transparent border-2 border-cyan-500 text-cyan-500 hover:bg-cyan-500/10 hover:-translate-y-0.5;
-  }
-
-  .btn:disabled {
-    @apply opacity-50 cursor-not-allowed hover:translate-y-0;
-  }
-
-  .card {
-    @apply bg-slate-800 border border-slate-700 rounded-lg shadow-lg;
-  }
-
-  .input-base {
-    @apply px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-50 transition-all duration-300 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 placeholder-slate-400;
-  }
-
-  .form-group {
-    @apply flex flex-col gap-2;
-  }
-
-  .form-label {
-    @apply block text-sm font-semibold text-slate-200;
-  }
-
-  .error-text {
-    @apply text-red-400 text-xs font-medium;
-  }
-
-  .error-banner {
-    @apply p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium;
+/* ── Utility layer ─────────────────────────────────────────── */
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-400 to-brand-300 bg-clip-text text-transparent;
   }
 }
 

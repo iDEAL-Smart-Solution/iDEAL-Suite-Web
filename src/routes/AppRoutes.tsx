@@ -1,24 +1,38 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Landing from "../pages/public/Landing";
-import Login from "../pages/public/Login";
-import SchoolRegistration from "../pages/public/SchoolRegistration";
-import CreateAdmin from "../pages/public/CreateAdmin";
-import DashboardLayout from "../components/layout/DashboardLayout";
-import DevDashboardLayout from "../components/layout/DevDashboardLayout";
-import DashboardHome from "../pages/dashboard/DashboardHome";
-import DevDashboardHome from "../pages/dashboard/DevDashboardHome";
-import SchoolsManagement from "../pages/dashboard/SchoolsManagement";
-import ProductsManagement from "../pages/dashboard/ProductsManagement";
-import SubscriptionsManagement from "../pages/dashboard/SubscriptionsManagement";
-import UserManagement from "../pages/dashboard/UserManagement";
-import SubscriptionManagement from "../pages/dashboard/SubscriptionManagement";
-import ProductMonitoring from "../pages/dashboard/ProductMonitoring";
-import ProfileSettings from "../pages/dashboard/ProfileSettings";
 import ProtectedRoute from "./ProtectedRoute";
+
+/* ── Lazy-loaded pages ─────────────────────────────── */
+const Landing = lazy(() => import("../pages/public/Landing"));
+const Login = lazy(() => import("../pages/public/Login"));
+const SchoolRegistration = lazy(() => import("../pages/public/SchoolRegistration"));
+const CreateAdmin = lazy(() => import("../pages/public/CreateAdmin"));
+
+const DashboardLayout = lazy(() => import("../components/layout/DashboardLayout"));
+const DevDashboardLayout = lazy(() => import("../components/layout/DevDashboardLayout"));
+
+const DashboardHome = lazy(() => import("../pages/dashboard/DashboardHome"));
+const DevDashboardHome = lazy(() => import("../pages/dashboard/DevDashboardHome"));
+const SchoolsManagement = lazy(() => import("../pages/dashboard/SchoolsManagement"));
+const ProductsManagement = lazy(() => import("../pages/dashboard/ProductsManagement"));
+const SubscriptionsManagement = lazy(() => import("../pages/dashboard/SubscriptionsManagement"));
+const UserManagement = lazy(() => import("../pages/dashboard/UserManagement"));
+const SubscriptionManagement = lazy(() => import("../pages/dashboard/SubscriptionManagement"));
+const ProductMonitoring = lazy(() => import("../pages/dashboard/ProductMonitoring"));
+const ProfileSettings = lazy(() => import("../pages/dashboard/ProfileSettings"));
+const PaymentHistory = lazy(() => import("../pages/dashboard/PaymentHistory"));
+
+/* ── Suspense fallback ─────────────────────────────── */
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen bg-surface-950">
+    <div className="w-8 h-8 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
+  </div>
+);
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
+      <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
@@ -65,6 +79,17 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <DevDashboardLayout>
                 <ProductsManagement />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dev/payments"
+          element={
+            <ProtectedRoute>
+              <DevDashboardLayout>
+                <PaymentHistory />
               </DevDashboardLayout>
             </ProtectedRoute>
           }
@@ -126,6 +151,17 @@ const AppRoutes = () => {
         />
 
         <Route
+          path="/payments"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <PaymentHistory />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/profile"
           element={
             <ProtectedRoute>
@@ -147,6 +183,7 @@ const AppRoutes = () => {
           }
         />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { cn } from "../../lib/utils";
 import type { User, CreateUserRequest } from "../../types/user";
 import { UserRole } from "../../types/user";
 
@@ -117,18 +118,18 @@ const UserModal: React.FC<UserModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{user ? "Edit User" : "Add New User"}</h2>
-          <button className="modal-close" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
+      <div className="bg-surface-800 border border-surface-700 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-6 border-b border-surface-700">
+          <h2 className="text-lg font-bold text-white">{user ? "Edit User" : "Add New User"}</h2>
+          <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-surface-700 transition-colors" onClick={onClose}>
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="user-form">
-          <div className="form-group">
-            <label htmlFor="firstName">First Name *</label>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label htmlFor="firstName" className="block text-sm font-medium text-slate-300 mb-1.5">First Name *</label>
             <input
               type="text"
               id="firstName"
@@ -136,15 +137,18 @@ const UserModal: React.FC<UserModalProps> = ({
               value={formData.firstName}
               onChange={handleChange}
               placeholder="Enter first name"
-              className={errors.firstName ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.firstName ? "border-red-500" : "border-surface-600"
+              )}
             />
             {errors.firstName && (
-              <span className="error-message">{errors.firstName}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.firstName}</span>
             )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="lastName">Last Name *</label>
+          <div>
+            <label htmlFor="lastName" className="block text-sm font-medium text-slate-300 mb-1.5">Last Name *</label>
             <input
               type="text"
               id="lastName"
@@ -152,15 +156,18 @@ const UserModal: React.FC<UserModalProps> = ({
               value={formData.lastName}
               onChange={handleChange}
               placeholder="Enter last name"
-              className={errors.lastName ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.lastName ? "border-red-500" : "border-surface-600"
+              )}
             />
             {errors.lastName && (
-              <span className="error-message">{errors.lastName}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.lastName}</span>
             )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email *</label>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1.5">Email *</label>
             <input
               type="email"
               id="email"
@@ -169,16 +176,19 @@ const UserModal: React.FC<UserModalProps> = ({
               onChange={handleChange}
               placeholder="Enter email address"
               disabled={!!user}
-              className={errors.email ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50",
+                errors.email ? "border-red-500" : "border-surface-600"
+              )}
             />
             {errors.email && (
-              <span className="error-message">{errors.email}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.email}</span>
             )}
           </div>
 
           {!user && (
-            <div className="form-group">
-              <label htmlFor="password">Password *</label>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1.5">Password *</label>
               <input
                 type="password"
                 id="password"
@@ -186,16 +196,19 @@ const UserModal: React.FC<UserModalProps> = ({
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter password"
-                className={errors.password ? "error" : ""}
+                className={cn(
+                  "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                  errors.password ? "border-red-500" : "border-surface-600"
+                )}
               />
               {errors.password && (
-                <span className="error-message">{errors.password}</span>
+                <span className="text-xs font-medium text-red-400 mt-1 block">{errors.password}</span>
               )}
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="phoneNumber">Phone Number *</label>
+          <div>
+            <label htmlFor="phoneNumber" className="block text-sm font-medium text-slate-300 mb-1.5">Phone Number *</label>
             <input
               type="tel"
               id="phoneNumber"
@@ -203,21 +216,27 @@ const UserModal: React.FC<UserModalProps> = ({
               value={formData.phoneNumber}
               onChange={handleChange}
               placeholder="Enter phone number"
-              className={errors.phoneNumber ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.phoneNumber ? "border-red-500" : "border-surface-600"
+              )}
             />
             {errors.phoneNumber && (
-              <span className="error-message">{errors.phoneNumber}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.phoneNumber}</span>
             )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="role">Role *</label>
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-slate-300 mb-1.5">Role *</label>
             <select
               id="role"
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className={errors.role ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.role ? "border-red-500" : "border-surface-600"
+              )}
             >
               <option value={UserRole.SuperAdmin}>SuperAdmin</option>
               <option value={UserRole.Staff}>Staff</option>
@@ -225,14 +244,14 @@ const UserModal: React.FC<UserModalProps> = ({
               <option value={UserRole.Dev}>Dev</option>
             </select>
             {errors.role && (
-              <span className="error-message">{errors.role}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.role}</span>
             )}
           </div>
 
-          <div className="modal-actions">
+          <div className="flex items-center justify-end gap-3 p-6 border-t border-surface-700 -mx-6 -mb-4 mt-6">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="px-4 py-2 rounded-lg bg-surface-700 hover:bg-surface-600 text-slate-200 font-medium transition-colors duration-200"
               onClick={onClose}
               disabled={isLoading}
             >
@@ -240,7 +259,7 @@ const UserModal: React.FC<UserModalProps> = ({
             </button>
             <button
               type="submit"
-              className="btn btn-primary"
+              className="px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-medium transition-colors duration-200 disabled:opacity-50"
               disabled={isLoading}
             >
               {isLoading ? "Saving..." : "Save User"}

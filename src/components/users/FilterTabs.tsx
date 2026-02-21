@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "../../lib/utils";
 import type { UserRoleType } from "../../types/user";
 import { UserRole } from "../../types/user";
 
@@ -26,19 +27,20 @@ const FilterTabs: React.FC<FilterTabsProps> = ({
   ];
 
   return (
-    <div className="flex gap-3 mb-6 border-b border-slate-700 overflow-x-auto">
+    <div className="flex gap-3 mb-6 border-b border-surface-700 overflow-x-auto">
       {filters.map((filter) => (
         <button
           key={filter.value === "all" ? "all" : filter.value}
-          className={`px-4 py-3 font-semibold transition-colors whitespace-nowrap border-b-2 ${
+          className={cn(
+            "px-4 py-3 font-semibold transition-colors duration-200 whitespace-nowrap border-b-2",
             activeFilter === filter.value
-              ? "border-blue-500 text-blue-400"
-              : "border-transparent text-slate-400 hover:text-slate-50"
-          }`}
+              ? "border-brand-400 text-brand-400"
+              : "border-transparent text-slate-400 hover:text-white"
+          )}
           onClick={() => onFilterChange(filter.value)}
         >
           {filter.label}
-          <span className="ml-2 text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded-full">
+          <span className="ml-2 text-xs bg-surface-700 text-slate-300 px-2 py-1 rounded-full">
             {filter.count}
           </span>
         </button>

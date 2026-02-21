@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { cn } from "../../lib/utils";
 import type { CreateSubscriptionRequest } from "../../types/subscription";
 import { SubscriptionStatus, PaymentMethod } from "../../types/subscription";
 
@@ -121,18 +122,18 @@ const CreateSubscriptionModal: React.FC<CreateSubscriptionModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{isRenewal ? "Renew Subscription" : "Create New Subscription"}</h2>
-          <button className="modal-close" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
+      <div className="bg-surface-800 border border-surface-700 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-6 border-b border-surface-700">
+          <h2 className="text-lg font-bold text-white">{isRenewal ? "Renew Subscription" : "Create New Subscription"}</h2>
+          <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-surface-700 transition-colors" onClick={onClose}>
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="subscription-form">
-          <div className="form-group">
-            <label htmlFor="paidStudentSlots">Student Slots *</label>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label htmlFor="paidStudentSlots" className="block text-sm font-medium text-slate-300 mb-1.5">Student Slots *</label>
             <input
               type="number"
               id="paidStudentSlots"
@@ -141,52 +142,64 @@ const CreateSubscriptionModal: React.FC<CreateSubscriptionModalProps> = ({
               onChange={handleChange}
               placeholder="Enter number of student slots (e.g., 200)"
               min="1"
-              className={errors.paidStudentSlots ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.paidStudentSlots ? "border-red-500" : "border-surface-600"
+              )}
             />
             {errors.paidStudentSlots && (
-              <span className="error-message">{errors.paidStudentSlots}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.paidStudentSlots}</span>
             )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="startDate">Start Date *</label>
+          <div>
+            <label htmlFor="startDate" className="block text-sm font-medium text-slate-300 mb-1.5">Start Date *</label>
             <input
               type="date"
               id="startDate"
               name="startDate"
               value={formData.startDate}
               onChange={handleChange}
-              className={errors.startDate ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.startDate ? "border-red-500" : "border-surface-600"
+              )}
             />
             {errors.startDate && (
-              <span className="error-message">{errors.startDate}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.startDate}</span>
             )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="expiryDate">Expiry Date *</label>
+          <div>
+            <label htmlFor="expiryDate" className="block text-sm font-medium text-slate-300 mb-1.5">Expiry Date *</label>
             <input
               type="date"
               id="expiryDate"
               name="expiryDate"
               value={formData.expiryDate}
               onChange={handleChange}
-              className={errors.expiryDate ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.expiryDate ? "border-red-500" : "border-surface-600"
+              )}
             />
             {errors.expiryDate && (
-              <span className="error-message">{errors.expiryDate}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.expiryDate}</span>
             )}
-            <small>Default: 1 year from start date</small>
+            <p className="text-xs text-slate-500 mt-1">Default: 1 year from start date</p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="paymentMethod">Payment Method *</label>
+          <div>
+            <label htmlFor="paymentMethod" className="block text-sm font-medium text-slate-300 mb-1.5">Payment Method *</label>
             <select
               id="paymentMethod"
               name="paymentMethod"
               value={formData.paymentMethod}
               onChange={handleChange}
-              className={errors.paymentMethod ? "error" : ""}
+              className={cn(
+                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.paymentMethod ? "border-red-500" : "border-surface-600"
+              )}
             >
               <option value={PaymentMethod.Card}>Card</option>
               <option value={PaymentMethod.BankTransfer}>Bank Transfer</option>
@@ -194,17 +207,18 @@ const CreateSubscriptionModal: React.FC<CreateSubscriptionModalProps> = ({
               <option value={PaymentMethod.Cash}>Cash</option>
             </select>
             {errors.paymentMethod && (
-              <span className="error-message">{errors.paymentMethod}</span>
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.paymentMethod}</span>
             )}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="status">Status *</label>
+          <div>
+            <label htmlFor="status" className="block text-sm font-medium text-slate-300 mb-1.5">Status *</label>
             <select
               id="status"
               name="status"
               value={formData.status}
               onChange={handleChange}
+              className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200"
             >
               <option value={SubscriptionStatus.Pending}>Pending</option>
               <option value={SubscriptionStatus.Active}>Active</option>
@@ -212,13 +226,13 @@ const CreateSubscriptionModal: React.FC<CreateSubscriptionModalProps> = ({
                 Deactivated
               </option>
             </select>
-            <small>Default: Pending (until payment confirmed)</small>
+            <p className="text-xs text-slate-500 mt-1">Default: Pending (until payment confirmed)</p>
           </div>
 
-          <div className="modal-actions">
+          <div className="flex items-center justify-end gap-3 p-6 border-t border-surface-700 -mx-6 -mb-4 mt-6">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="px-4 py-2 rounded-lg bg-surface-700 hover:bg-surface-600 text-slate-200 font-medium transition-colors duration-200"
               onClick={onClose}
               disabled={isLoading}
             >
@@ -226,7 +240,7 @@ const CreateSubscriptionModal: React.FC<CreateSubscriptionModalProps> = ({
             </button>
             <button
               type="submit"
-              className="btn btn-primary"
+              className="px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-medium transition-colors duration-200 disabled:opacity-50"
               disabled={isLoading}
             >
               {isLoading

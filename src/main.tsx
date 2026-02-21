@@ -2,12 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import {AuthProvider}   from './context/AuthContext.tsx';
+import { useAuthStore } from './stores/useAuthStore';
+
+// Hydrate auth state from sessionStorage before rendering
+useAuthStore.getState().hydrate();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <App />
   </StrictMode>,
 )

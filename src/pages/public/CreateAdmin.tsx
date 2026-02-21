@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import api from "../../services/api";
 import { isEmailValid, isPhoneValid } from "../../utils/validators";
-import { useAuth } from "../../context/AuthContext";
-import { User, Lock, Phone, ArrowRight } from "lucide-react";
+import { useUserStore } from "../../stores/useUserStore";
+import { ArrowRight } from "lucide-react";
+import { cn } from "../../lib/utils";
 
 const CreateAdmin = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { demoCreateAdmin } = useAuth();
+  const { registerUser } = useUserStore();
 
   const schoolId = params.get("schoolId");
 
@@ -52,7 +52,7 @@ const CreateAdmin = () => {
       setLoading(true);
       setApiError("");
 
-      await api.post("/user/register", {
+      await registerUser({
         ...form,
         schoolId,
         role: 1, // SuperAdmin
@@ -71,15 +71,14 @@ const CreateAdmin = () => {
 
   const handleDemoCreateAdmin = async () => {
     if (schoolId) {
-     await demoCreateAdmin(schoolId);
       navigate("/dashboard");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-surface-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-slate-800 rounded-lg shadow-xl p-8">
+        <div className="bg-surface-800 border border-surface-700 rounded-xl shadow-2xl p-8">
           <h2 className="text-3xl font-bold text-white mb-2">Create Admin Account</h2>
           <p className="text-slate-400 mb-8">
             This account will manage your school on iDEAL-Suite.
@@ -93,9 +92,10 @@ const CreateAdmin = () => {
               </label>
               <input
                 type="text"
-                className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
-                  errors.firstName ? "border-red-500" : "border-slate-600"
-                }`}
+                className={cn(
+                  "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all",
+                  errors.firstName ? "border-red-500" : "border-surface-600"
+                )}
                 value={form.firstName}
                 onChange={(e) =>
                   setForm({ ...form, firstName: e.target.value })
@@ -113,9 +113,10 @@ const CreateAdmin = () => {
               </label>
               <input
                 type="text"
-                className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
-                  errors.lastName ? "border-red-500" : "border-slate-600"
-                }`}
+                className={cn(
+                  "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all",
+                  errors.lastName ? "border-red-500" : "border-surface-600"
+                )}
                 value={form.lastName}
                 onChange={(e) =>
                   setForm({ ...form, lastName: e.target.value })
@@ -133,9 +134,10 @@ const CreateAdmin = () => {
               </label>
               <input
                 type="email"
-                className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
-                  errors.email ? "border-red-500" : "border-slate-600"
-                }`}
+                className={cn(
+                  "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all",
+                  errors.email ? "border-red-500" : "border-surface-600"
+                )}
                 value={form.email}
                 onChange={(e) =>
                   setForm({ ...form, email: e.target.value })
@@ -153,9 +155,10 @@ const CreateAdmin = () => {
               </label>
               <input
                 type="password"
-                className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
-                  errors.password ? "border-red-500" : "border-slate-600"
-                }`}
+                className={cn(
+                  "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all",
+                  errors.password ? "border-red-500" : "border-surface-600"
+                )}
                 value={form.password}
                 onChange={(e) =>
                   setForm({ ...form, password: e.target.value })
@@ -174,9 +177,10 @@ const CreateAdmin = () => {
               <input
                 type="text"
                 placeholder="+234801234567"
-                className={`w-full px-4 py-3 bg-slate-700 border rounded-lg text-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
-                  errors.phoneNumber ? "border-red-500" : "border-slate-600"
-                }`}
+                className={cn(
+                  "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all",
+                  errors.phoneNumber ? "border-red-500" : "border-surface-600"
+                )}
                 value={form.phoneNumber}
                 onChange={(e) =>
                   setForm({ ...form, phoneNumber: e.target.value })
@@ -197,7 +201,7 @@ const CreateAdmin = () => {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              className="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
             >
               {loading ? "Creating Account..." : <>Create Admin Account <ArrowRight size={20} /></>}
             </button>
@@ -205,7 +209,7 @@ const CreateAdmin = () => {
             {/* Demo Button */}
             <button
               onClick={handleDemoCreateAdmin}
-              className="w-full bg-slate-700 border border-slate-600 text-slate-50 py-3 rounded-lg font-semibold hover:bg-slate-600 transition-colors"
+              className="w-full bg-surface-700 border border-surface-600 text-slate-200 py-3 rounded-lg font-semibold hover:bg-surface-600 transition-colors"
             >
               Try Demo Admin Setup
             </button>
@@ -213,7 +217,7 @@ const CreateAdmin = () => {
             {/* Footer */}
             <p className="text-center text-slate-400 mt-6">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-400 font-semibold hover:text-blue-300">
+              <Link to="/login" className="text-brand-400 font-semibold hover:text-brand-300">
                 Login
               </Link>
             </p>
