@@ -19,8 +19,13 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   fetchStats: async (schoolId) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await api.get<DashboardStats>(`/Dashboard/school/${schoolId}`);
-      set({ stats: res.data, isLoading: false });
+      const res = await api.get(`/Dashboard/school/${schoolId}`);
+      const stats: DashboardStats = res.data?.data ?? res.data;
+      if (!stats || res.status === 204) {
+        set({ stats: null, error: "No dashboard data available", isLoading: false });
+        return;
+      }
+      set({ stats, isLoading: false });
     } catch (err: any) {
       set({
         error: err.response?.data?.message || "Failed to load dashboard data",

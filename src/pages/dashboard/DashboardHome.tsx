@@ -8,6 +8,7 @@ import Skeleton from "../../components/ui/Skeleton";
 import StudentsGrowthChart from "../../components/charts/StudentsGrowthChart";
 import UsageChart from "../../components/charts/UsageChart";
 import SubscriptionStatusCard from "../../components/ui/SubscriptionStatusCard";
+import SystemStatusCard from "../../components/ui/SystemStatusCard";
 import ProductUsageTable from "../../components/ui/ProductUsageTable";
 import ExpiryWarningBanner from "../../components/ui/ExpiryWarningBanner";
 
@@ -76,6 +77,7 @@ const DashboardHome = () => {
           expiryDate={stats.expiryDate}
           paymentMethod={stats.paymentMethod}
         />
+        <SystemStatusCard />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

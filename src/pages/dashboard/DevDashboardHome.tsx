@@ -6,6 +6,7 @@ import { useStudentStore } from "../../stores/useStudentStore";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 import MetricCard from "../../components/ui/MetricCard";
 import MetricCardSkeleton from "../../components/ui/MetricCardSkeleton";
+import SystemStatusCard from "../../components/ui/SystemStatusCard";
 
 const DevDashboardHome = () => {
   const user = useAuthStore((s) => s.user);
@@ -51,6 +52,8 @@ const DevDashboardHome = () => {
           </>
         )}
       </div>
+
+      <SystemStatusCard />
 
       <div className="bg-surface-800 rounded-xl p-6">
         <h2 className="text-xl font-bold text-white mb-4">Recent Schools</h2>

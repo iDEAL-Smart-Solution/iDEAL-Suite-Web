@@ -36,6 +36,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   const [step, setStep] = useState<"form" | "processing" | "redirect">("form");
 
   const handlePay = async () => {
+    console.log("handlePay called");
+    console.log("subscription:", subscription);
+    console.log("schoolId:", schoolId);
+    console.log("email:", email);
+    console.log("amount:", amount);
+    
     if (!subscription) {
       setPaymentError("No subscription found. Please create a subscription first.");
       return;
@@ -51,6 +57,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setStep("processing");
 
     try {
+      console.log("Calling initializePayment with:", {
+        subscriptionId: subscription.id,
+        schoolId,
+        amount,
+        email,
+        callbackUrl: `${window.location.origin}/subscriptions`,
+      });
+      
       const authorizationUrl = await initializePayment({
         subscriptionId: subscription.id,
         schoolId,
@@ -58,18 +72,23 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         email,
         callbackUrl: `${window.location.origin}/subscriptions`,
       });
+      
+      console.log("authorizationUrl received:", authorizationUrl);
 
       if (authorizationUrl) {
         setStep("redirect");
         // Short delay so user sees the redirect message
         setTimeout(() => {
+          console.log("Redirecting to:", authorizationUrl);
           window.location.href = authorizationUrl;
         }, 1500);
       } else {
+        console.error("No authorization URL returned");
         setStep("form");
-        setPaymentError("Payment gateway did not return a redirect URL. Please try again.");
+        setPaymentError("Payment gateway did not return a redirect URL. Please check console for details.");
       }
-    } catch {
+    } catch (err) {
+      console.error("Payment initialization error:", err);
       setStep("form");
     }
   };
@@ -85,6 +104,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   if (!isOpen) return null;
 
   const displayError = paymentError || error;
+  const canPay = subscription && !isInitializing && amount >= 1000;
 
   return (
     <div
@@ -224,23 +244,31 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
         {/* Footer */}
         {step === "form" && (
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-surface-700">
-            <button
-              type="button"
-              className="px-4 py-2.5 rounded-lg bg-surface-700 hover:bg-surface-600 text-slate-200 font-medium transition-colors duration-200"
-              onClick={handleClose}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="px-6 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors duration-200 disabled:opacity-50 flex items-center gap-2"
-              onClick={handlePay}
-              disabled={isInitializing || !subscription}
-            >
-              <CreditCard className="w-4 h-4" />
-              Pay ₦{amount.toLocaleString()}
-            </button>
+          <div className="p-6 border-t border-surface-700">
+            {!subscription && (
+              <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 text-sm">
+                ⚠️ No subscription available. Please create a subscription before making payment.
+              </div>
+            )}
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                className="px-4 py-2.5 rounded-lg bg-surface-700 hover:bg-surface-600 text-slate-200 font-medium transition-colors duration-200"
+                onClick={handleClose}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-6 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                onClick={handlePay}
+                disabled={!canPay}
+                title={!subscription ? "No subscription available" : !canPay ? "Please fix errors above" : ""}
+              >
+                <CreditCard className="w-4 h-4" />
+                Pay ₦{amount.toLocaleString()}
+              </button>
+            </div>
           </div>
         )}
       </div>
