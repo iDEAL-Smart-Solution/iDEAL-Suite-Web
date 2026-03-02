@@ -1,5 +1,6 @@
 import { AlertTriangle, X } from "lucide-react";
 import { useState } from "react";
+import { cn } from "../../lib/utils";
 
 interface ExpiryWarningBannerProps {
   expiryDate: string;
@@ -23,31 +24,30 @@ const ExpiryWarningBanner = ({ expiryDate }: ExpiryWarningBannerProps) => {
 
   return (
     <div
-      className={`flex items-center gap-3 p-4 mb-6 rounded-lg border ${
+      role="alert"
+      className={cn(
+        "flex items-center gap-3 p-4 mb-6 rounded-xl border transition-all duration-200",
         isAlert
-          ? "bg-red-500/10 border-red-500/30"
-          : "bg-yellow-500/10 border-yellow-500/30"
-      }`}
+          ? "bg-red-500/10 border-red-500/20 text-red-400"
+          : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+      )}
     >
-      <AlertTriangle
-        size={20}
-        className={isAlert ? "text-red-400 flex-shrink-0" : "text-yellow-400 flex-shrink-0"}
-      />
+      <AlertTriangle size={20} className="flex-shrink-0" />
       <div className="flex-1">
-        <strong className={isAlert ? "text-red-400" : "text-yellow-400"}>
+        <strong className="block text-sm font-semibold">
           Your subscription expires in {daysUntilExpiry} day
           {daysUntilExpiry !== 1 ? "s" : ""}
         </strong>
-        <p className={`text-sm mt-1 ${isAlert ? "text-red-400" : "text-yellow-400"}`}>
+        <p className="text-sm mt-0.5 opacity-80">
           Renew now to avoid interruption.
         </p>
       </div>
       <button
         onClick={() => setDismissed(true)}
-        className={`bg-transparent border-none cursor-pointer p-1 flex items-center flex-shrink-0 hover:opacity-75 transition-opacity`}
+        className="flex-shrink-0 p-1.5 rounded-lg hover:bg-white/5 transition-colors duration-200"
         aria-label="Dismiss warning"
       >
-        <X size={18} className={isAlert ? "text-red-400" : "text-yellow-400"} />
+        <X size={18} />
       </button>
     </div>
   );

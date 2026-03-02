@@ -6,8 +6,18 @@ import {
   Package,
   UserCircle,
   X,
+  Wallet,
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { cn } from "../../lib/utils";
+import { useAuthStore } from "../../stores/useAuthStore";
+
+const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
+  cn(
+    "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200",
+    isActive
+      ? "bg-brand-500/10 text-brand-400 border-l-[3px] border-brand-400"
+      : "text-slate-400 hover:text-slate-200 hover:bg-surface-800"
+  );
 
 const Sidebar = ({
   isOpen = false,
@@ -16,104 +26,62 @@ const Sidebar = ({
   isOpen?: boolean;
   onClose?: () => void;
 }) => {
-  const { user } = useAuth();
+  const user = useAuthStore((s) => s.user);
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen w-64 bg-slate-800 border-r border-slate-700 flex flex-col transition-all duration-300 z-40 ${
+      className={cn(
+        "fixed left-0 top-0 h-screen w-64 bg-surface-900 border-r border-surface-700 flex flex-col transition-transform duration-300 z-40",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-      }`}
-      aria-hidden={!isOpen}
+      )}
+      aria-label="Main navigation"
     >
       {/* Sidebar Header */}
-      <div className="flex justify-between items-center p-6 border-b border-slate-700">
-        <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text">
-          iDEAL-Suite
-        </div>
+      <div className="flex justify-between items-center p-5 border-b border-surface-700">
+        <span className="text-xl font-bold text-gradient">iDEAL-Suite</span>
         <button
-          className="lg:hidden text-slate-400 hover:text-slate-50 transition-colors"
+          className="lg:hidden text-slate-400 hover:text-slate-50 transition-colors duration-200"
           onClick={onClose}
           aria-label="Close sidebar"
         >
-          <X size={24} />
+          <X size={22} />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        <NavLink
-          to="/dashboard"
-          end
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
-              isActive
-                ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
-                : "text-slate-400 hover:text-slate-50 hover:bg-slate-700/50"
-            }`
-          }
-        >
+      <nav className="flex-1 p-5 flex flex-col gap-1 overflow-y-auto" aria-label="Sidebar navigation">
+        <NavLink to="/dashboard" end className={navLinkClasses} aria-label="Dashboard">
           <LayoutDashboard size={18} />
           Dashboard
         </NavLink>
 
-        {(user.role === 1 || user.role === 2) && (
-          <NavLink
-            to="/users"
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                isActive
-                  ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
-                  : "text-slate-400 hover:text-slate-50 hover:bg-slate-700/50"
-              }`
-            }
-          >
+        {(user?.role === 1 || user?.role === 2) && (
+          <NavLink to="/users" className={navLinkClasses} aria-label="Users">
             <Users size={18} />
             Users
           </NavLink>
         )}
 
-        {user.role === 1 && (
+        {user?.role === 1 && (
           <>
-            <NavLink
-              to="/subscriptions"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                  isActive
-                    ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
-                    : "text-slate-400 hover:text-slate-50 hover:bg-slate-700/50"
-                }`
-              }
-            >
+            <NavLink to="/subscriptions" className={navLinkClasses} aria-label="Subscriptions">
               <CreditCard size={18} />
               Subscriptions
             </NavLink>
 
-            <NavLink
-              to="/products"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
-                  isActive
-                    ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
-                    : "text-slate-400 hover:text-slate-50 hover:bg-slate-700/50"
-                }`
-              }
-            >
+            <NavLink to="/payments" className={navLinkClasses} aria-label="Payments">
+              <Wallet size={18} />
+              Payments
+            </NavLink>
+
+            <NavLink to="/products" className={navLinkClasses} aria-label="Products">
               <Package size={18} />
               Products
             </NavLink>
           </>
         )}
 
-        <NavLink
-          to="/profile"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
-              isActive
-                ? "bg-blue-500/20 border border-blue-500/30 text-blue-400"
-                : "text-slate-400 hover:text-slate-50 hover:bg-slate-700/50"
-            }`
-          }
-        >
+        <NavLink to="/profile" className={navLinkClasses} aria-label="Profile">
           <UserCircle size={18} />
           Profile
         </NavLink>

@@ -1,132 +1,114 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Building2, CheckCircle, Users, AlertTriangle } from "lucide-react";
+import { useAuthStore } from "../../stores/useAuthStore";
+import { useSchoolStore } from "../../stores/useSchoolStore";
+import { useStudentStore } from "../../stores/useStudentStore";
+import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 import MetricCard from "../../components/ui/MetricCard";
-import { Building2, CreditCard, Package, DollarSign, Users } from "lucide-react";
 import MetricCardSkeleton from "../../components/ui/MetricCardSkeleton";
+import SystemStatusCard from "../../components/ui/SystemStatusCard";
 
 const DevDashboardHome = () => {
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalSchools: 0,
-    activeSubscriptions: 0,
-    totalProducts: 0,
-    monthlyRevenue: 0,
-    totalUsers: 0,
-  });
+  const user = useAuthStore((s) => s.user);
+  const { schools, isLoading: schoolsLoading, fetchAllSchools } = useSchoolStore();
+  const { totalStudents, isLoading: studentsLoading, fetchAllStudents } = useStudentStore();
+  const { subscriptionHistory, isLoading: subsLoading, fetchExpiringSubscriptions } = useSubscriptionStore();
+  const [greeting, setGreeting] = useState("");
 
   useEffect(() => {
-    // Mock data - replace with API call
-    setTimeout(() => {
-      setStats({
-        totalSchools: 127,
-        activeSubscriptions: 119,
-        totalProducts: 8,
-        monthlyRevenue: 45320,
-        totalUsers: 3240,
-      });
-      setLoading(false);
-    }, 800);
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good Morning");
+    else if (hour < 17) setGreeting("Good Afternoon");
+    else setGreeting("Good Evening");
   }, []);
 
-  if (loading) {
-    return (
-      <div className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <MetricCardSkeleton />
-          <MetricCardSkeleton />
-          <MetricCardSkeleton />
-          <MetricCardSkeleton />
-          <MetricCardSkeleton />
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchAllSchools();
+    fetchAllStudents();
+    fetchExpiringSubscriptions();
+  }, [fetchAllSchools, fetchAllStudents, fetchExpiringSubscriptions]);
+
+  const isLoading = schoolsLoading || studentsLoading || subsLoading;
+  const activeSchools = schools.filter((s) => s.subscriptionStatus === "ACTIVE").length;
 
   return (
-    <div className="p-8 space-y-8">
-      {/* Welcome Section */}
+    <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-bold text-white mb-2">
-          Platform Overview
+        <h1 className="text-3xl font-bold text-white mb-2">
+          {greeting}, {user?.fullName || "Developer"} 👋
         </h1>
-        <p className="text-slate-400">
-          Manage all schools, subscriptions, and products across the iDEAL platform.
-        </p>
+        <p className="text-slate-400">Here's an overview of the iDEAL Suite platform</p>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <MetricCard
-          title="Total Schools"
-          value={stats.totalSchools}
-          icon={<Building2 size={24} />}
-        />
-
-        <MetricCard
-          title="Active Subscriptions"
-          value={stats.activeSubscriptions}
-          icon={<CreditCard size={24} />}
-        />
-
-        <MetricCard
-          title="Total Products"
-          value={stats.totalProducts}
-          icon={<Package size={24} />}
-        />
-
-        <MetricCard
-          title="Monthly Revenue"
-          value={`$${stats.monthlyRevenue.toLocaleString()}`}
-          icon={<DollarSign size={24} />}
-        />
-
-        <MetricCard
-          title="Total Users"
-          value={stats.totalUsers}
-          icon={<Users size={24} />}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => <MetricCardSkeleton key={i} />)
+        ) : (
+          <>
+            <MetricCard title="Total Schools" value={schools.length} icon={<Building2 size={24} />} />
+            <MetricCard title="Active Schools" value={activeSchools} icon={<CheckCircle size={24} />} />
+            <MetricCard title="Total Students" value={totalStudents} icon={<Users size={24} />} />
+            <MetricCard title="Expiring Soon" value={subscriptionHistory.length} icon={<AlertTriangle size={24} />} />
+          </>
+        )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-slate-900 rounded-lg p-6 border border-slate-800">
-        <h2 className="text-xl font-bold text-white mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <button className="px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors">
-            Add New School
-          </button>
-          <button className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors">
-            Manage Subscriptions
-          </button>
-          <button className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors">
-            Create Product
-          </button>
-          <button className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors">
-            View Reports
-          </button>
-        </div>
+      <SystemStatusCard />
+
+      <div className="bg-surface-800 rounded-xl p-6">
+        <h2 className="text-xl font-bold text-white mb-4">Recent Schools</h2>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="w-6 h-6 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
+          </div>
+        ) : schools.length === 0 ? (
+          <p className="text-slate-400 text-center py-8">No schools registered yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px]">
+              <thead>
+                <tr className="border-b border-surface-700">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase">School Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase">State</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-surface-700">
+                {schools.slice(0, 5).map((school) => (
+                  <tr key={school.id} className="hover:bg-surface-700/30">
+                    <td className="px-4 py-3 text-white">{school.name}</td>
+                    <td className="px-4 py-3 text-slate-300">{school.email}</td>
+                    <td className="px-4 py-3 text-slate-300">{school.state}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 text-xs rounded-md ${school.subscriptionStatus === "ACTIVE" ? "text-green-400 bg-green-900/20" : "text-yellow-400 bg-yellow-900/20"}`}>
+                        {school.subscriptionStatus || "N/A"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {/* System Status */}
-      <div className="bg-slate-900 rounded-lg p-6 border border-slate-800">
-        <h2 className="text-xl font-bold text-white mb-4">System Status</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-slate-300">API: Operational</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-slate-300">Database: Online</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-slate-300">Services: Running</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            <span className="text-slate-300">Last Check: 2 min ago</span>
+      {subscriptionHistory.length > 0 && (
+        <div className="bg-yellow-900/10 border border-yellow-500/30 rounded-lg p-6">
+          <h2 className="text-xl font-bold text-yellow-400 mb-4">⚠️ Expiring Subscriptions</h2>
+          <div className="space-y-3">
+            {subscriptionHistory.map((sub) => (
+              <div key={sub.id} className="flex justify-between items-center bg-surface-800 p-4 rounded-lg">
+                <div>
+                  <p className="text-white font-medium">{sub.schoolId || "Unknown School"}</p>
+                  <p className="text-slate-400 text-sm">Expires: {new Date(sub.expiryDate).toLocaleDateString()}</p>
+                </div>
+                <span className="text-yellow-400 text-sm font-medium">{sub.status === 1 ? "Active" : sub.status === 2 ? "Pending" : "Deactivated"}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

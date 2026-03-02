@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Building2, Mail, Phone, MapPin, Radio, CheckCircle } from "lucide-react";
-import api from "../../services/api";
+import { useSchoolStore } from "../../stores/useSchoolStore";
 import { isEmailValid, isPhoneValid } from "../../utils/validators";
+import { cn } from "../../lib/utils";
 
 const NIGERIAN_STATES = [
   "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Borno",
@@ -14,6 +15,7 @@ const NIGERIAN_STATES = [
 
 const SchoolRegistration = () => {
   const navigate = useNavigate();
+  const { registerSchool } = useSchoolStore();
 
   const [form, setForm] = useState({
     name: "",
@@ -67,17 +69,16 @@ const SchoolRegistration = () => {
       setLoading(true);
       setApiError("");
 
-      const response = await api.post("/school/register", {
+      const schoolId = await registerSchool({
         name: form.name,
         email: form.email,
         phoneNumber: form.phoneNumber,
         address: form.address,
         state: form.state,
-        planType: form.planType,
+        planType: form.planType!,
       });
 
       setSuccess(true);
-      const schoolId = response.data.schoolId;
 
       setTimeout(() => {
         navigate(`/create-admin?schoolId=${schoolId}`);
@@ -96,18 +97,18 @@ const SchoolRegistration = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center px-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-radial from-cyan-500/10 via-transparent to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-radial from-teal-500/10 via-transparent to-transparent rounded-full blur-3xl" />
+      <div className="min-h-screen bg-surface-950 flex items-center justify-center px-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-radial from-brand-500/10 via-transparent to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-radial from-brand-500/10 via-transparent to-transparent rounded-full blur-3xl" />
 
-        <div className="w-full max-w-md bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-12 text-center relative z-10 animate-in fade-in scale-in-95 duration-500">
+        <div className="w-full max-w-md bg-surface-800 border border-surface-700 rounded-xl shadow-2xl p-12 text-center relative z-10">
           <div className="mb-4 flex justify-center">
-            <CheckCircle className="w-16 h-16 text-teal-400" />
+            <CheckCircle className="w-16 h-16 text-brand-400" />
           </div>
           <h2 className="text-2xl font-black text-slate-50 mb-2">School Registered!</h2>
           <p className="text-slate-400 mb-6">Redirecting to admin account creation...</p>
-          <div className="w-full h-1 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-cyan-500 to-teal-600 animate-pulse" />
+          <div className="w-full h-1 bg-brand-500 rounded-full overflow-hidden">
+            <div className="h-full bg-brand-500 animate-pulse" />
           </div>
         </div>
       </div>
@@ -115,23 +116,23 @@ const SchoolRegistration = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center px-4 relative overflow-hidden">
       {/* Decorative gradients */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-radial from-cyan-500/10 via-transparent to-transparent rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-radial from-teal-500/10 via-transparent to-transparent rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-radial from-brand-500/10 via-transparent to-transparent rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-radial from-brand-500/10 via-transparent to-transparent rounded-full blur-3xl" />
 
       {/* Header with navigation */}
       <div className="w-full max-w-md mb-8 relative z-10">
-        <Link to="/" className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-teal-500 bg-clip-text text-transparent inline-block mb-2">
+        <Link to="/" className="text-3xl font-black text-gradient inline-block mb-2">
           iDEAL-Suite
         </Link>
         <p className="text-slate-400 text-sm">
-          <Link to="/" className="text-cyan-400 hover:text-cyan-300 font-semibold">← Back to Home</Link>
+          <Link to="/" className="text-brand-400 hover:text-brand-300 font-semibold">← Back to Home</Link>
         </p>
       </div>
 
       {/* Registration Card */}
-      <div className="w-full max-w-2xl bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="w-full max-w-2xl bg-surface-800 border border-surface-700 rounded-xl shadow-2xl p-8 relative z-10">
         <h2 className="text-3xl font-black mb-2 text-slate-50">Register Your School</h2>
         <p className="text-slate-400 mb-8">Join iDEAL-Suite and streamline your school operations</p>
 
@@ -143,8 +144,8 @@ const SchoolRegistration = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* School Name */}
-          <div className="form-group">
-            <label className="form-label flex items-center gap-2 mb-2">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
               <Building2 className="w-4 h-4" />
               School Name
             </label>
@@ -154,14 +155,14 @@ const SchoolRegistration = () => {
               placeholder="Grace Academy"
               value={form.name}
               onChange={handleInputChange}
-              className="input-base"
+              className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
             />
-            {errors.name && <span className="error-text">{errors.name}</span>}
+            {errors.name && <span className="text-xs font-medium text-red-400 mt-1">{errors.name}</span>}
           </div>
 
           {/* Email */}
-          <div className="form-group">
-            <label className="form-label flex items-center gap-2 mb-2">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
               <Mail className="w-4 h-4" />
               Email Address
             </label>
@@ -171,14 +172,14 @@ const SchoolRegistration = () => {
               placeholder="admin@school.com"
               value={form.email}
               onChange={handleInputChange}
-              className="input-base"
+              className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
             />
-            {errors.email && <span className="error-text">{errors.email}</span>}
+            {errors.email && <span className="text-xs font-medium text-red-400 mt-1">{errors.email}</span>}
           </div>
 
           {/* Phone */}
-          <div className="form-group">
-            <label className="form-label flex items-center gap-2 mb-2">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
               <Phone className="w-4 h-4" />
               Phone Number
             </label>
@@ -188,14 +189,14 @@ const SchoolRegistration = () => {
               placeholder="+234801234567"
               value={form.phoneNumber}
               onChange={handleInputChange}
-              className="input-base"
+              className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
             />
-            {errors.phoneNumber && <span className="error-text">{errors.phoneNumber}</span>}
+            {errors.phoneNumber && <span className="text-xs font-medium text-red-400 mt-1">{errors.phoneNumber}</span>}
           </div>
 
           {/* Address */}
-          <div className="form-group">
-            <label className="form-label flex items-center gap-2 mb-2">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
               <MapPin className="w-4 h-4" />
               Address
             </label>
@@ -204,31 +205,31 @@ const SchoolRegistration = () => {
               placeholder="123 School Street, Lagos"
               value={form.address}
               onChange={handleInputChange}
-              className="input-base resize-none min-h-24"
+              className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 resize-none min-h-24"
             />
-            {errors.address && <span className="error-text">{errors.address}</span>}
+            {errors.address && <span className="text-xs font-medium text-red-400 mt-1">{errors.address}</span>}
           </div>
 
           {/* State Selection */}
-          <div className="form-group">
-            <label className="form-label mb-2">State</label>
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-300 mb-2">State</label>
             <select
               name="state"
               value={form.state}
               onChange={handleInputChange}
-              className="input-base"
+              className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 appearance-none"
             >
               <option value="">Select a State</option>
               {NIGERIAN_STATES.map(state => (
                 <option key={state} value={state}>{state}</option>
               ))}
             </select>
-            {errors.state && <span className="error-text">{errors.state}</span>}
+            {errors.state && <span className="text-xs font-medium text-red-400 mt-1">{errors.state}</span>}
           </div>
 
           {/* Plan Type Selection */}
-          <div className="form-group">
-            <label className="form-label flex items-center gap-2 mb-3">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-3">
               <Radio className="w-4 h-4" />
               Deployment Plan
             </label>
@@ -236,11 +237,12 @@ const SchoolRegistration = () => {
               <button
                 type="button"
                 onClick={() => handlePlanTypeChange(1)}
-                className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                className={cn(
+                  "p-4 rounded-lg border-2 transition-all duration-300",
                   form.planType === 1
-                    ? 'border-cyan-500 bg-cyan-500/10 ring-2 ring-cyan-500/20'
-                    : 'border-slate-600 bg-slate-700/50 hover:border-cyan-500'
-                }`}
+                    ? "border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/20"
+                    : "border-surface-600 bg-surface-700/50 hover:border-brand-500/50"
+                )}
               >
                 <div className="font-semibold text-slate-50">Local</div>
                 <div className="text-xs text-slate-300 mt-1">On-premise</div>
@@ -248,36 +250,37 @@ const SchoolRegistration = () => {
               <button
                 type="button"
                 onClick={() => handlePlanTypeChange(2)}
-                className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                className={cn(
+                  "p-4 rounded-lg border-2 transition-all duration-300",
                   form.planType === 2
-                    ? 'border-cyan-500 bg-cyan-500/10 ring-2 ring-cyan-500/20'
-                    : 'border-slate-600 bg-slate-700/50 hover:border-cyan-500'
-                }`}
+                    ? "border-brand-500 bg-brand-500/10 ring-2 ring-brand-500/20"
+                    : "border-surface-600 bg-surface-700/50 hover:border-brand-500/50"
+                )}
               >
                 <div className="font-semibold text-slate-50">Remote</div>
                 <div className="text-xs text-slate-300 mt-1">Cloud-based</div>
               </button>
             </div>
-            {errors.planType && <span className="error-text">{errors.planType}</span>}
+            {errors.planType && <span className="text-xs font-medium text-red-400 mt-1">{errors.planType}</span>}
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-teal-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            className="w-full px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
             {loading ? "Registering..." : "Register School"}
           </button>
         </form>
 
         {/* Footer */}
-        <div className="mt-8 pt-6 border-t border-slate-700 text-center text-sm text-slate-400">
+        <div className="mt-8 pt-6 border-t border-surface-700 text-center text-sm text-slate-400">
           <p>
             Already registered?{" "}
             <Link
               to="/login"
-              className="text-cyan-400 font-semibold hover:text-cyan-300 transition-colors"
+              className="text-brand-400 font-semibold hover:text-brand-300 transition-colors"
             >
               Login here
             </Link>

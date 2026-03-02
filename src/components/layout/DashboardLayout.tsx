@@ -7,14 +7,14 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-slate-950">
+    <div className="flex h-screen bg-surface-950">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-hidden
         />
@@ -26,7 +26,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         <Topbar onToggleSidebar={() => setSidebarOpen((s) => !s)} />
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto mt-16 bg-gradient-to-b from-slate-950 to-slate-900">
+        <main className="flex-1 overflow-y-auto mt-16 bg-surface-950">
           {children}
         </main>
       </div>

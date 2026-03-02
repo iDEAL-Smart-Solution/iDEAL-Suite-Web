@@ -5,60 +5,66 @@ interface ProductUsageTableProps {
   products: Product[];
 }
 
-const ProductUsageTable = ({ products }: ProductUsageTableProps) => {
+const ProductUsageTable = ({ products = [] }: ProductUsageTableProps) => {
   const getStatusBadge = (status: "Active" | "Inactive") => {
     if (status === "Active") {
       return (
-        <span style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-          <CheckCircle size={16} style={{ color: "#10b981" }} />
-          <span style={{ color: "#10b981", fontWeight: 600 }}>Active</span>
-        </span>
-      );
-    } else {
-      return (
-        <span style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-          <XCircle size={16} style={{ color: "#ef4444" }} />
-          <span style={{ color: "#ef4444", fontWeight: 600 }}>Inactive</span>
+        <span className="inline-flex items-center gap-1.5">
+          <CheckCircle size={16} className="text-emerald-400" />
+          <span className="text-emerald-400 font-semibold text-sm">Active</span>
         </span>
       );
     }
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <XCircle size={16} className="text-red-400" />
+        <span className="text-red-400 font-semibold text-sm">Inactive</span>
+      </span>
+    );
   };
 
   return (
-    <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 shadow-md">
-      <h3 className="text-lg font-bold text-slate-50 mb-4">Product Usage Overview</h3>
+    <div className="bg-surface-800 border border-surface-700 rounded-xl shadow-sm overflow-hidden">
+      <div className="px-6 py-5">
+        <h3 className="text-lg font-semibold text-white">Product Usage Overview</h3>
+      </div>
 
+      {products.length === 0 ? (
+        <div className="px-6 py-8 text-center text-slate-400">
+          <p>No product usage data available yet.</p>
+        </div>
+      ) : (
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[600px]">
           <thead>
-            <tr className="border-b border-slate-700 bg-slate-900">
-              <th className="text-left px-4 py-3 font-semibold text-slate-400">
+            <tr className="bg-surface-900">
+              <th className="text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Product Name
               </th>
-              <th className="text-center px-4 py-3 font-semibold text-slate-400">
+              <th className="text-center px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Usage Count
               </th>
-              <th className="text-center px-4 py-3 font-semibold text-slate-400">
+              <th className="text-center px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Last Used
               </th>
-              <th className="text-center px-4 py-3 font-semibold text-slate-400">
+              <th className="text-center px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Status
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-surface-700">
             {products.map((product) => (
               <tr
                 key={product.id}
-                className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors cursor-pointer"
+                className="hover:bg-surface-700/50 transition-colors duration-200"
               >
-                <td className="px-4 py-3">
-                  <strong className="text-slate-50">{product.name}</strong>
+                <td className="px-6 py-4">
+                  <span className="text-sm font-medium text-white">{product.name}</span>
                 </td>
-                <td className="px-4 py-3 text-center text-slate-400">
+                <td className="px-6 py-4 text-center text-sm text-slate-400 tabular-nums">
                   {product.usageCount}
                 </td>
-                <td className="px-4 py-3 text-center text-slate-400">
+                <td className="px-6 py-4 text-center text-sm text-slate-400">
                   {product.lastUsed ? (
                     new Date(product.lastUsed).toLocaleDateString("en-US", {
                       year: "numeric",
@@ -69,7 +75,7 @@ const ProductUsageTable = ({ products }: ProductUsageTableProps) => {
                     <span className="text-slate-500">Never</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-center">
+                <td className="px-6 py-4 text-center">
                   {getStatusBadge(product.status)}
                 </td>
               </tr>
@@ -77,6 +83,7 @@ const ProductUsageTable = ({ products }: ProductUsageTableProps) => {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 };

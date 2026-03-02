@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "../../lib/utils";
 import type { UserProfile } from "../../types/profile";
 
 interface PersonalInfoFormProps {
@@ -52,12 +53,12 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
   };
 
   return (
-    <form className="profile-form" onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label className="form-label">First Name *</label>
+    <form className="space-y-5" onSubmit={handleSubmit}>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">First Name *</label>
         <input
           type="text"
-          className="input"
+          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.firstName}
           onChange={(e) =>
             setFormData({ ...formData, firstName: e.target.value })
@@ -65,45 +66,45 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
           disabled={isLoading}
         />
         {errors.firstName && (
-          <span className="error-text">{errors.firstName}</span>
+          <span className="text-xs font-medium text-red-400">{errors.firstName}</span>
         )}
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Last Name *</label>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">Last Name *</label>
         <input
           type="text"
-          className="input"
+          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.lastName}
           onChange={(e) =>
             setFormData({ ...formData, lastName: e.target.value })
           }
           disabled={isLoading}
         />
-        {errors.lastName && <span className="error-text">{errors.lastName}</span>}
+        {errors.lastName && <span className="text-xs font-medium text-red-400">{errors.lastName}</span>}
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Email</label>
-        <div className="readonly-field">
-          <input type="email" className="input" value={user.email} disabled />
-          <span className="readonly-icon">🔒</span>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">Email</label>
+        <div className="relative">
+          <input type="email" className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50" value={user.email} disabled />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔒</span>
         </div>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">UIN (User ID)</label>
-        <div className="readonly-field">
-          <input type="text" className="input" value={user.uin} disabled />
-          <span className="readonly-icon">🔒</span>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">UIN (User ID)</label>
+        <div className="relative">
+          <input type="text" className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50" value={user.uin} disabled />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔒</span>
         </div>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Phone Number</label>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">Phone Number</label>
         <input
           type="tel"
-          className="input"
+          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           placeholder="+234 801 234 5678"
           value={formData.phoneNumber}
           onChange={(e) =>
@@ -112,36 +113,36 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
           disabled={isLoading}
         />
         {errors.phoneNumber && (
-          <span className="error-text">{errors.phoneNumber}</span>
+          <span className="text-xs font-medium text-red-400">{errors.phoneNumber}</span>
         )}
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Role</label>
-        <div className="readonly-field">
-          <span className="role-badge">{user.roleLabel || "User"}</span>
-          <span className="readonly-icon">🔒</span>
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-slate-300">Role</label>
+        <div className="relative">
+          <span className="inline-block px-3 py-1 bg-brand-500/15 text-brand-400 rounded-md text-sm font-medium">{user.roleLabel || "User"}</span>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔒</span>
         </div>
       </div>
 
       {user.schoolName && (
-        <div className="form-group">
-          <label className="form-label">School</label>
-          <div className="readonly-field">
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium text-slate-300">School</label>
+          <div className="relative">
             <input
               type="text"
-              className="input"
+              className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50"
               value={user.schoolName}
               disabled
             />
-            <span className="readonly-icon">🔒</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔒</span>
           </div>
         </div>
       )}
 
       <button
         type="submit"
-        className="btn btn-primary form-submit-btn"
+        className="w-full h-10 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50"
         disabled={isLoading}
       >
         {isLoading ? "Updating..." : "Update Profile"}

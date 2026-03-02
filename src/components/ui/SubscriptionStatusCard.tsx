@@ -1,4 +1,5 @@
 import { AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { cn } from "../../lib/utils";
 
 interface SubscriptionStatusCardProps {
   planType: "Local" | "Remote";
@@ -6,6 +7,12 @@ interface SubscriptionStatusCardProps {
   expiryDate: string;
   paymentMethod: string;
 }
+
+const statusConfig = {
+  Active: { icon: CheckCircle, color: "text-emerald-400" },
+  Pending: { icon: Clock, color: "text-yellow-400" },
+  Deactivated: { icon: AlertCircle, color: "text-red-400" },
+} as const;
 
 const SubscriptionStatusCard = ({
   planType,
@@ -19,65 +26,43 @@ const SubscriptionStatusCard = ({
     (expiryDateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
   );
 
-  const getStatusColor = (s: string) => {
-    switch (s) {
-      case "Active":
-        return "#10b981";
-      case "Pending":
-        return "#f59e0b";
-      case "Deactivated":
-        return "#ef4444";
-      default:
-        return "#6b7280";
-    }
-  };
-
-  const getStatusIcon = (s: string) => {
-    switch (s) {
-      case "Active":
-        return <CheckCircle size={20} style={{ color: getStatusColor(s) }} />;
-      case "Pending":
-        return <Clock size={20} style={{ color: getStatusColor(s) }} />;
-      case "Deactivated":
-        return <AlertCircle size={20} style={{ color: getStatusColor(s) }} />;
-      default:
-        return null;
-    }
+  const { icon: StatusIcon, color: statusColor } = statusConfig[status] ?? {
+    icon: AlertCircle,
+    color: "text-slate-400",
   };
 
   const isExpiringWarning = daysUntilExpiry <= 30 && daysUntilExpiry > 7;
   const isExpiringAlert = daysUntilExpiry <= 7 && daysUntilExpiry > 0;
 
   return (
-    <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 shadow-md">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-700">
-        <h3 className="text-lg font-bold text-slate-50">Subscription Status</h3>
-        <div className="flex gap-2 items-center">
-          <span
-            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-              planType === "Local"
-                ? "bg-blue-500/20 text-blue-400"
-                : "bg-purple-500/20 text-purple-400"
-            }`}
-          >
-            {planType}
-          </span>
-        </div>
+    <div className="bg-surface-800 border border-surface-700 rounded-xl p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-surface-700">
+        <h3 className="text-lg font-semibold text-white">Subscription Status</h3>
+        <span
+          className={cn(
+            "inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold",
+            planType === "Local"
+              ? "bg-brand-500/10 text-brand-400"
+              : "bg-purple-500/10 text-purple-400"
+          )}
+        >
+          {planType}
+        </span>
       </div>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between py-2">
-          <span className="text-slate-400 text-sm">Status:</span>
+          <span className="text-sm text-slate-400">Status</span>
           <span className="flex gap-2 items-center">
-            {getStatusIcon(status)}
-            <strong className="text-slate-50">{status}</strong>
+            <StatusIcon size={18} className={statusColor} />
+            <strong className="text-sm text-white">{status}</strong>
           </span>
         </div>
 
         <div className="flex items-center justify-between py-2">
-          <span className="text-slate-400 text-sm">Expires:</span>
+          <span className="text-sm text-slate-400">Expires</span>
           <span className="flex items-center gap-2">
-            <span className="text-slate-50">
+            <span className="text-sm text-white">
               {expiryDateObj.toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
@@ -85,12 +70,12 @@ const SubscriptionStatusCard = ({
               })}
             </span>
             {isExpiringAlert && (
-              <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-500/20 text-red-400">
-                Expires in {daysUntilExpiry} days
+              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-red-500/10 text-red-400">
+                {daysUntilExpiry}d left
               </span>
             )}
             {isExpiringWarning && (
-              <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-yellow-500/20 text-yellow-400">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-yellow-500/10 text-yellow-400">
                 Expiring Soon
               </span>
             )}
@@ -98,16 +83,16 @@ const SubscriptionStatusCard = ({
         </div>
 
         <div className="flex items-center justify-between py-2">
-          <span className="text-slate-400 text-sm">Payment Method:</span>
-          <span className="text-slate-50">{paymentMethod}</span>
+          <span className="text-sm text-slate-400">Payment Method</span>
+          <span className="text-sm text-white">{paymentMethod}</span>
         </div>
       </div>
 
-      {isExpiringWarning || isExpiringAlert ? (
-        <button className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+      {(isExpiringWarning || isExpiringAlert) && (
+        <button className="mt-6 w-full h-10 bg-brand-500 hover:bg-brand-600 text-white font-medium text-sm rounded-lg transition-colors duration-200">
           Renew Subscription
         </button>
-      ) : null}
+      )}
     </div>
   );
 };

@@ -1,26 +1,52 @@
-interface SelectProps {
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options: string[];
+import { forwardRef } from "react";
+import type { SelectHTMLAttributes } from "react";
+import { cn } from "../../lib/utils";
+
+export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string;
   error?: string;
+  options: { label: string; value: string }[] | string[];
+  placeholder?: string;
 }
 
-const Select = ({ label, value, onChange, options, error }: SelectProps) => {
-  return (
-    <div className="form-group">
-      <label>{label}</label>
-      <select value={value} onChange={onChange}>
-        <option value="">Select State</option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-      {error && <small className="error">{error}</small>}
-    </div>
-  );
-};
+const Select = forwardRef<HTMLSelectElement, SelectProps>(
+  ({ className, label, error, options, placeholder, id, ...props }, ref) => {
+    const selectId = id || label?.toLowerCase().replace(/\s+/g, "-");
+    return (
+      <div className="space-y-1.5">
+        {label && (
+          <label htmlFor={selectId} className="block text-sm font-medium text-slate-300">
+            {label}
+          </label>
+        )}
+        <select
+          id={selectId}
+          ref={ref}
+          className={cn(
+            "w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white transition-colors duration-200 appearance-none",
+            "focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            error && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
+            className
+          )}
+          {...props}
+        >
+          {placeholder && <option value="">{placeholder}</option>}
+          {options.map((opt) => {
+            const value = typeof opt === "string" ? opt : opt.value;
+            const optLabel = typeof opt === "string" ? opt : opt.label;
+            return (
+              <option key={value} value={value}>
+                {optLabel}
+              </option>
+            );
+          })}
+        </select>
+        {error && <p className="text-xs font-medium text-red-400">{error}</p>}
+      </div>
+    );
+  }
+);
+Select.displayName = "Select";
 
 export default Select;

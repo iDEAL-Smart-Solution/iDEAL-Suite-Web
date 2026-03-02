@@ -1,81 +1,72 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, LogIn, Users, GraduationCap, Shield } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { Mail, Lock, LogIn } from "lucide-react";
+import { useAuthStore } from "../../stores/useAuthStore";
 import { isEmailValid } from "../../utils/validators";
 
 const Login = () => {
-    const { login, demoLogin, demoLoginAsDev, demoLoginAsStaff, demoLoginAsStudent } = useAuth();
+    const { login, isLoading, error: storeError } = useAuthStore();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
-        if (!isEmailValid(email) || password.length < 6) {
+        if (!isEmailValid(email)) {
             setError("Invalid email or password");
             return;
         }
 
         try {
-            setLoading(true);
             setError("");
             await login(email, password);
-            navigate("/dashboard");
+
+            // Route based on role
+            const raw = sessionStorage.getItem("ideal_user");
+            const user = raw ? JSON.parse(raw) : null;
+
+            if (user?.role === 0) {
+                navigate("/dev/dashboard");
+            } else {
+                navigate("/dashboard");
+            }
         } catch {
-            setError("Incorrect email or password");
-        } finally {
-            setLoading(false);
+            setError(storeError || "Incorrect email or password");
         }
     };
 
-    const handleDemoLogin = (role: string) => {
-        if (role === 'dev') {
-            demoLoginAsDev();
-            navigate("/dev/dashboard");
-        } else if (role === 'admin') {
-            demoLogin();
-            navigate("/dashboard");
-        } else if (role === 'staff') {
-            demoLoginAsStaff();
-            navigate("/dashboard");
-        } else if (role === 'student') {
-            demoLoginAsStudent();
-            navigate("/dashboard");
-        }
-    };
+    const displayError = error || storeError;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center px-4 relative overflow-hidden">
+        <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center px-4 relative overflow-hidden">
             {/* Decorative gradients */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-radial from-cyan-500/10 via-transparent to-transparent rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-radial from-teal-500/10 via-transparent to-transparent rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-radial from-brand-500/10 via-transparent to-transparent rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-radial from-brand-500/10 via-transparent to-transparent rounded-full blur-3xl" />
 
             {/* Logo and header */}
             <div className="mb-12 text-center relative z-10">
-                <div className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-teal-500 bg-clip-text text-transparent mb-2">
+                <div className="text-4xl font-black text-gradient mb-2">
                     iDEAL-Suite
                 </div>
                 <p className="text-slate-400">School Management Platform</p>
             </div>
 
             {/* Login Card */}
-            <div className="w-full max-w-md bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="w-full max-w-md bg-surface-800 border border-surface-700 rounded-xl shadow-2xl p-8 relative z-10">
                 <h2 className="text-2xl font-black mb-2 text-slate-50">Login to Dashboard</h2>
                 <p className="text-slate-400 text-sm mb-8">Access your school management tools</p>
 
-                {error && (
+                {displayError && (
                     <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium mb-6">
-                        {error}
+                        {displayError}
                     </div>
                 )}
 
                 <div className="space-y-6 mb-8">
                     {/* Email Input */}
-                    <div className="form-group">
-                        <label className="form-label flex items-center gap-2 mb-2">
+                    <div className="space-y-1.5">
+                        <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
                             <Mail className="w-4 h-4" />
                             Email Address
                         </label>
@@ -84,13 +75,13 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="admin@school.com"
-                            className="input-base"
+                            className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
                         />
                     </div>
 
                     {/* Password Input */}
-                    <div className="form-group">
-                        <label className="form-label flex items-center gap-2 mb-2">
+                    <div className="space-y-1.5">
+                        <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
                             <Lock className="w-4 h-4" />
                             Password
                         </label>
@@ -99,7 +90,8 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
-                            className="input-base"
+                            className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
+                            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                         />
                     </div>
                 </div>
@@ -107,64 +99,27 @@ const Login = () => {
                 {/* Login Button */}
                 <button
                     onClick={handleSubmit}
-                    disabled={loading}
-                    className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-teal-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
+                    disabled={isLoading}
+                    className="w-full px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
                 >
                     <LogIn className="w-5 h-5" />
-                    {loading ? "Logging in..." : "Login"}
+                    {isLoading ? "Logging in..." : "Login"}
                 </button>
 
-                {/* Demo Login */}
-                <button
-                    onClick={() => handleDemoLogin('dev')}
-                    className="w-full mt-4 px-6 py-3 border-2 border-purple-500 text-purple-400 font-semibold rounded-lg hover:bg-purple-500/10 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                >
-                    <Shield className="w-5 h-5" />
-                    Demo Platform Admin
-                </button>
-
-                <button
-                    onClick={() => handleDemoLogin('admin')}
-                    className="w-full px-6 py-3 border-2 border-cyan-500 text-cyan-400 font-semibold rounded-lg hover:bg-cyan-500/10 transition-all duration-300 hover:-translate-y-0.5"
-                >
-                    Try Demo Account (School Admin)
-                </button>
-
-                <button
-                    onClick={() => handleDemoLogin('staff')}
-                    className="w-full px-6 py-3 border-2 border-teal-500 text-teal-400 font-semibold rounded-lg hover:bg-teal-500/10 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                >
-                    <Users className="w-5 h-5" />
-                    Demo Staff
-                </button>
-
-                <button
-                    onClick={() => handleDemoLogin('student')}
-                    className="w-full px-6 py-3 border-2 border-pink-500 text-pink-400 font-semibold rounded-lg hover:bg-pink-500/10 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                >
-                    <GraduationCap className="w-5 h-5" />
-                    Demo Student
-                </button>
-            
-
-            <p className="text-center text-xs text-slate-400 mt-3">
-                No account needed - explore the dashboard instantly
-            </p>
-
-            {/* Footer */}
-            <div className="mt-8 pt-6 border-t border-slate-700 text-center text-sm text-slate-400">
-                <p>
-                    New admin user?
-                    <Link
-                        to="/create-admin"
-                        className="text-cyan-400 font-semibold hover:text-cyan-300 transition-colors"
-                    >
-                        Create Admin Account
-                    </Link>
-                </p>
+                {/* Footer */}
+                <div className="mt-8 pt-6 border-t border-surface-700 text-center text-sm text-slate-400">
+                    <p>
+                        Don't have an account?{" "}
+                        <Link
+                            to="/register-school"
+                            className="text-brand-400 font-semibold hover:text-brand-300 transition-colors"
+                        >
+                            Register School
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
-        </div >
     );
 };
 

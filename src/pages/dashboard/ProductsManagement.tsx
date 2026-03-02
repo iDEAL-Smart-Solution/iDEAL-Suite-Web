@@ -1,181 +1,109 @@
-import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  status: "ACTIVE" | "INACTIVE";
-  availableIn: string[];
-  schoolsUsing: number;
-}
+import { useEffect, useState } from "react";
+import { Search, Plus, Edit, Trash2 } from "lucide-react";
+import { useProductStore } from "../../stores/useProductStore";
+import { useAuthStore } from "../../stores/useAuthStore";
+import AddProductModal from "../../components/products/AddProductModal";
 
 const ProductsManagement = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const user = useAuthStore((s) => s.user);
+  const { products, isLoading, error, fetchProducts, toggleProductStatus } = useProductStore();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   useEffect(() => {
-    // Mock data - replace with API call
-    setTimeout(() => {
-      setProducts([
-        {
-          id: "1",
-          name: "Student Management System",
-          description: "Comprehensive student information and registration management",
-          status: "ACTIVE",
-          availableIn: ["STARTER", "PROFESSIONAL", "ENTERPRISE"],
-          schoolsUsing: 127,
-        },
-        {
-          id: "2",
-          name: "Analytics Dashboard",
-          description: "Advanced analytics and reporting tools",
-          status: "ACTIVE",
-          availableIn: ["PROFESSIONAL", "ENTERPRISE"],
-          schoolsUsing: 89,
-        },
-        {
-          id: "3",
-          name: "Assignment Management",
-          description: "Create, assign, and grade assignments",
-          status: "ACTIVE",
-          availableIn: ["PROFESSIONAL", "ENTERPRISE"],
-          schoolsUsing: 76,
-        },
-        {
-          id: "4",
-          name: "Parent Portal",
-          description: "Parent-teacher communication and progress tracking",
-          status: "ACTIVE",
-          availableIn: ["ENTERPRISE"],
-          schoolsUsing: 45,
-        },
-        {
-          id: "5",
-          name: "Attendance Tracking",
-          description: "Track and monitor student attendance",
-          status: "ACTIVE",
-          availableIn: ["STARTER", "PROFESSIONAL", "ENTERPRISE"],
-          schoolsUsing: 120,
-        },
-        {
-          id: "6",
-          name: "Online Examinations",
-          description: "Create and conduct online exams",
-          status: "INACTIVE",
-          availableIn: ["PROFESSIONAL", "ENTERPRISE"],
-          schoolsUsing: 0,
-        },
-      ]);
-      setLoading(false);
-    }, 600);
-  }, []);
+    if (user?.schoolId) fetchProducts(user.schoolId);
+  }, [user?.schoolId, fetchProducts]);
 
-  const getStatusColor = (status: string) => {
-    return status === "ACTIVE"
-      ? "text-green-400 bg-green-900/20"
-      : "text-slate-400 bg-slate-800";
-  };
-
-  const getPlanColor = (plan: string) => {
-    switch (plan) {
-      case "ENTERPRISE":
-        return "bg-purple-900/20 text-purple-400 border-purple-800";
-      case "PROFESSIONAL":
-        return "bg-cyan-900/20 text-cyan-400 border-cyan-800";
-      case "STARTER":
-        return "bg-blue-900/20 text-blue-400 border-blue-800";
-      default:
-        return "bg-slate-800 text-slate-400 border-slate-700";
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="p-8">
-        <p className="text-slate-400">Loading products...</p>
-      </div>
-    );
-  }
+  const filteredProducts = products.filter((product) =>
+    product.productName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-8 space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Products Management</h1>
-          <p className="text-slate-400">Manage all iDEAL platform products and services</p>
+          <p className="text-slate-400">Manage all iDEAL Suite products</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors">
+        <button
+          onClick={() => setIsAddOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-medium transition-colors"
+        >
           <Plus size={20} />
           Add Product
         </button>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="bg-slate-900 rounded-lg p-6 border border-slate-800 hover:border-slate-700 transition-colors"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-white mb-2">{product.name}</h3>
-                <p className="text-slate-400 text-sm">{product.description}</p>
-              </div>
-              <span
-                className={`px-3 py-1 text-xs font-medium rounded ${getStatusColor(
-                  product.status
-                )}`}
-              >
-                {product.status}
-              </span>
-            </div>
-
-            {/* Available Plans */}
-            <div className="mb-4">
-              <p className="text-slate-400 text-sm mb-2">Available in:</p>
-              <div className="flex flex-wrap gap-2">
-                {product.availableIn.map((plan) => (
-                  <span
-                    key={plan}
-                    className={`px-3 py-1 text-xs font-medium rounded border ${getPlanColor(
-                      plan
-                    )}`}
-                  >
-                    {plan}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Usage Stats */}
-            <div className="mb-4">
-              <p className="text-slate-300 text-sm">
-                <span className="font-bold text-cyan-400">{product.schoolsUsing}</span> schools
-                using this product
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-2">
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors text-sm">
-                <Eye size={16} />
-                View
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors text-sm">
-                <Edit size={16} />
-                Edit
-              </button>
-              <button className="px-4 py-2 bg-red-900/20 hover:bg-red-900/30 text-red-400 rounded-lg transition-colors text-sm">
-                <Trash2 size={16} />
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-surface-800 border border-surface-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
+          />
+        </div>
       </div>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">{error}</div>
+      )}
+
+      <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[600px]">
+          <thead className="bg-surface-900">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Product Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Usage</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-surface-700">
+            {isLoading ? (
+              <tr><td colSpan={4} className="px-6 py-4 text-center text-slate-400">Loading products...</td></tr>
+            ) : filteredProducts.length === 0 ? (
+              <tr><td colSpan={4} className="px-6 py-4 text-center text-slate-400">No products found</td></tr>
+            ) : (
+              filteredProducts.map((product) => (
+                <tr key={product.productId} className="hover:bg-surface-700/50 transition-colors">
+                  <td className="px-6 py-4 text-white font-medium">{product.productName}</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-0.5 text-xs font-medium rounded-md ${product.isActive ? "text-green-400 bg-green-900/20" : "text-red-400 bg-red-900/20"}`}>
+                      {product.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-slate-300">{product.usageCount ?? 0} uses</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <button className="p-2 text-brand-400 hover:bg-brand-500/10 rounded transition-colors"><Edit size={16} /></button>
+                      <button
+                        className="p-2 text-yellow-400 hover:bg-yellow-900/20 rounded transition-colors text-xs"
+                        onClick={() => toggleProductStatus(product.productId, product.isActive)}
+                      >
+                        {product.isActive ? "Disable" : "Enable"}
+                      </button>
+                      <button className="p-2 text-red-400 hover:bg-red-900/20 rounded transition-colors"><Trash2 size={16} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <AddProductModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        onSuccess={() => {
+          if (user?.schoolId) fetchProducts(user.schoolId);
+        }}
+      />
     </div>
   );
 };
