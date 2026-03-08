@@ -7,6 +7,7 @@ import {
   UserCircle,
   X,
   Wallet,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuthStore } from "../../stores/useAuthStore";
@@ -79,6 +80,13 @@ const Sidebar = ({
               Products
             </NavLink>
           </>
+        )}
+
+        {(user?.role === 1 || user?.role === 2) && (
+          <NavLink to="/feedback" className={navLinkClasses} aria-label="Feedback">
+            <MessageSquare size={18} />
+            Feedback
+          </NavLink>
         )}
 
         <NavLink to="/profile" className={navLinkClasses} aria-label="Profile">

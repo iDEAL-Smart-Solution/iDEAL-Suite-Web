@@ -21,6 +21,7 @@ const SubscriptionManagement = lazy(() => import("../pages/dashboard/Subscriptio
 const ProductMonitoring = lazy(() => import("../pages/dashboard/ProductMonitoring"));
 const ProfileSettings = lazy(() => import("../pages/dashboard/ProfileSettings"));
 const PaymentHistory = lazy(() => import("../pages/dashboard/PaymentHistory"));
+const FeedbackPage = lazy(() => import("../pages/dashboard/FeedbackPage"));
 
 /* ── Suspense fallback ─────────────────────────────── */
 const PageLoader = () => (
@@ -107,6 +108,17 @@ const AppRoutes = () => {
         />
 
         <Route
+          path="/dev/feedback"
+          element={
+            <ProtectedRoute>
+              <DevDashboardLayout>
+                <FeedbackPage />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
@@ -178,6 +190,17 @@ const AppRoutes = () => {
             <ProtectedRoute>
               <DashboardLayout>
                 <ProfileSettings />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/feedback"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <FeedbackPage />
               </DashboardLayout>
             </ProtectedRoute>
           }
