@@ -14,13 +14,33 @@ import ExpiryWarningBanner from "../../components/ui/ExpiryWarningBanner";
 
 const DashboardHome = () => {
   const user = useAuthStore((s) => s.user);
-  const { stats, isLoading, error, fetchStats } = useDashboardStore();
+  const {
+    stats,
+    usageData,
+    productEngagementMySchool,
+    subscriptionOverview,
+    isLoading,
+    error,
+    fetchStats,
+    fetchUinUsage,
+    fetchProductEngagementMySchool,
+    fetchSubscriptionOverview,
+  } = useDashboardStore();
 
   useEffect(() => {
     if (user?.schoolId) {
       fetchStats(user.schoolId);
+      fetchUinUsage();
+      fetchProductEngagementMySchool();
+      fetchSubscriptionOverview();
     }
-  }, [user?.schoolId, fetchStats]);
+  }, [
+    user?.schoolId,
+    fetchStats,
+    fetchUinUsage,
+    fetchProductEngagementMySchool,
+    fetchSubscriptionOverview,
+  ]);
 
   if (isLoading) {
     return (
@@ -40,9 +60,9 @@ const DashboardHome = () => {
   if (error) return <p className="text-red-400 p-8">{error}</p>;
   if (!stats) return <p className="text-red-400 p-8">No data available</p>;
 
-  const slotsUsagePercent = Math.round(
-    (stats.totalRegisteredStudents / stats.subscribedSlots) * 100
-  );
+  const slotsUsagePercent = stats.subscribedSlots
+    ? Math.round((stats.totalRegisteredStudents / stats.subscribedSlots) * 100)
+    : 0;
 
   return (
     <div className="p-8 space-y-8">
@@ -70,6 +90,16 @@ const DashboardHome = () => {
         />
       </div>
 
+      {subscriptionOverview && (
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <MetricCard title="All Subscriptions" value={subscriptionOverview.totalSubscriptions} icon={<Ticket size={20} />} />
+          <MetricCard title="Active" value={subscriptionOverview.activeSubscriptions} icon={<Ticket size={20} />} />
+          <MetricCard title="Pending" value={subscriptionOverview.pendingSubscriptions} icon={<Ticket size={20} />} />
+          <MetricCard title="Deactivated" value={subscriptionOverview.deactivatedSubscriptions} icon={<Ticket size={20} />} />
+          <MetricCard title="Expiring Soon" value={subscriptionOverview.expiringSoon} icon={<Ticket size={20} />} />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <SubscriptionStatusCard
           planType={stats.planType}
@@ -82,10 +112,16 @@ const DashboardHome = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <StudentsGrowthChart data={[]} />
-        <UsageChart data={[]} />
+        <UsageChart data={usageData} />
       </div>
 
-      <ProductUsageTable products={stats.products ?? []} />
+      <ProductUsageTable
+        products={
+          productEngagementMySchool.length > 0
+            ? productEngagementMySchool
+            : (stats.products ?? [])
+        }
+      />
     </div>
   );
 };

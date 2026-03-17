@@ -3,12 +3,12 @@ import { Search } from "lucide-react";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 
 const SubscriptionsManagement = () => {
-  const { subscriptionHistory, isLoading, error, fetchExpiringSubscriptions } = useSubscriptionStore();
+  const { subscriptionHistory, isLoading, error, fetchReportingSubscriptions } = useSubscriptionStore();
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetchExpiringSubscriptions();
-  }, [fetchExpiringSubscriptions]);
+    fetchReportingSubscriptions();
+  }, [fetchReportingSubscriptions]);
 
   const filteredSubscriptions = subscriptionHistory.filter(
     (sub) =>

@@ -5,6 +5,57 @@ import type {
   CreateSubscriptionRequest,
 } from "../types/subscription";
 
+const normalizeSubscriptionStatus = (value: unknown): 1 | 2 | 3 => {
+  const numeric = Number(value);
+  if (numeric === 1 || numeric === 2 || numeric === 3) return numeric;
+
+  const label = String(value ?? "").toLowerCase();
+  if (label === "active") return 1;
+  if (label === "deactivated" || label === "inactive") return 3;
+  return 2;
+};
+
+const normalizeReportingSubscriptions = (payload: unknown): Subscription[] => {
+  const value = (payload as any)?.data ?? payload;
+  const list = Array.isArray(value)
+    ? value
+    : Array.isArray((value as any)?.subscriptions)
+      ? (value as any).subscriptions
+      : Array.isArray((value as any)?.items)
+        ? (value as any).items
+        : [];
+
+  return list.map((sub: any, index: number) => {
+    const status = normalizeSubscriptionStatus(
+      sub?.status ?? sub?.subscriptionStatus ?? sub?.statusCode
+    );
+
+    return {
+      id: String(sub?.id ?? sub?.subscriptionId ?? `report-sub-${index}`),
+      schoolId: String(sub?.schoolId ?? sub?.schoolName ?? "N/A"),
+      paidStudentSlots: Number(
+        sub?.paidStudentSlots ?? sub?.studentSlots ?? sub?.subscribedSlots ?? 0
+      ),
+      startDate:
+        sub?.startDate ?? sub?.createdAt ?? new Date().toISOString(),
+      expiryDate:
+        sub?.expiryDate ?? sub?.endDate ?? new Date().toISOString(),
+      paymentMethod: String(sub?.paymentMethod ?? "Card") as
+        | "Card"
+        | "Bank Transfer"
+        | "PayStack"
+        | "Cash",
+      status,
+      planType:
+        String(sub?.planType ?? "Local").toLowerCase() === "remote"
+          ? "Remote"
+          : "Local",
+      createdAt: sub?.createdAt,
+      updatedAt: sub?.updatedAt,
+    };
+  });
+};
+
 interface SubscriptionState {
   currentSubscription: Subscription | null;
   subscriptionHistory: Subscription[];
@@ -17,6 +68,7 @@ interface SubscriptionState {
 
   fetchCurrentSubscription: (schoolId: string) => Promise<void>;
   fetchSubscriptionHistory: (schoolId: string, page?: number, limit?: number) => Promise<void>;
+  fetchReportingSubscriptions: () => Promise<void>;
   checkHasActive: (schoolId: string) => Promise<boolean>;
   createSubscription: (data: CreateSubscriptionRequest) => Promise<void>;
   fetchExpiringSubscriptions: (daysThreshold?: number) => Promise<void>;
@@ -91,6 +143,22 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
         message = err.message;
       }
       set({ subscriptionHistory: [], error: message, isLoading: false });
+    }
+  },
+
+  fetchReportingSubscriptions: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.get("/Reporting/subscriptions");
+      set({
+        subscriptionHistory: normalizeReportingSubscriptions(res.data),
+        isLoading: false,
+      });
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.message || "Failed to fetch subscriptions report",
+        isLoading: false,
+      });
     }
   },
 
