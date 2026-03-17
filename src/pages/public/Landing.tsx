@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Zap, Users, TrendingUp, BarChart3 } from "lucide-react";
-import { cn } from "../../lib/utils";
 
 const Landing = () => {
   const navigate = useNavigate();

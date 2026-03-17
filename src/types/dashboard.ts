@@ -20,3 +20,16 @@ export interface Product {
   status: "Active" | "Inactive";
   lastUsed?: string;
 }
+
+export interface UsageChartData {
+  name: string;
+  count: number;
+}
+
+export interface ReportingSubscriptionOverview {
+  totalSubscriptions: number;
+  activeSubscriptions: number;
+  pendingSubscriptions: number;
+  deactivatedSubscriptions: number;
+  expiringSoon: number;
+}

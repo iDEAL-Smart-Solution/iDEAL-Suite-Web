@@ -4,6 +4,7 @@ import { useAuthStore } from "../../stores/useAuthStore";
 import { useSchoolStore } from "../../stores/useSchoolStore";
 import { useStudentStore } from "../../stores/useStudentStore";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
+import { useDashboardStore } from "../../stores/useDashboardStore";
 import MetricCard from "../../components/ui/MetricCard";
 import MetricCardSkeleton from "../../components/ui/MetricCardSkeleton";
 import SystemStatusCard from "../../components/ui/SystemStatusCard";
@@ -12,7 +13,8 @@ const DevDashboardHome = () => {
   const user = useAuthStore((s) => s.user);
   const { schools, isLoading: schoolsLoading, fetchAllSchools } = useSchoolStore();
   const { totalStudents, isLoading: studentsLoading, fetchAllStudents } = useStudentStore();
-  const { subscriptionHistory, isLoading: subsLoading, fetchExpiringSubscriptions } = useSubscriptionStore();
+  const { subscriptionHistory, isLoading: subsLoading, fetchReportingSubscriptions } = useSubscriptionStore();
+  const { productEngagementAll, fetchProductEngagementAll } = useDashboardStore();
   const [greeting, setGreeting] = useState("");
 
   useEffect(() => {
@@ -25,11 +27,21 @@ const DevDashboardHome = () => {
   useEffect(() => {
     fetchAllSchools();
     fetchAllStudents();
-    fetchExpiringSubscriptions();
-  }, [fetchAllSchools, fetchAllStudents, fetchExpiringSubscriptions]);
+    fetchReportingSubscriptions();
+    fetchProductEngagementAll();
+  }, [
+    fetchAllSchools,
+    fetchAllStudents,
+    fetchReportingSubscriptions,
+    fetchProductEngagementAll,
+  ]);
 
   const isLoading = schoolsLoading || studentsLoading || subsLoading;
   const activeSchools = schools.filter((s) => s.subscriptionStatus === "ACTIVE").length;
+  const totalProductEngagements = productEngagementAll.reduce(
+    (sum, product) => sum + product.usageCount,
+    0
+  );
 
   return (
     <div className="space-y-8">
@@ -48,7 +60,11 @@ const DevDashboardHome = () => {
             <MetricCard title="Total Schools" value={schools.length} icon={<Building2 size={24} />} />
             <MetricCard title="Active Schools" value={activeSchools} icon={<CheckCircle size={24} />} />
             <MetricCard title="Total Students" value={totalStudents} icon={<Users size={24} />} />
-            <MetricCard title="Expiring Soon" value={subscriptionHistory.length} icon={<AlertTriangle size={24} />} />
+            <MetricCard
+              title="Product Engagements"
+              value={totalProductEngagements}
+              icon={<AlertTriangle size={24} />}
+            />
           </>
         )}
       </div>

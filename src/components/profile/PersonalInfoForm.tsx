@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { cn } from "../../lib/utils";
 import type { UserProfile } from "../../types/profile";
 
 interface PersonalInfoFormProps {
