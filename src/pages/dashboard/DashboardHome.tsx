@@ -44,7 +44,7 @@ const DashboardHome = () => {
 
   if (isLoading) {
     return (
-      <div className="p-8">
+      <div>
         <Skeleton width="250px" height="28px" />
         <Skeleton width="350px" height="16px" style={{ marginTop: "8px" }} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
@@ -57,15 +57,15 @@ const DashboardHome = () => {
     );
   }
 
-  if (error) return <p className="text-red-400 p-8">{error}</p>;
-  if (!stats) return <p className="text-red-400 p-8">No data available</p>;
+  if (error) return <p className="text-red-400">{error}</p>;
+  if (!stats) return <p className="text-red-400">No data available</p>;
 
   const slotsUsagePercent = stats.subscribedSlots
     ? Math.round((stats.totalRegisteredStudents / stats.subscribedSlots) * 100)
     : 0;
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="space-y-8">
       <ExpiryWarningBanner expiryDate={stats.expiryDate} />
 
       <div>

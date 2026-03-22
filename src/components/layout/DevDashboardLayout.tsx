@@ -125,7 +125,9 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
 
         {/* Content Area */}
         <main className="flex-1 overflow-auto bg-surface-950">
-          {children}
+          <div className="px-4 py-6 sm:px-6 lg:px-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>

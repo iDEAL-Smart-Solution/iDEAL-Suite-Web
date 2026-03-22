@@ -44,7 +44,7 @@ const ProductMonitoring = () => {
 
   if (!isLoading && products.length === 0 && !error) {
     return (
-      <div className="p-8">
+      <div>
         <h1 className="text-3xl font-bold text-white mb-8">Product Monitoring</h1>
         <div className="text-center py-16">
           <p className="text-xl text-slate-400 mb-2">No products available yet.</p>
@@ -55,7 +55,7 @@ const ProductMonitoring = () => {
   }
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">Product Monitoring</h1>
         <p className="text-slate-400">View and manage available products for your school</p>
