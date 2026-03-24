@@ -57,7 +57,7 @@ const ProfileSettings = () => {
 
   if (isLoading && !profile) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin mb-4" />
         <p className="text-slate-400">Loading profile...</p>
       </div>
@@ -66,7 +66,7 @@ const ProfileSettings = () => {
 
   if (!profile) {
     return (
-      <div className="p-8">
+      <div>
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
           {error || "Unable to load profile"}
         </div>
@@ -75,7 +75,7 @@ const ProfileSettings = () => {
   }
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">Profile Settings</h1>
         <p className="text-slate-400">Manage your account and security settings</p>

@@ -29,7 +29,7 @@ const SchoolsManagement = () => {
   };
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Schools Management</h1>

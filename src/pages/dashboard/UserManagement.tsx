@@ -101,7 +101,7 @@ const UserManagement: React.FC = () => {
 
   if (!schoolId) {
     return (
-      <div className="p-8">
+      <div>
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
           Unable to load users. Please login again.
         </div>
@@ -110,7 +110,7 @@ const UserManagement: React.FC = () => {
   }
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="space-y-6">
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400 flex justify-between items-center">
           {error}
