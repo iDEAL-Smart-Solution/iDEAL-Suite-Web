@@ -7,10 +7,10 @@ const Topbar = ({ onToggleSidebar }: { onToggleSidebar?: () => void }) => {
   const initial = user?.fullName?.charAt(0)?.toUpperCase() ?? user?.email?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
-    <header className="fixed top-0 left-0 lg:left-64 right-0 bg-surface-900/80 backdrop-blur-md border-b border-surface-700/50 h-16 flex items-center justify-between px-6 z-30">
+    <header className="fixed top-0 left-0 lg:left-64 right-0 bg-white/90 backdrop-blur-md border-b border-brand-100 h-16 flex items-center justify-between px-6 z-30 shadow-sm">
       {/* Hamburger Menu */}
       <button
-        className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-surface-800 transition-colors duration-200 text-slate-400 hover:text-slate-200"
+        className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-brand-50 transition-colors duration-200 text-slate-600 hover:text-brand-700"
         onClick={onToggleSidebar}
         aria-label="Toggle sidebar"
       >
@@ -22,14 +22,14 @@ const Topbar = ({ onToggleSidebar }: { onToggleSidebar?: () => void }) => {
       {/* User Actions */}
       <div className="flex items-center gap-4">
         <div className="hidden sm:flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-brand-500/15 text-brand-400 flex items-center justify-center text-sm font-semibold">
+          <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold">
             {initial}
           </div>
-          <span className="text-slate-400 text-sm">{user?.email}</span>
+          <span className="text-slate-600 text-sm">{user?.email}</span>
         </div>
         <button
           onClick={logout}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:text-red-500 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium"
           aria-label="Logout"
         >
           <LogOut size={18} />
