@@ -7,22 +7,23 @@ interface ProtectedRouteProps {
   allowedRoles?: number[];
 }
 
+const getDefaultRouteForRole = (role?: number) => {
+  if (role === 0) return "/dev/dashboard";
+  if (role === 1 || role === 2 || role === 3) return "/dashboard";
+  return "/login";
+};
+
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const { user, token } = useAuthStore();
 
-  // 🔐 Not authenticated (no real user AND no demo token)
-  if (!user && !token) {
+  // Require both auth token and a hydrated user so role checks are always possible.
+  if (!user || !token) {
     return <Navigate to="/login" replace />;
   }
 
-  // 🧪 Demo account: allow access without role checks (both demo tokens)
-  if (token === "demo-token" || token === "dev-demo-token") {
-    return children;
-  }
-
-  // 🔐 Role-based protection (real users only)
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/login" replace />;
+  // Enforce route-level role access.
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to={getDefaultRouteForRole(user.role)} replace />;
   }
 
   return children;

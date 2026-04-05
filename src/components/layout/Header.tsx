@@ -17,13 +17,6 @@ const Header = () => {
           >
             Login
           </Link>
-
-          <Link
-            to="/register-school"
-            className="px-5 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white transition-colors duration-200 text-sm font-medium"
-          >
-            Get Started
-          </Link>
         </nav>
       </div>
     </header>
