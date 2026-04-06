@@ -12,7 +12,7 @@ interface CardProps {
 const Card = ({ icon, title, description, children, className }: CardProps) => (
   <div
     className={cn(
-      "bg-surface-800 border border-surface-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200",
+      "bg-white border border-brand-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200",
       className
     )}
   >
@@ -21,8 +21,8 @@ const Card = ({ icon, title, description, children, className }: CardProps) => (
         {icon}
       </div>
     )}
-    <h3 className="text-base font-semibold text-white mb-1">{title}</h3>
-    {description && <p className="text-sm text-slate-400 leading-relaxed">{description}</p>}
+    <h3 className="text-base font-semibold text-slate-900 mb-1">{title}</h3>
+    {description && <p className="text-sm text-slate-600 leading-relaxed">{description}</p>}
     {children}
   </div>
 );

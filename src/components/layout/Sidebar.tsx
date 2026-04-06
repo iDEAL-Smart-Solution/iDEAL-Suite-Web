@@ -16,8 +16,8 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
   cn(
     "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200",
     isActive
-      ? "bg-brand-500/10 text-brand-400 border-l-[3px] border-brand-400"
-      : "text-slate-400 hover:text-slate-200 hover:bg-surface-800"
+      ? "bg-brand-100 text-brand-700 border-l-[3px] border-brand-500"
+      : "text-slate-700 hover:text-brand-700 hover:bg-brand-50"
   );
 
 const Sidebar = ({
@@ -32,16 +32,16 @@ const Sidebar = ({
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-screen w-64 bg-surface-900 border-r border-surface-700 flex flex-col transition-transform duration-300 z-40",
+        "fixed left-0 top-0 h-screen w-64 bg-white border-r border-brand-100 shadow-sm flex flex-col transition-transform duration-300 z-40",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}
       aria-label="Main navigation"
     >
       {/* Sidebar Header */}
-      <div className="flex justify-between items-center p-5 border-b border-surface-700">
+      <div className="flex justify-between items-center p-5 border-b border-brand-100">
         <span className="text-xl font-bold text-gradient">iDEAL-Suite</span>
         <button
-          className="lg:hidden text-slate-400 hover:text-slate-50 transition-colors duration-200"
+          className="lg:hidden text-slate-500 hover:text-brand-700 transition-colors duration-200"
           onClick={onClose}
           aria-label="Close sidebar"
         >

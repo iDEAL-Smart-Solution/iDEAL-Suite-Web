@@ -39,80 +39,78 @@ const Login = () => {
     const displayError = error || storeError;
 
     return (
-        <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center px-4 relative overflow-hidden">
-            {/* Decorative gradients */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-radial from-brand-500/10 via-transparent to-transparent rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-radial from-brand-500/10 via-transparent to-transparent rounded-full blur-3xl" />
+        <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-brand-100/60 flex items-center justify-center px-4 py-10 relative overflow-hidden">
+            <div className="absolute -top-20 -right-24 h-72 w-72 rounded-full bg-brand-300/20 blur-3xl" />
+            <div className="absolute -bottom-20 -left-24 h-72 w-72 rounded-full bg-brand-500/10 blur-3xl" />
 
-            {/* Logo and header */}
-            <div className="mb-12 text-center relative z-10">
-                <div className="text-4xl font-black text-gradient mb-2">
-                    iDEAL-Suite
+            <div className="w-full max-w-md rounded-2xl bg-white border border-brand-100 shadow-2xl shadow-brand-500/10 p-8 sm:p-10 relative z-10">
+                <div className="text-center mb-8">
+                    <p className="text-xs sm:text-sm font-semibold tracking-[0.2em] text-brand-600 uppercase">iDEAL-Suite</p>
+                    <h1 className="text-3xl sm:text-[2rem] font-black text-slate-900 mt-2">Welcome Back</h1>
+                    <p className="text-sm text-slate-600 mt-2">Sign in to continue to your school dashboard</p>
                 </div>
-                <p className="text-slate-400">School Management Platform</p>
-            </div>
-
-            {/* Login Card */}
-            <div className="w-full max-w-md bg-surface-800 border border-surface-700 rounded-xl shadow-2xl p-8 relative z-10">
-                <h2 className="text-2xl font-black mb-2 text-slate-50">Login to Dashboard</h2>
-                <p className="text-slate-400 text-sm mb-8">Access your school management tools</p>
 
                 {displayError && (
-                    <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium mb-6">
+                    <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm font-medium mb-6">
                         {displayError}
                     </div>
                 )}
 
-                <div className="space-y-6 mb-8">
-                    {/* Email Input */}
+                <form
+                    className="space-y-5"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSubmit();
+                    }}
+                >
                     <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
-                            <Mail className="w-4 h-4" />
+                        <label htmlFor="login-email" className="block text-sm font-medium text-slate-700 flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-brand-600" />
                             Email Address
                         </label>
                         <input
+                            id="login-email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="admin@school.com"
-                            className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
+                            autoComplete="email"
+                            className="w-full h-11 px-3.5 rounded-xl bg-white border border-brand-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 transition-all"
                         />
                     </div>
 
-                    {/* Password Input */}
                     <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-slate-300 flex items-center gap-2 mb-2">
-                            <Lock className="w-4 h-4" />
+                        <label htmlFor="login-password" className="block text-sm font-medium text-slate-700 flex items-center gap-2">
+                            <Lock className="w-4 h-4 text-brand-600" />
                             Password
                         </label>
                         <input
+                            id="login-password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
-                            className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
-                            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                            autoComplete="current-password"
+                            className="w-full h-11 px-3.5 rounded-xl bg-white border border-brand-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 transition-all"
                         />
                     </div>
-                </div>
 
-                {/* Login Button */}
-                <button
-                    onClick={handleSubmit}
-                    disabled={isLoading}
-                    className="w-full px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
-                >
-                    <LogIn className="w-5 h-5" />
-                    {isLoading ? "Logging in..." : "Login"}
-                </button>
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full mt-2 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
+                    >
+                        <LogIn className="w-5 h-5" />
+                        {isLoading ? "Logging in..." : "Login"}
+                    </button>
+                </form>
 
-                {/* Footer */}
-                <div className="mt-8 pt-6 border-t border-surface-700 text-center text-sm text-slate-400">
+                <div className="mt-7 pt-5 border-t border-brand-100 text-center text-sm text-slate-600">
                     <p>
                         Don't have an account?{" "}
                         <Link
                             to="/register-school"
-                            className="text-brand-400 font-semibold hover:text-brand-300 transition-colors"
+                            className="text-brand-600 font-semibold hover:text-brand-700"
                         >
                             Register School
                         </Link>

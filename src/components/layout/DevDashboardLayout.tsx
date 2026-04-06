@@ -49,19 +49,19 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-surface-900 transition-all duration-300 flex flex-col border-r border-surface-700",
+          "bg-white transition-all duration-300 flex flex-col border-r border-brand-100 shadow-sm",
           sidebarOpen ? "w-64" : "w-20"
         )}
         aria-label="Platform navigation"
       >
         {/* Header */}
-        <div className="p-5 border-b border-surface-700 flex items-center justify-between">
+        <div className="p-5 border-b border-brand-100 flex items-center justify-between">
           {sidebarOpen && (
             <span className="text-xl font-bold text-gradient">iDEAL-Suite</span>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-slate-400 hover:text-slate-200 transition-colors duration-200"
+            className="text-slate-500 hover:text-brand-700 transition-colors duration-200"
             aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
@@ -78,8 +78,8 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200",
                 isActive(item.path)
-                  ? "bg-brand-500/10 text-brand-400 border-l-[3px] border-brand-400"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-surface-800"
+                  ? "bg-brand-100 text-brand-700 border-l-[3px] border-brand-500"
+                  : "text-slate-700 hover:text-brand-700 hover:bg-brand-50"
               )}
             >
               {item.icon}
@@ -89,17 +89,17 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
         </nav>
 
         {/* User section */}
-        <div className="p-5 border-t border-surface-700">
+        <div className="p-5 border-t border-brand-100">
           {sidebarOpen ? (
             <div className="mb-3 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-brand-500/15 text-brand-400 flex items-center justify-center text-sm font-semibold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold shrink-0">
                 {initial}
               </div>
               <div className="min-w-0">
-                <p className="text-slate-200 font-medium text-sm truncate">
+                <p className="text-slate-700 font-medium text-sm truncate">
                   {user?.fullName}
                 </p>
-                <span className="inline-block mt-0.5 text-[11px] font-medium text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded-md">
+                <span className="inline-block mt-0.5 text-[11px] font-medium text-brand-700 bg-brand-100 px-2 py-0.5 rounded-md">
                   Platform Admin
                 </span>
               </div>
@@ -107,7 +107,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
           ) : null}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:text-red-500 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium"
             aria-label="Logout"
           >
             <LogOut size={18} />
@@ -119,8 +119,8 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <header className="bg-surface-900 border-b border-surface-700/50 px-6 h-16 flex items-center">
-          <h1 className="text-lg font-semibold text-slate-100">Platform Admin Dashboard</h1>
+        <header className="bg-white border-b border-brand-100 px-6 h-16 flex items-center shadow-sm">
+          <h1 className="text-lg font-semibold text-slate-800">Platform Admin Dashboard</h1>
         </header>
 
         {/* Content Area */}
