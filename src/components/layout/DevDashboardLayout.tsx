@@ -13,6 +13,7 @@ import {
   X,
   Wallet,
   MessageSquare,
+  Users,
 } from "lucide-react";
 
 interface DevDashboardLayoutProps {
@@ -31,6 +32,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
     { label: "Subscriptions", path: "/dev/subscriptions", icon: <CreditCard size={18} /> },
     { label: "Payments", path: "/dev/payments", icon: <Wallet size={18} /> },
     { label: "Products", path: "/dev/products", icon: <Package size={18} /> },
+    { label: "Students", path: "/dev/students", icon: <Users size={18} /> },
     { label: "Feedback", path: "/dev/feedback", icon: <MessageSquare size={18} /> },
     { label: "Settings", path: "/dev/settings", icon: <Settings size={18} /> },
   ];

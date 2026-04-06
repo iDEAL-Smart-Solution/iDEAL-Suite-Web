@@ -5,8 +5,6 @@ import ProtectedRoute from "./ProtectedRoute";
 /* ── Lazy-loaded pages ─────────────────────────────── */
 const Landing = lazy(() => import("../pages/public/Landing"));
 const Login = lazy(() => import("../pages/public/Login"));
-const SchoolRegistration = lazy(() => import("../pages/public/SchoolRegistration"));
-const CreateAdmin = lazy(() => import("../pages/public/CreateAdmin"));
 
 const DashboardLayout = lazy(() => import("../components/layout/DashboardLayout"));
 const DevDashboardLayout = lazy(() => import("../components/layout/DevDashboardLayout"));
@@ -22,6 +20,7 @@ const ProductMonitoring = lazy(() => import("../pages/dashboard/ProductMonitorin
 const ProfileSettings = lazy(() => import("../pages/dashboard/ProfileSettings"));
 const PaymentHistory = lazy(() => import("../pages/dashboard/PaymentHistory"));
 const FeedbackPage = lazy(() => import("../pages/dashboard/FeedbackPage"));
+const StudentListPage = lazy(() => import("../pages/dashboard/StudentListPage"));
 
 /* ── Suspense fallback ─────────────────────────────── */
 const PageLoader = () => (
@@ -37,14 +36,11 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register-school" element={<SchoolRegistration />} />
-        <Route path="/signup" element={<SchoolRegistration />} />
-        <Route path="/create-admin" element={<CreateAdmin />} />
 
         <Route
           path="/dev/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[0]}>
               <DevDashboardLayout>
                 <DevDashboardHome />
               </DevDashboardLayout>
@@ -55,7 +51,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/schools"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[0]}>
               <DevDashboardLayout>
                 <SchoolsManagement />
               </DevDashboardLayout>
@@ -66,7 +62,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/subscriptions"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[0]}>
               <DevDashboardLayout>
                 <SubscriptionsManagement />
               </DevDashboardLayout>
@@ -77,7 +73,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/products"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[0]}>
               <DevDashboardLayout>
                 <ProductsManagement />
               </DevDashboardLayout>
@@ -88,7 +84,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/payments"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[0]}>
               <DevDashboardLayout>
                 <PaymentHistory />
               </DevDashboardLayout>
@@ -99,7 +95,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/settings"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[0]}>
               <DevDashboardLayout>
                 <ProfileSettings />
               </DevDashboardLayout>
@@ -110,7 +106,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/feedback"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[0]}>
               <DevDashboardLayout>
                 <FeedbackPage />
               </DevDashboardLayout>
@@ -119,9 +115,20 @@ const AppRoutes = () => {
         />
 
         <Route
+          path="/dev/students"
+          element={
+            <ProtectedRoute allowedRoles={[0]}>
+              <DevDashboardLayout>
+                <StudentListPage />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[1, 2, 3]}>
               <DashboardLayout>
                 <DashboardHome />
               </DashboardLayout>
@@ -132,7 +139,7 @@ const AppRoutes = () => {
         <Route
           path="/users"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[1, 2]}>
               <DashboardLayout>
                 <UserManagement />
               </DashboardLayout>
@@ -143,7 +150,7 @@ const AppRoutes = () => {
         <Route
           path="/subscriptions"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[1]}>
               <DashboardLayout>
                 <SubscriptionManagement />
               </DashboardLayout>
@@ -154,7 +161,7 @@ const AppRoutes = () => {
         <Route
           path="/products"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[1, 2, 3]}>
               <DashboardLayout>
                 <ProductMonitoring />
               </DashboardLayout>
@@ -165,7 +172,7 @@ const AppRoutes = () => {
         <Route
           path="/payments"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[1]}>
               <DashboardLayout>
                 <PaymentHistory />
               </DashboardLayout>
@@ -176,7 +183,7 @@ const AppRoutes = () => {
         <Route
           path="/profile"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[1, 2, 3]}>
               <DashboardLayout>
                 <ProfileSettings />
               </DashboardLayout>
@@ -187,7 +194,7 @@ const AppRoutes = () => {
         <Route
           path="/settings"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[1, 2, 3]}>
               <DashboardLayout>
                 <ProfileSettings />
               </DashboardLayout>
@@ -198,7 +205,7 @@ const AppRoutes = () => {
         <Route
           path="/feedback"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={[1, 2]}>
               <DashboardLayout>
                 <FeedbackPage />
               </DashboardLayout>

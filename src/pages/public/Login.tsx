@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { isEmailValid } from "../../utils/validators";
@@ -28,9 +28,15 @@ const Login = () => {
 
             if (user?.role === 0) {
                 navigate("/dev/dashboard");
-            } else {
-                navigate("/dashboard");
+                return;
             }
+
+            if (user?.role === 1 || user?.role === 2 || user?.role === 3) {
+                navigate("/dashboard");
+                return;
+            }
+
+            setError("Your account role is not configured for dashboard access.");
         } catch {
             setError(storeError || "Incorrect email or password");
         }
@@ -105,17 +111,6 @@ const Login = () => {
                     </button>
                 </form>
 
-                <div className="mt-7 pt-5 border-t border-brand-100 text-center text-sm text-slate-600">
-                    <p>
-                        Don't have an account?{" "}
-                        <Link
-                            to="/register-school"
-                            className="text-brand-600 font-semibold hover:text-brand-700"
-                        >
-                            Register School
-                        </Link>
-                    </p>
-                </div>
             </div>
         </div>
     );

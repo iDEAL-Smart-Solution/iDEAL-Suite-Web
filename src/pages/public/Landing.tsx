@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Zap, Users, TrendingUp, BarChart3 } from "lucide-react";
+import { Zap, Users, TrendingUp, BarChart3 } from "lucide-react";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -42,12 +42,6 @@ const Landing = () => {
             >
               Login
             </button>
-            <button
-              onClick={() => navigate("/register-school")}
-              className="px-6 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold shadow-lg transition-all duration-300 hover:-translate-y-0.5"
-            >
-              Get Started
-            </button>
           </nav>
         </div>
       </header>
@@ -68,14 +62,7 @@ const Landing = () => {
           <p className="text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
             Comprehensive school management, subscription tracking, and product monitoring in one powerful platform
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate("/register-school")}
-              className="px-8 py-4 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex items-center justify-center gap-2"
-            >
-              Register Your School
-              <ArrowRight className="w-5 h-5" />
-            </button>
+          <div className="flex justify-center">
             <button
               onClick={() => navigate("/login")}
               className="px-8 py-4 rounded-lg border-2 border-brand-300 text-brand-700 font-semibold hover:bg-brand-50 transition-all duration-300 hover:-translate-y-1"
