@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
+import PageHeader from "../../components/layout/PageHeader";
 
 const SubscriptionsManagement = () => {
   const { subscriptionHistory, isLoading, error, fetchReportingSubscriptions } = useSubscriptionStore();
@@ -36,12 +37,12 @@ const SubscriptionsManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Subscriptions Management</h1>
-        <p className="text-slate-400">Manage all school subscriptions across the platform</p>
-      </div>
+      <PageHeader
+        title="Subscriptions Management"
+        subtitle="Manage all school subscriptions across the platform"
+      />
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
           <input
@@ -60,15 +61,15 @@ const SubscriptionsManagement = () => {
 
       <div className="bg-surface-800 rounded-xl border border-surface-700 overflow-hidden">
         <div className="overflow-x-auto">
-        <table className="w-full min-w-[750px]">
+        <table className="w-full min-w-[620px]">
           <thead className="bg-surface-900">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Plan</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">School</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Start Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Expiry Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Student Slots</th>
+              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Plan</th>
+              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">School</th>
+              <th className="hidden sm:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Start Date</th>
+              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Expiry Date</th>
+              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Status</th>
+              <th className="hidden md:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Student Slots</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-surface-700">
@@ -79,16 +80,16 @@ const SubscriptionsManagement = () => {
             ) : (
               filteredSubscriptions.map((sub) => (
                 <tr key={sub.id} className="hover:bg-surface-700/50 transition-colors">
-                  <td className="px-6 py-4 text-white font-medium">{sub.planType || "N/A"}</td>
-                  <td className="px-6 py-4 text-slate-300">{sub.schoolId}</td>
-                  <td className="px-6 py-4 text-slate-300">{sub.startDate ? new Date(sub.startDate).toLocaleDateString() : "N/A"}</td>
-                  <td className="px-6 py-4 text-slate-300">{sub.expiryDate ? new Date(sub.expiryDate).toLocaleDateString() : "N/A"}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 sm:px-6 py-4 text-white font-medium">{sub.planType || "N/A"}</td>
+                  <td className="px-3 sm:px-6 py-4 text-slate-300">{sub.schoolId}</td>
+                  <td className="hidden sm:table-cell px-3 sm:px-6 py-4 text-slate-300">{sub.startDate ? new Date(sub.startDate).toLocaleDateString() : "N/A"}</td>
+                  <td className="px-3 sm:px-6 py-4 text-slate-300">{sub.expiryDate ? new Date(sub.expiryDate).toLocaleDateString() : "N/A"}</td>
+                  <td className="px-3 sm:px-6 py-4">
                     <span className={`px-2 py-0.5 text-xs font-medium rounded-md ${getStatusColor(sub.status)}`}>
                       {getStatusLabel(sub.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-300">{sub.paidStudentSlots ?? 0}</td>
+                  <td className="hidden md:table-cell px-3 sm:px-6 py-4 text-slate-300">{sub.paidStudentSlots ?? 0}</td>
                 </tr>
               ))
             )}

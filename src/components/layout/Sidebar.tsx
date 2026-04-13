@@ -22,9 +22,11 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
 
 const Sidebar = ({
   isOpen = false,
+  isCollapsed = false,
   onClose,
 }: {
   isOpen?: boolean;
+  isCollapsed?: boolean;
   onClose?: () => void;
 }) => {
   const user = useAuthStore((s) => s.user);
@@ -32,16 +34,18 @@ const Sidebar = ({
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-screen w-64 bg-white border-r border-brand-100 shadow-sm flex flex-col transition-transform duration-300 z-40",
-        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        "fixed left-0 top-0 h-screen bg-white border-r border-brand-100 shadow-sm flex flex-col z-40 transition-all duration-300",
+        "w-64 md:translate-x-0",
+        isCollapsed ? "md:w-20" : "md:w-64",
+        isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}
       aria-label="Main navigation"
     >
       {/* Sidebar Header */}
       <div className="flex justify-between items-center p-5 border-b border-brand-100">
-        <span className="text-xl font-bold text-gradient">iDEAL-Suite</span>
+        {!isCollapsed && <span className="text-xl font-bold text-gradient">iDEAL-Suite</span>}
         <button
-          className="lg:hidden text-slate-500 hover:text-brand-700 transition-colors duration-200"
+          className="md:hidden text-slate-500 hover:text-brand-700 transition-colors duration-200"
           onClick={onClose}
           aria-label="Close sidebar"
         >
@@ -53,13 +57,13 @@ const Sidebar = ({
       <nav className="flex-1 p-5 flex flex-col gap-1 overflow-y-auto" aria-label="Sidebar navigation">
         <NavLink to="/dashboard" end className={navLinkClasses} aria-label="Dashboard">
           <LayoutDashboard size={18} />
-          Dashboard
+          {!isCollapsed && "Dashboard"}
         </NavLink>
 
         {(user?.role === 1 || user?.role === 2) && (
           <NavLink to="/users" className={navLinkClasses} aria-label="Users">
             <Users size={18} />
-            Users
+            {!isCollapsed && "Users"}
           </NavLink>
         )}
 
@@ -67,17 +71,17 @@ const Sidebar = ({
           <>
             <NavLink to="/subscriptions" className={navLinkClasses} aria-label="Subscriptions">
               <CreditCard size={18} />
-              Subscriptions
+              {!isCollapsed && "Subscriptions"}
             </NavLink>
 
             <NavLink to="/payments" className={navLinkClasses} aria-label="Payments">
               <Wallet size={18} />
-              Payments
+              {!isCollapsed && "Payments"}
             </NavLink>
 
             <NavLink to="/products" className={navLinkClasses} aria-label="Products">
               <Package size={18} />
-              Products
+              {!isCollapsed && "Products"}
             </NavLink>
           </>
         )}
@@ -85,13 +89,13 @@ const Sidebar = ({
         {(user?.role === 1 || user?.role === 2) && (
           <NavLink to="/feedback" className={navLinkClasses} aria-label="Feedback">
             <MessageSquare size={18} />
-            Feedback
+            {!isCollapsed && "Feedback"}
           </NavLink>
         )}
 
         <NavLink to="/profile" className={navLinkClasses} aria-label="Profile">
           <UserCircle size={18} />
-          Profile
+          {!isCollapsed && "Profile"}
         </NavLink>
       </nav>
     </aside>

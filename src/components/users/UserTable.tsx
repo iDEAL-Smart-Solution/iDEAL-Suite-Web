@@ -56,7 +56,7 @@ const UserTable: React.FC<UserTableProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-8 shadow-sm">
+      <div className="bg-surface-800 rounded-xl border border-surface-700 p-4 md:p-6 shadow-sm">
         <div className="text-center text-slate-400">Loading users...</div>
       </div>
     );
@@ -64,7 +64,7 @@ const UserTable: React.FC<UserTableProps> = ({
 
   if (users.length === 0) {
     return (
-      <div className="bg-surface-800 rounded-xl border border-surface-700 p-8 shadow-sm">
+      <div className="bg-surface-800 rounded-xl border border-surface-700 p-4 md:p-6 shadow-sm">
         <div className="text-center">
           <p className="text-slate-400">No users found. Add your first user!</p>
         </div>
@@ -75,39 +75,39 @@ const UserTable: React.FC<UserTableProps> = ({
   return (
     <div className="bg-surface-800 rounded-xl border border-surface-700 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[800px]">
+        <table className="w-full min-w-[620px]">
           <thead>
             <tr className="bg-surface-900 border-b border-surface-700">
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Avatar</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Full Name</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Email</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Phone Number</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Role</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Actions</th>
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Avatar</th>
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Full Name</th>
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Email</th>
+              <th className="hidden md:table-cell px-3 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Phone Number</th>
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Role</th>
+              <th className="hidden sm:table-cell px-3 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Status</th>
+              <th className="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr key={user.id} className="border-b border-surface-700 hover:bg-surface-700/50 transition-colors duration-200">
-                <td className="px-4 py-3">
+                <td className="px-3 sm:px-4 py-3">
                   <div className="w-10 h-10 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-semibold text-sm">
                     {getInitials(user.firstName, user.lastName)}
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-3 sm:px-4 py-3">
                   <span className="text-white font-semibold">
                     {user.firstName} {user.lastName}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-slate-400">{user.email}</td>
-                <td className="px-4 py-3 text-slate-400">{user.phoneNumber}</td>
-                <td className="px-4 py-3">
+                <td className="px-3 sm:px-4 py-3 text-slate-400">{user.email}</td>
+                <td className="hidden md:table-cell px-3 sm:px-4 py-3 text-slate-400">{user.phoneNumber}</td>
+                <td className="px-3 sm:px-4 py-3">
                   <span className={cn("inline-block px-3 py-1 rounded-md text-xs font-semibold", getRoleColor(user.role))}>
                     {getRoleName(user.role)}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="hidden sm:table-cell px-3 sm:px-4 py-3">
                   <span className={cn(
                     "inline-block px-3 py-1 rounded-md text-xs font-semibold",
                     user.status === "active" 
@@ -117,8 +117,8 @@ const UserTable: React.FC<UserTableProps> = ({
                     {user.status || "active"}
                   </span>
                 </td>
-                <td className="px-4 py-3">
-                  <div className="flex gap-2">
+                <td className="px-3 sm:px-4 py-3">
+                  <div className="flex flex-wrap gap-2">
                     {canEdit && (
                       <button
                         className="bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 font-semibold py-1 px-3 rounded-lg text-sm transition-colors duration-200"

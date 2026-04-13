@@ -6,6 +6,7 @@ import CurrentSubscriptionCard from "../../components/subscriptions/CurrentSubsc
 import CreateSubscriptionModal from "../../components/subscriptions/CreateSubscriptionModal";
 import SubscriptionHistoryTable from "../../components/subscriptions/SubscriptionHistoryTable";
 import PaymentModal from "../../components/subscriptions/PaymentModal";
+import PageHeader from "../../components/layout/PageHeader";
 
 const SubscriptionManagement: React.FC = () => {
   const user = useAuthStore((s) => s.user);
@@ -77,15 +78,17 @@ const SubscriptionManagement: React.FC = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-white">Subscription Management</h1>
-        <button
-          className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-lg font-medium transition-all"
-          onClick={() => { setIsRenewalMode(false); setIsModalOpen(true); }}
-        >
-          + Create New Subscription
-        </button>
-      </div>
+      <PageHeader
+        title="Subscription Management"
+        action={
+          <button
+            className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-medium transition-all"
+            onClick={() => { setIsRenewalMode(false); setIsModalOpen(true); }}
+          >
+            + Create New Subscription
+          </button>
+        }
+      />
 
       <CurrentSubscriptionCard
         subscription={currentSubscription}
@@ -98,7 +101,7 @@ const SubscriptionManagement: React.FC = () => {
       />
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-white">Subscription History</h2>
+        <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-white">Subscription History</h2>
         <SubscriptionHistoryTable subscriptions={subscriptionHistory} isLoading={isLoading} />
       </div>
 

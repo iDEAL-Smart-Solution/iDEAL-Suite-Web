@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "../../lib/utils";
 import { CreditCard, Loader2, ExternalLink, ShieldCheck } from "lucide-react";
 import { usePaymentStore } from "../../stores/usePaymentStore";
@@ -15,6 +15,21 @@ interface PaymentModalProps {
 const PLAN_PRICES: Record<string, number> = {
   Local: 50000,
   Remote: 100000,
+};
+
+const isTrustedPaymentUrl = (url: string): boolean => {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    return (
+      parsed.protocol === "https:" &&
+      (host === "paystack.com" ||
+        host.endsWith(".paystack.com") ||
+        host === "checkout.paystack.com")
+    );
+  } catch {
+    return false;
+  }
 };
 
 const PaymentModal: React.FC<PaymentModalProps> = ({
@@ -34,16 +49,35 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   );
   const [paymentError, setPaymentError] = useState("");
   const [step, setStep] = useState<"form" | "processing" | "redirect">("form");
+  const redirectTimeoutRef = useRef<number | null>(null);
+  const isSubmittingRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current) {
+        window.clearTimeout(redirectTimeoutRef.current);
+      }
+      isSubmittingRef.current = false;
+    };
+  }, []);
 
   const handlePay = async () => {
-    console.log("handlePay called");
-    console.log("subscription:", subscription);
-    console.log("schoolId:", schoolId);
-    console.log("email:", email);
-    console.log("amount:", amount);
+    if (isSubmittingRef.current || step !== "form") {
+      return;
+    }
     
     if (!subscription) {
       setPaymentError("No subscription found. Please create a subscription first.");
+      return;
+    }
+
+    if (!schoolId?.trim()) {
+      setPaymentError("School context is missing. Please log in again.");
+      return;
+    }
+
+    if (!email?.trim()) {
+      setPaymentError("A valid payment email is required.");
       return;
     }
 
@@ -54,47 +88,48 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
     setPaymentError("");
     clearMessages();
+    isSubmittingRef.current = true;
     setStep("processing");
 
     try {
-      console.log("Calling initializePayment with:", {
-        subscriptionId: subscription.id,
-        schoolId,
-        amount,
-        email,
-        callbackUrl: `${window.location.origin}/subscriptions`,
-      });
-      
       const authorizationUrl = await initializePayment({
         subscriptionId: subscription.id,
         schoolId,
         amount,
-        email,
-        callbackUrl: `${window.location.origin}/subscriptions`,
+        email: email.trim(),
+        callbackUrl: `${window.location.origin}/payments/success`,
       });
-      
-      console.log("authorizationUrl received:", authorizationUrl);
 
-      if (authorizationUrl) {
-        setStep("redirect");
-        // Short delay so user sees the redirect message
-        setTimeout(() => {
-          console.log("Redirecting to:", authorizationUrl);
-          window.location.href = authorizationUrl;
-        }, 1500);
-      } else {
-        console.error("No authorization URL returned");
+      if (!authorizationUrl) {
         setStep("form");
-        setPaymentError("Payment gateway did not return a redirect URL. Please check console for details.");
+        setPaymentError("Unable to start payment. Please try again.");
+        return;
       }
-    } catch (err) {
-      console.error("Payment initialization error:", err);
+
+      if (!isTrustedPaymentUrl(authorizationUrl)) {
+        setStep("form");
+        setPaymentError("Received an invalid payment gateway URL. Please contact support.");
+        return;
+      }
+
+      setStep("redirect");
+      redirectTimeoutRef.current = window.setTimeout(() => {
+        window.location.assign(authorizationUrl);
+      }, 700);
+    } catch {
       setStep("form");
+      setPaymentError("Payment initialization failed. Please try again.");
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
   const handleClose = () => {
     if (step === "processing") return; // Don't close while processing
+    if (redirectTimeoutRef.current) {
+      window.clearTimeout(redirectTimeoutRef.current);
+      redirectTimeoutRef.current = null;
+    }
     setStep("form");
     setPaymentError("");
     clearMessages();
@@ -104,7 +139,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   if (!isOpen) return null;
 
   const displayError = paymentError || error;
-  const canPay = subscription && !isInitializing && amount >= 1000;
+  const canPay = subscription && !isInitializing && step === "form" && amount >= 1000;
 
   return (
     <div
@@ -112,11 +147,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       onClick={handleClose}
     >
       <div
-        className="bg-surface-800 border border-surface-700 rounded-xl shadow-2xl w-full max-w-md"
+        className="bg-surface-800 border border-surface-700 rounded-xl shadow-2xl w-full max-w-sm sm:max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-surface-700">
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-surface-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center">
               <CreditCard className="w-5 h-5 text-brand-400" />
@@ -136,7 +171,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           {step === "redirect" && (
             <div className="text-center py-8 space-y-4">
               <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mx-auto">
@@ -244,23 +279,23 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
         {/* Footer */}
         {step === "form" && (
-          <div className="p-6 border-t border-surface-700">
+          <div className="p-4 md:p-6 border-t border-surface-700">
             {!subscription && (
               <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 text-sm">
                 ⚠️ No subscription available. Please create a subscription before making payment.
               </div>
             )}
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
               <button
                 type="button"
-                className="px-4 py-2.5 rounded-lg bg-surface-700 hover:bg-surface-600 text-slate-200 font-medium transition-colors duration-200"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-surface-700 hover:bg-surface-600 text-slate-200 font-medium transition-colors duration-200"
                 onClick={handleClose}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="px-6 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                 onClick={handlePay}
                 disabled={!canPay}
                 title={!subscription ? "No subscription available" : !canPay ? "Please fix errors above" : ""}

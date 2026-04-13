@@ -25,7 +25,7 @@ const ProductUsageTable = ({ products = [] }: ProductUsageTableProps) => {
 
   return (
     <div className="bg-surface-800 border border-surface-700 rounded-xl shadow-sm overflow-hidden">
-      <div className="px-6 py-5">
+      <div className="px-4 sm:px-6 py-4 sm:py-5">
         <h3 className="text-lg font-semibold text-white">Product Usage Overview</h3>
       </div>
 
@@ -35,19 +35,19 @@ const ProductUsageTable = ({ products = [] }: ProductUsageTableProps) => {
         </div>
       ) : (
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px]">
+        <table className="w-full min-w-[520px]">
           <thead>
             <tr className="bg-surface-900">
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th className="text-left px-3 sm:px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Product Name
               </th>
-              <th className="text-center px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th className="text-center px-3 sm:px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Usage Count
               </th>
-              <th className="text-center px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th className="hidden sm:table-cell text-center px-3 sm:px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Last Used
               </th>
-              <th className="text-center px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <th className="text-center px-3 sm:px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Status
               </th>
             </tr>
@@ -58,13 +58,13 @@ const ProductUsageTable = ({ products = [] }: ProductUsageTableProps) => {
                 key={product.id}
                 className="hover:bg-surface-700/50 transition-colors duration-200"
               >
-                <td className="px-6 py-4">
-                  <span className="text-sm font-medium text-white">{product.name}</span>
+                <td className="px-3 sm:px-6 py-4">
+                  <span className="text-xs sm:text-sm font-medium text-white">{product.name}</span>
                 </td>
-                <td className="px-6 py-4 text-center text-sm text-slate-400 tabular-nums">
+                <td className="px-3 sm:px-6 py-4 text-center text-xs sm:text-sm text-slate-400 tabular-nums">
                   {product.usageCount}
                 </td>
-                <td className="px-6 py-4 text-center text-sm text-slate-400">
+                <td className="hidden sm:table-cell px-3 sm:px-6 py-4 text-center text-sm text-slate-400">
                   {product.lastUsed ? (
                     new Date(product.lastUsed).toLocaleDateString("en-US", {
                       year: "numeric",
@@ -75,7 +75,7 @@ const ProductUsageTable = ({ products = [] }: ProductUsageTableProps) => {
                     <span className="text-slate-500">Never</span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-center">
+                <td className="px-3 sm:px-6 py-4 text-center">
                   {getStatusBadge(product.status)}
                 </td>
               </tr>

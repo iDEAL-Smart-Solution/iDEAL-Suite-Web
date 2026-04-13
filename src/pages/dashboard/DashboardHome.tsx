@@ -69,10 +69,10 @@ const DashboardHome = () => {
       <ExpiryWarningBanner expiryDate={stats.expiryDate} />
 
       <div>
-        <h1 className="text-4xl font-bold text-white mb-2">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
           Welcome back, {user?.fullName}!
         </h1>
-        <p className="text-xl font-semibold text-brand-400 mb-2">{stats.schoolName}</p>
+        <p className="text-base sm:text-lg md:text-xl font-semibold text-brand-400 mb-2">{stats.schoolName}</p>
         <p className="text-slate-400">Here's a quick overview of your school system.</p>
       </div>
 
@@ -91,7 +91,7 @@ const DashboardHome = () => {
       </div>
 
       {subscriptionOverview && (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           <MetricCard title="All Subscriptions" value={subscriptionOverview.totalSubscriptions} icon={<Ticket size={20} />} />
           <MetricCard title="Active" value={subscriptionOverview.activeSubscriptions} icon={<Ticket size={20} />} />
           <MetricCard title="Pending" value={subscriptionOverview.pendingSubscriptions} icon={<Ticket size={20} />} />

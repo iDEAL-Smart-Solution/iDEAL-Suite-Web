@@ -27,40 +27,40 @@ const StudentTable = ({ students = [], isLoading = false }: StudentTableProps) =
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1400px]">
+          <table className="w-full min-w-[980px]">
             <thead>
               <tr className="bg-surface-900 border-b border-surface-700">
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="hidden sm:table-cell text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   School Name
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   UIN
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   First Name
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Last Name
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="hidden md:table-cell text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Middle Name
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="hidden lg:table-cell text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Gender
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Email
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="hidden lg:table-cell text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Date of Birth
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Class Name
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="hidden md:table-cell text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Phone Number
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <th className="hidden xl:table-cell text-left px-3 sm:px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Source System
                 </th>
               </tr>
@@ -81,39 +81,39 @@ const StudentTable = ({ students = [], isLoading = false }: StudentTableProps) =
                     key={`${student.uin}-${index}`}
                     className="hover:bg-surface-700/50 transition-colors duration-200"
                   >
-                    <td className="px-6 py-4 text-sm font-medium text-white">
+                    <td className="hidden sm:table-cell px-3 sm:px-6 py-4 text-sm font-medium text-white">
                       {student.schoolName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {student.uin}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {student.firstName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {student.lastName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="hidden md:table-cell px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {student.middleName || "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="hidden lg:table-cell px-3 sm:px-6 py-4 text-sm text-slate-300">
                       <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-brand-500/10 text-brand-400">
                         {student.gender}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300 truncate">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-slate-300 truncate">
                       {student.email}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="hidden lg:table-cell px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {formatDate(student.dateOfBirth)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {student.className}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="hidden md:table-cell px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {student.phoneNumber}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
+                    <td className="hidden xl:table-cell px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {student.sourceSystem}
                     </td>
                   </tr>

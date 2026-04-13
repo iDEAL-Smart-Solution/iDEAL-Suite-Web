@@ -4,6 +4,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"
 
 const api = axios.create({
   baseURL,
+  timeout: 20000,
   // Safely handle empty / 204 responses so JSON.parse("") never throws
   transformResponse: [
     (data) => {

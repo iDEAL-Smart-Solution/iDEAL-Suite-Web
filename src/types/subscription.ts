@@ -87,3 +87,16 @@ export type PaymentRecord = {
   paidAt?: string;
   createdAt: string;
 };
+
+export type BillingSummary = {
+  totalPayments: number;
+  successfulPayments: number;
+  pendingPayments: number;
+  failedPayments: number;
+  totalPaidAmount: number;
+};
+
+export type PaymentReferenceResponse = {
+  payment: PaymentRecord | null;
+  message?: string;
+};

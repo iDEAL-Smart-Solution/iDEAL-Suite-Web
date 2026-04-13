@@ -19,6 +19,7 @@ const SubscriptionManagement = lazy(() => import("../pages/dashboard/Subscriptio
 const ProductMonitoring = lazy(() => import("../pages/dashboard/ProductMonitoring"));
 const ProfileSettings = lazy(() => import("../pages/dashboard/ProfileSettings"));
 const PaymentHistory = lazy(() => import("../pages/dashboard/PaymentHistory"));
+const PaymentSuccess = lazy(() => import("../pages/dashboard/PaymentSuccess"));
 const FeedbackPage = lazy(() => import("../pages/dashboard/FeedbackPage"));
 const StudentListPage = lazy(() => import("../pages/dashboard/StudentListPage"));
 
@@ -175,6 +176,17 @@ const AppRoutes = () => {
             <ProtectedRoute allowedRoles={[1]}>
               <DashboardLayout>
                 <PaymentHistory />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payments/success"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DashboardLayout>
+                <PaymentSuccess />
               </DashboardLayout>
             </ProtectedRoute>
           }

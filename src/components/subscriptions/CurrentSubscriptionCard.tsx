@@ -61,10 +61,10 @@ const CurrentSubscriptionCard = (props: CurrentSubscriptionCardProps) => {
   const expiryDate = new Date(subscription.expiryDate).toLocaleDateString();
 
   return (
-    <div className="bg-surface-800 border border-surface-700 rounded-xl p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-surface-700">
+    <div className="bg-surface-800 border border-surface-700 rounded-xl p-4 md:p-6 shadow-sm">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6 pb-4 border-b border-surface-700">
         <h2 className="text-lg font-bold text-white">Current Subscription</h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {isExpired && <span className="bg-red-500/20 text-red-400 text-xs font-semibold px-3 py-1 rounded-full">Expired</span>}
           {isExpiringSoon && !isExpired && (
             <span className="bg-yellow-500/20 text-yellow-400 text-xs font-semibold px-3 py-1 rounded-full">Expiring Soon</span>
@@ -159,10 +159,10 @@ const CurrentSubscriptionCard = (props: CurrentSubscriptionCardProps) => {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-3 mt-6">
+      <div className="flex flex-col sm:flex-row gap-3 mt-6">
         {onMakePayment && subscription.status === 2 && (
           <button
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 min-w-[140px]"
+            className="w-full sm:flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50"
             onClick={onMakePayment}
             disabled={isLoading}
           >
@@ -170,14 +170,14 @@ const CurrentSubscriptionCard = (props: CurrentSubscriptionCardProps) => {
           </button>
         )}
         <button
-          className="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 min-w-[140px]"
+          className="w-full sm:flex-1 bg-brand-500 hover:bg-brand-600 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50"
           onClick={onRenew}
           disabled={isLoading}
         >
           Renew Subscription
         </button>
         <button
-          className="flex-1 bg-surface-700 hover:bg-surface-600 text-slate-200 font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 min-w-[140px]"
+          className="w-full sm:flex-1 bg-surface-700 hover:bg-surface-600 text-slate-200 font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50"
           onClick={onUpgrade}
           disabled={isLoading}
         >

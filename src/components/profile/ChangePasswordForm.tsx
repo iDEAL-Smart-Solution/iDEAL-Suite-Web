@@ -97,7 +97,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         <label className="block text-sm font-medium text-slate-300">Current Password *</label>
         <input
           type="password"
-          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
+          className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.currentPassword}
           onChange={(e) =>
             setFormData({ ...formData, currentPassword: e.target.value })
@@ -114,7 +114,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         <label className="block text-sm font-medium text-slate-300">New Password *</label>
         <input
           type="password"
-          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
+          className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.newPassword}
           onChange={(e) => handleNewPasswordChange(e.target.value)}
           disabled={isLoading}
@@ -195,7 +195,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         <label className="block text-sm font-medium text-slate-300">Confirm Password *</label>
         <input
           type="password"
-          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
+          className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.confirmPassword}
           onChange={(e) =>
             setFormData({ ...formData, confirmPassword: e.target.value })
@@ -210,7 +210,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
 
       <button
         type="submit"
-        className="w-full h-10 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50"
+        className="w-full bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 py-2.5"
         disabled={isLoading}
       >
         {isLoading ? "Changing..." : "Change Password"}

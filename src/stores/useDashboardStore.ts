@@ -7,6 +7,8 @@ import type {
   UsageChartData,
 } from "../types/dashboard";
 
+const DASHBOARD_SCHOOL_METRICS_ENDPOINT = "/Dashboard/school";
+
 const normalizeUsageChartData = (payload: unknown): UsageChartData[] => {
   const value = (payload as any)?.data ?? payload;
 

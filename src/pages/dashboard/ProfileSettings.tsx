@@ -5,6 +5,7 @@ import { useProfileStore } from "../../stores/useProfileStore";
 import ProfileAvatar from "../../components/profile/ProfileAvatar";
 import PersonalInfoForm from "../../components/profile/PersonalInfoForm";
 import ChangePasswordForm from "../../components/profile/ChangePasswordForm";
+import PageHeader from "../../components/layout/PageHeader";
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
@@ -76,10 +77,10 @@ const ProfileSettings = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Profile Settings</h1>
-        <p className="text-slate-400">Manage your account and security settings</p>
-      </div>
+      <PageHeader
+        title="Profile Settings"
+        subtitle="Manage your account and security settings"
+      />
 
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">{error}</div>
@@ -89,29 +90,29 @@ const ProfileSettings = () => {
       )}
 
       <div className="space-y-8">
-        <div className="bg-surface-800 rounded-xl p-6">
+        <div className="bg-surface-800 rounded-xl p-4 md:p-6">
           <ProfileAvatar user={profile} onAvatarUpload={handleAvatarUpload} isLoading={isLoading} />
         </div>
 
-        <div className="bg-surface-800 rounded-xl p-6">
+        <div className="bg-surface-800 rounded-xl p-4 md:p-6">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Personal Information</h2>
+            <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-white mb-2">Personal Information</h2>
             <p className="text-slate-400">Update your profile information</p>
           </div>
           <PersonalInfoForm user={profile} onSubmit={handleUpdateProfile} isLoading={isLoading} />
         </div>
 
-        <div className="bg-surface-800 rounded-xl p-6">
+        <div className="bg-surface-800 rounded-xl p-4 md:p-6">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Change Password</h2>
+            <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-white mb-2">Change Password</h2>
             <p className="text-slate-400">Update your password to keep your account secure</p>
           </div>
           <ChangePasswordForm onSubmit={handleChangePassword} isLoading={isLoading} />
         </div>
 
-        <div className="bg-surface-800 rounded-xl p-6">
+        <div className="bg-surface-800 rounded-xl p-4 md:p-6">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Logout</h2>
+            <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-white mb-2">Logout</h2>
             <p className="text-slate-400">Sign out of your account on this device</p>
           </div>
           <button
@@ -127,17 +128,17 @@ const ProfileSettings = () => {
       {showLogoutConfirm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowLogoutConfirm(false)}>
           <div className="bg-surface-800 rounded-xl shadow-lg w-full max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-6 border-b border-surface-700">
-              <h2 className="text-2xl font-bold text-white">Confirm Logout</h2>
+            <div className="flex justify-between items-center p-4 md:p-6 border-b border-surface-700">
+              <h2 className="text-lg md:text-2xl font-bold text-white">Confirm Logout</h2>
               <button className="text-slate-400 hover:text-slate-50" onClick={() => setShowLogoutConfirm(false)}>✕</button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-4 md:p-6 space-y-4">
               <p className="text-slate-50">Are you sure you want to logout?</p>
               <p className="text-slate-400">You will need to login again to access your account.</p>
             </div>
-            <div className="flex gap-4 p-6 border-t border-surface-700">
-              <button className="flex-1 px-4 py-2 bg-surface-700 text-slate-200 rounded-lg hover:bg-surface-600 transition-colors" onClick={() => setShowLogoutConfirm(false)}>Cancel</button>
-              <button className="flex-1 px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors" onClick={handleLogout}>Logout</button>
+            <div className="flex flex-col sm:flex-row gap-3 p-4 md:p-6 border-t border-surface-700">
+              <button className="w-full sm:flex-1 px-4 py-2 bg-surface-700 text-slate-200 rounded-lg hover:bg-surface-600 transition-colors" onClick={() => setShowLogoutConfirm(false)}>Cancel</button>
+              <button className="w-full sm:flex-1 px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors" onClick={handleLogout}>Logout</button>
             </div>
           </div>
         </div>

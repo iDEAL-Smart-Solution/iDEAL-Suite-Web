@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import api from "../services/api";
+import { useAuthStore } from "./useAuthStore";
 import type {
   Product,
   GetProductsResponse,
@@ -17,7 +18,7 @@ interface ProductState {
   error: string | null;
   successMessage: string | null;
 
-  fetchProducts: (schoolId: string) => Promise<void>;
+  fetchProducts: (schoolId?: string) => Promise<void>;
   setSearch: (query: string) => void;
   setFilter: (filter: "all" | "active" | "inactive" | "subscription") => void;
   selectProduct: (product: Product | null) => void;
@@ -65,19 +66,70 @@ export const useProductStore = create<ProductState>((set, get) => ({
   fetchProducts: async (schoolId) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await api.get<GetProductsResponse>(
-        `/ProductMonitoring/school/${schoolId}`
-      );
-      const products = res.data.products ?? res.data ?? [];
+      const authSchoolId = useAuthStore.getState().user?.schoolId;
+      const resolvedSchoolId = schoolId || authSchoolId;
+
+      if (!resolvedSchoolId) {
+        console.error("fetchProducts aborted: schoolId is missing", {
+          schoolIdArg: schoolId,
+          authSchoolId,
+        });
+        set({
+          products: [],
+          filteredProducts: [],
+          error: "School context is missing. Please log in again.",
+          isLoading: false,
+        });
+        return;
+      }
+
+      const endpoint = `/ProductMonitoring/school/${resolvedSchoolId}`;
+      const token = sessionStorage.getItem("ideal_token");
+      console.log("fetchProducts request", {
+        schoolId: resolvedSchoolId,
+        endpoint,
+        baseURL: api.defaults.baseURL,
+        hasToken: !!token,
+        authHeaderViaInterceptor: true,
+      });
+
+      const res = await api.get<GetProductsResponse>(endpoint);
+      console.log("fetchProducts response", res?.data);
+
+      const payload: any = res?.data;
+      const products: Product[] = Array.isArray(payload?.data)
+        ? payload.data
+        : Array.isArray(payload?.products)
+          ? payload.products
+          : Array.isArray(payload)
+            ? payload
+            : [];
+
       const { searchQuery, filterOption } = get();
       set({
         products,
         filteredProducts: applyFilters(products, searchQuery, filterOption),
+        error: null,
         isLoading: false,
       });
     } catch (err: any) {
+      const status = err?.response?.status;
+      const backendMessage =
+        err?.response?.data?.message || err?.response?.data?.error;
+      const fallbackMessage =
+        !err?.response || err?.code === "ERR_NETWORK"
+          ? "Network error while loading products"
+          : "Failed to load products";
+
+      console.error("fetchProducts error", {
+        status,
+        code: err?.code,
+        message: err?.message,
+        backendResponse: err?.response?.data,
+      });
+
       set({
-        error: err.response?.data?.message || "Failed to load products",
+        error: backendMessage || fallbackMessage,
         isLoading: false,
       });
     }
