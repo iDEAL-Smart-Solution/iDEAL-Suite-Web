@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Building2, CheckCircle, Users, AlertTriangle } from "lucide-react";
+import { Building2, CheckCircle, Users, AlertTriangle, Server, Database, Globe, Layers } from "lucide-react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { useSchoolStore } from "../../stores/useSchoolStore";
 import { useStudentStore } from "../../stores/useStudentStore";
@@ -7,15 +7,37 @@ import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 import { useDashboardStore } from "../../stores/useDashboardStore";
 import MetricCard from "../../components/ui/MetricCard";
 import MetricCardSkeleton from "../../components/ui/MetricCardSkeleton";
-import SystemStatusCard from "../../components/ui/SystemStatusCard";
+import SystemStatusCard, { type ServiceItem, type ServiceStatus } from "../../components/ui/SystemStatusCard";
+import BrandLoader from "../../components/ui/BrandLoader";
 
 const DevDashboardHome = () => {
   const user = useAuthStore((s) => s.user);
-  const { schools, isLoading: schoolsLoading, fetchAllSchools } = useSchoolStore();
-  const { totalStudents, isLoading: studentsLoading, fetchAllStudents } = useStudentStore();
-  const { subscriptionHistory, isLoading: subsLoading, fetchReportingSubscriptions } = useSubscriptionStore();
-  const { productEngagementAll, fetchProductEngagementAll } = useDashboardStore();
+  const {
+    schools,
+    isLoading: schoolsLoading,
+    error: schoolsError,
+    fetchAllSchools,
+  } = useSchoolStore();
+  const {
+    totalStudents,
+    isLoading: studentsLoading,
+    error: studentsError,
+    fetchAllStudents,
+  } = useStudentStore();
+  const {
+    subscriptionHistory,
+    isLoading: subsLoading,
+    error: subsError,
+    fetchReportingSubscriptions,
+  } = useSubscriptionStore();
+  const {
+    productEngagementAll,
+    error: dashboardError,
+    fetchProductEngagementAll,
+  } = useDashboardStore();
   const [greeting, setGreeting] = useState("");
+  const [isRefreshingStatus, setIsRefreshingStatus] = useState(false);
+  const [lastStatusUpdatedAt, setLastStatusUpdatedAt] = useState<Date | null>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -25,10 +47,28 @@ const DevDashboardHome = () => {
   }, []);
 
   useEffect(() => {
-    fetchAllSchools();
-    fetchAllStudents();
-    fetchReportingSubscriptions();
-    fetchProductEngagementAll();
+    let isMounted = true;
+
+    const loadDashboardData = async () => {
+      setIsRefreshingStatus(true);
+      await Promise.allSettled([
+        fetchAllSchools(),
+        fetchAllStudents(),
+        fetchReportingSubscriptions(),
+        fetchProductEngagementAll(),
+      ]);
+
+      if (isMounted) {
+        setLastStatusUpdatedAt(new Date());
+        setIsRefreshingStatus(false);
+      }
+    };
+
+    void loadDashboardData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [
     fetchAllSchools,
     fetchAllStudents,
@@ -42,6 +82,39 @@ const DevDashboardHome = () => {
     (sum, product) => sum + product.usageCount,
     0
   );
+
+  const getServiceStatus = (isLoadingState: boolean, hasError: string | null): ServiceStatus => {
+    if (hasError) return "down";
+    if (isLoadingState) return "degraded";
+    return "operational";
+  };
+
+  const services: ServiceItem[] = [
+    {
+      name: "Schools Service",
+      status: getServiceStatus(schoolsLoading, schoolsError),
+      icon: <Server className="w-5 h-5" />,
+      details: schoolsError ? `Issue: ${schoolsError}` : `${schools.length} schools loaded`,
+    },
+    {
+      name: "Students Service",
+      status: getServiceStatus(studentsLoading, studentsError),
+      icon: <Database className="w-5 h-5" />,
+      details: studentsError ? `Issue: ${studentsError}` : `${totalStudents} students loaded`,
+    },
+    {
+      name: "Subscriptions Reporting",
+      status: getServiceStatus(subsLoading, subsError),
+      icon: <Globe className="w-5 h-5" />,
+      details: subsError ? `Issue: ${subsError}` : `${subscriptionHistory.length} records loaded`,
+    },
+    {
+      name: "Product Engagement",
+      status: dashboardError ? "down" : isRefreshingStatus ? "degraded" : "operational",
+      icon: <Layers className="w-5 h-5" />,
+      details: dashboardError ? `Issue: ${dashboardError}` : `${productEngagementAll.length} products monitored`,
+    },
+  ];
 
   return (
     <div className="space-y-8">
@@ -69,13 +142,17 @@ const DevDashboardHome = () => {
         )}
       </div>
 
-      <SystemStatusCard />
+      <SystemStatusCard
+        services={services}
+        isRefreshing={isRefreshingStatus}
+        lastUpdatedAt={lastStatusUpdatedAt}
+      />
 
       <div className="bg-surface-800 rounded-xl p-4 md:p-6">
         <h2 className="text-lg md:text-xl font-bold text-white mb-4">Recent Schools</h2>
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
+            <BrandLoader size="sm" />
           </div>
         ) : schools.length === 0 ? (
           <p className="text-slate-400 text-center py-8">No schools registered yet.</p>

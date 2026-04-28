@@ -6,6 +6,7 @@ import ProfileAvatar from "../../components/profile/ProfileAvatar";
 import PersonalInfoForm from "../../components/profile/PersonalInfoForm";
 import ChangePasswordForm from "../../components/profile/ChangePasswordForm";
 import PageHeader from "../../components/layout/PageHeader";
+import BrandLoader from "../../components/ui/BrandLoader";
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ const ProfileSettings = () => {
   if (isLoading && !profile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin mb-4" />
+        <BrandLoader size="md" className="mb-4" />
         <p className="text-slate-400">Loading profile...</p>
       </div>
     );

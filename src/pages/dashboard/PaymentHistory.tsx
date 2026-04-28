@@ -5,6 +5,7 @@ import { usePaymentStore } from "../../stores/usePaymentStore";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 import PaymentModal from "../../components/subscriptions/PaymentModal";
 import PageHeader from "../../components/layout/PageHeader";
+import BrandLoader from "../../components/ui/BrandLoader";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -153,7 +154,7 @@ const PaymentHistory: React.FC = () => {
                     className="px-4 py-8 text-center text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-6 h-6 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
+                      <BrandLoader size="sm" />
                       Loading payments...
                     </div>
                   </td>

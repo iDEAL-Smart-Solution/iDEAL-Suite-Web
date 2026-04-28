@@ -1,4 +1,5 @@
 import type { Student } from "../../types/student";
+import BrandLoader from "./BrandLoader";
 
 interface StudentTableProps {
   students: Student[];
@@ -70,7 +71,7 @@ const StudentTable = ({ students = [], isLoading = false }: StudentTableProps) =
                 <tr>
                   <td colSpan={11} className="px-6 py-8 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-8 h-8 border-4 border-surface-600 border-t-brand-400 rounded-full animate-spin" />
+                      <BrandLoader size="md" />
                       <p className="text-slate-400">Loading students...</p>
                     </div>
                   </td>

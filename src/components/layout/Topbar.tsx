@@ -1,7 +1,5 @@
-import { useAuthStore } from "../../stores/useAuthStore";
-import { Menu, LogOut, ChevronDown } from "lucide-react";
+import { Menu } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useState } from "react";
 
 const Topbar = ({
   onToggleSidebar,
@@ -10,11 +8,6 @@ const Topbar = ({
   onToggleSidebar?: () => void;
   isSidebarCollapsed?: boolean;
 }) => {
-  const { user, logout } = useAuthStore();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const initial = user?.fullName?.charAt(0)?.toUpperCase() ?? user?.email?.charAt(0)?.toUpperCase() ?? "?";
-
   return (
     <header
       className={cn(
@@ -33,42 +26,6 @@ const Topbar = ({
       </button>
 
       <div className="flex-1" />
-
-      {/* User Actions */}
-      <div className="relative flex items-center gap-3 md:gap-4">
-        <div className="hidden sm:flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold">
-            {initial}
-          </div>
-          <span className="text-slate-600 text-sm truncate max-w-[180px] md:max-w-[240px]">{user?.email}</span>
-        </div>
-        <button
-          type="button"
-          className="sm:hidden flex items-center gap-1 text-slate-700"
-          onClick={() => setIsProfileOpen((s) => !s)}
-          aria-label="Toggle profile menu"
-        >
-          <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold">
-            {initial}
-          </div>
-          <ChevronDown size={14} />
-        </button>
-        <button
-          onClick={logout}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:text-red-500 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium"
-          aria-label="Logout"
-        >
-          <LogOut size={18} />
-          <span className="hidden sm:inline">Logout</span>
-        </button>
-
-        {isProfileOpen && (
-          <div className="absolute right-0 top-12 sm:hidden bg-white border border-brand-100 rounded-lg shadow-lg p-3 min-w-[180px]">
-            <p className="text-xs text-slate-500 mb-1">Signed in as</p>
-            <p className="text-sm text-slate-700 break-words">{user?.email}</p>
-          </div>
-        )}
-      </div>
     </header>
   );
 };

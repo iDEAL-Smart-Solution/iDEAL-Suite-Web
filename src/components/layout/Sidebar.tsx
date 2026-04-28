@@ -8,7 +8,9 @@ import {
   X,
   Wallet,
   MessageSquare,
+  LogOut,
 } from "lucide-react";
+import logo from "../../assets/logo.png";
 import { cn } from "../../lib/utils";
 import { useAuthStore } from "../../stores/useAuthStore";
 
@@ -30,6 +32,8 @@ const Sidebar = ({
   onClose?: () => void;
 }) => {
   const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const initial = user?.fullName?.charAt(0)?.toUpperCase() ?? user?.email?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
     <aside
@@ -43,7 +47,13 @@ const Sidebar = ({
     >
       {/* Sidebar Header */}
       <div className="flex justify-between items-center p-5 border-b border-brand-100">
-        {!isCollapsed && <span className="text-xl font-bold text-gradient">iDEAL-Suite</span>}
+        {!isCollapsed && (
+          <img
+            src={logo}
+            alt="App logo"
+            className="h-9 w-auto max-w-[150px] object-contain"
+          />
+        )}
         <button
           className="md:hidden text-slate-500 hover:text-brand-700 transition-colors duration-200"
           onClick={onClose}
@@ -98,6 +108,36 @@ const Sidebar = ({
           {!isCollapsed && "Profile"}
         </NavLink>
       </nav>
+
+      {/* User section */}
+      <div className="p-5 border-t border-brand-100">
+        {!isCollapsed ? (
+          <div className="mb-3 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold shrink-0">
+              {initial}
+            </div>
+            <div className="min-w-0">
+              <p className="text-slate-700 font-medium text-sm truncate">
+                {user?.fullName || user?.email || "Signed in user"}
+              </p>
+              <span className="inline-block mt-0.5 text-[11px] font-medium text-brand-700 bg-brand-100 px-2 py-0.5 rounded-md">
+                Signed in
+              </span>
+            </div>
+          </div>
+        ) : null}
+        <button
+          onClick={logout}
+          className={cn(
+            "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:text-red-500 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium",
+            isCollapsed && "justify-center px-3"
+          )}
+          aria-label="Logout"
+        >
+          <LogOut size={18} />
+          {!isCollapsed && <span>Logout</span>}
+        </button>
+      </div>
     </aside>
   );
 };

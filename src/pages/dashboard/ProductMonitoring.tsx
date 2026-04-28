@@ -5,6 +5,7 @@ import ProductCard from "../../components/products/ProductCard";
 import ProductDetailModal from "../../components/products/ProductDetailModal";
 import ProductFilters from "../../components/products/ProductFilters";
 import PageHeader from "../../components/layout/PageHeader";
+import BrandLoader from "../../components/ui/BrandLoader";
 
 const ProductMonitoring = () => {
   const user = useAuthStore((s) => s.user);
@@ -81,7 +82,7 @@ const ProductMonitoring = () => {
 
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-16">
-          <div className="w-8 h-8 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin mb-4" />
+          <BrandLoader size="md" className="mb-4" />
           <p className="text-slate-400">Loading products...</p>
         </div>
       )}

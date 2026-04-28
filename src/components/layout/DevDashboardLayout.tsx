@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Users,
 } from "lucide-react";
+import logo from "../../assets/logo.png";
 import Container from "./Container";
 
 interface DevDashboardLayoutProps {
@@ -73,11 +74,15 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
         {/* Header */}
         <div className="p-5 border-b border-brand-100 flex items-center justify-between">
           {!isTabletSidebarCollapsed && (
-            <span className="text-xl font-bold text-gradient">iDEAL-Suite</span>
+            <img
+              src={logo}
+              alt="iDEAL logo"
+              className="h-9 w-auto max-w-[150px] object-contain"
+            />
           )}
           <button
             onClick={handleToggleSidebar}
-            className="text-slate-500 hover:text-brand-700 transition-colors duration-200"
+            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:text-brand-700 hover:bg-brand-50 transition-colors duration-200"
             aria-label="Toggle sidebar"
           >
             {mobileSidebarOpen || !isTabletSidebarCollapsed ? <X size={22} /> : <Menu size={22} />}

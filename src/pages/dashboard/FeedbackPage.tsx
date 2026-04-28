@@ -3,6 +3,7 @@ import { useFeedbackStore } from "../../stores/useFeedbackStore";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { MessageSquare, Star, User, Mail, Calendar, Package, AlertCircle } from "lucide-react";
 import PageHeader from "../../components/layout/PageHeader";
+import BrandLoader from "../../components/ui/BrandLoader";
 
 const FeedbackPage: React.FC = () => {
   const user = useAuthStore((s) => s.user);
@@ -120,7 +121,7 @@ const FeedbackPage: React.FC = () => {
       {/* Loading State */}
       {isLoading && (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
+          <BrandLoader size="md" />
         </div>
       )}
 
