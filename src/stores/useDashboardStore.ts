@@ -7,6 +7,8 @@ import type {
   UsageChartData,
 } from "../types/dashboard";
 
+const DASHBOARD_SCHOOL_METRICS_ENDPOINT = "/Dashboard/school";
+
 const normalizeUsageChartData = (payload: unknown): UsageChartData[] => {
   const value = (payload as any)?.data ?? payload;
 
@@ -104,7 +106,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   fetchStats: async (schoolId) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await api.get(`/Dashboard/school/${schoolId}`);
+      const res = await api.get(`${DASHBOARD_SCHOOL_METRICS_ENDPOINT}/${schoolId}`);
       const stats: DashboardStats = res.data?.data ?? res.data;
       if (!stats || res.status === 204) {
         set({ stats: null, error: "No dashboard data available", isLoading: false });

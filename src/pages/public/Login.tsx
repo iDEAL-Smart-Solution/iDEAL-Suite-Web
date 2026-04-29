@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { isEmailValid } from "../../utils/validators";
+import logo from "../../assets/logo.png";
 
 const Login = () => {
     const { login, isLoading, error: storeError } = useAuthStore();
@@ -45,15 +46,28 @@ const Login = () => {
     const displayError = error || storeError;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-brand-100/60 flex items-center justify-center px-4 py-10 relative overflow-hidden">
+        <div className="min-h-[100svh] bg-gradient-to-br from-brand-50 via-white to-brand-100/60 flex items-center justify-center px-4 py-4 sm:py-6 relative overflow-hidden">
             <div className="absolute -top-20 -right-24 h-72 w-72 rounded-full bg-brand-300/20 blur-3xl" />
             <div className="absolute -bottom-20 -left-24 h-72 w-72 rounded-full bg-brand-500/10 blur-3xl" />
 
-            <div className="w-full max-w-md rounded-2xl bg-white border border-brand-100 shadow-2xl shadow-brand-500/10 p-8 sm:p-10 relative z-10">
-                <div className="text-center mb-8">
-                    <p className="text-xs sm:text-sm font-semibold tracking-[0.2em] text-brand-600 uppercase">iDEAL-Suite</p>
-                    <h1 className="text-3xl sm:text-[2rem] font-black text-slate-900 mt-2">Welcome Back</h1>
-                    <p className="text-sm text-slate-600 mt-2">Sign in to continue to your school dashboard</p>
+            <div className="w-full max-w-sm rounded-2xl bg-white border border-brand-100 shadow-2xl shadow-brand-500/10 p-6 sm:p-8 relative z-10">
+                <div className="text-center mb-6 sm:mb-7">
+                    <div className="mx-auto mb-4 inline-flex items-center justify-center rounded-xl bg-brand-50 border border-brand-100 px-4 py-3 shadow-sm">
+                        <img
+                            src={logo}
+                            alt="Ideal Suite"
+                            className="h-10 sm:h-11 w-auto object-contain"
+                        />
+                    </div>
+                    <p className="text-xs sm:text-sm font-semibold tracking-[0.24em] text-brand-600 uppercase">
+                        School Management Platform
+                    </p>
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight">
+                        Welcome Back
+                    </h1>
+                    <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                        Sign in to continue to your secure school dashboard.
+                    </p>
                 </div>
 
                 {displayError && (
@@ -63,7 +77,7 @@ const Login = () => {
                 )}
 
                 <form
-                    className="space-y-5"
+                    className="space-y-4"
                     onSubmit={(e) => {
                         e.preventDefault();
                         handleSubmit();
@@ -107,7 +121,7 @@ const Login = () => {
                         className="w-full mt-2 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
                     >
                         <LogIn className="w-5 h-5" />
-                        {isLoading ? "Logging in..." : "Login"}
+                        {isLoading ? "Signing in..." : "Sign In"}
                     </button>
                 </form>
 

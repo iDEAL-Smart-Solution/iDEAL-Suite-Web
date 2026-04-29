@@ -6,6 +6,8 @@ import { useUserStore } from "../../stores/useUserStore";
 import UserTable from "../../components/users/UserTable";
 import UserModal from "../../components/users/UserModal";
 import FilterTabs from "../../components/users/FilterTabs";
+import PageHeader from "../../components/layout/PageHeader";
+import PageSection from "../../components/layout/PageSection";
 
 const UserManagement: React.FC = () => {
   const user = useAuthStore((s) => s.user);
@@ -125,19 +127,21 @@ const UserManagement: React.FC = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-white">User Management</h1>
-        {canAddUser && (
-          <button
-            className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-lg font-medium transition-all"
-            onClick={handleAddUser}
-          >
-            + Add New User
-          </button>
-        )}
-      </div>
+      <PageHeader
+        title="User Management"
+        action={
+          canAddUser ? (
+            <button
+              className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-medium transition-all"
+              onClick={handleAddUser}
+            >
+              + Add New User
+            </button>
+          ) : null
+        }
+      />
 
-      <div>
+      <PageSection>
         <input
           type="text"
           className="w-full px-4 py-3 bg-surface-800 border border-surface-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
@@ -145,7 +149,7 @@ const UserManagement: React.FC = () => {
           value={searchQuery}
           onChange={handleSearch}
         />
-      </div>
+      </PageSection>
 
       <FilterTabs
         counts={calculateCounts()}
@@ -163,21 +167,21 @@ const UserManagement: React.FC = () => {
       />
 
       {!isLoading && filteredUsers.length > 0 && (
-        <div className="flex justify-between items-center pt-6 border-t border-surface-700">
-          <span className="text-slate-400">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center pt-6 border-t border-surface-700">
+          <span className="text-slate-400 text-sm sm:text-base">
             Showing {startItem}-{endItem} of {totalUsers} users
           </span>
-          <div className="flex gap-4 items-center">
+          <div className="flex flex-wrap gap-3 items-center">
             <button
-              className="px-4 py-2 bg-surface-700 text-slate-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-600 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 bg-surface-700 text-slate-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-600 transition-colors"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
             >
               Previous
             </button>
-            <span className="text-slate-400">Page {currentPage} of {totalPages}</span>
+            <span className="text-slate-400 text-sm">Page {currentPage} of {totalPages}</span>
             <button
-              className="px-4 py-2 bg-surface-700 text-slate-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-600 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 bg-surface-700 text-slate-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-600 transition-colors"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
             >

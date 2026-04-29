@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
+import BrandLoader from "../components/ui/BrandLoader";
 
 /* ── Lazy-loaded pages ─────────────────────────────── */
 const Landing = lazy(() => import("../pages/public/Landing"));
@@ -19,13 +20,15 @@ const SubscriptionManagement = lazy(() => import("../pages/dashboard/Subscriptio
 const ProductMonitoring = lazy(() => import("../pages/dashboard/ProductMonitoring"));
 const ProfileSettings = lazy(() => import("../pages/dashboard/ProfileSettings"));
 const PaymentHistory = lazy(() => import("../pages/dashboard/PaymentHistory"));
+const PaymentSuccess = lazy(() => import("../pages/dashboard/PaymentSuccess"));
 const FeedbackPage = lazy(() => import("../pages/dashboard/FeedbackPage"));
 const StudentListPage = lazy(() => import("../pages/dashboard/StudentListPage"));
 
 /* ── Suspense fallback ─────────────────────────────── */
 const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen bg-surface-950">
-    <div className="w-8 h-8 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
+  <div className="flex flex-col items-center justify-center min-h-screen bg-surface-950 gap-4">
+    <BrandLoader size="lg" />
+    <p className="text-slate-400 text-sm">Loading dashboard...</p>
   </div>
 );
 
@@ -175,6 +178,17 @@ const AppRoutes = () => {
             <ProtectedRoute allowedRoles={[1]}>
               <DashboardLayout>
                 <PaymentHistory />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payments/success"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DashboardLayout>
+                <PaymentSuccess />
               </DashboardLayout>
             </ProtectedRoute>
           }

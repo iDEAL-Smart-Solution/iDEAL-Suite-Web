@@ -119,15 +119,15 @@ const UserModal: React.FC<UserModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="bg-surface-800 border border-surface-700 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-6 border-b border-surface-700">
+      <div className="bg-surface-800 border border-surface-700 rounded-xl shadow-2xl w-full max-w-sm sm:max-w-lg max-h-[85vh] sm:max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-surface-700">
           <h2 className="text-lg font-bold text-white">{user ? "Edit User" : "Add New User"}</h2>
           <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-surface-700 transition-colors" onClick={onClose}>
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
           <div>
             <label htmlFor="firstName" className="block text-sm font-medium text-slate-300 mb-1.5">First Name *</label>
             <input
@@ -138,7 +138,7 @@ const UserModal: React.FC<UserModalProps> = ({
               onChange={handleChange}
               placeholder="Enter first name"
               className={cn(
-                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                "w-full px-3 py-2.5 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
                 errors.firstName ? "border-red-500" : "border-surface-600"
               )}
             />
@@ -157,7 +157,7 @@ const UserModal: React.FC<UserModalProps> = ({
               onChange={handleChange}
               placeholder="Enter last name"
               className={cn(
-                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                "w-full px-3 py-2.5 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
                 errors.lastName ? "border-red-500" : "border-surface-600"
               )}
             />
@@ -177,7 +177,7 @@ const UserModal: React.FC<UserModalProps> = ({
               placeholder="Enter email address"
               disabled={!!user}
               className={cn(
-                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50",
+                "w-full px-3 py-2.5 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50",
                 errors.email ? "border-red-500" : "border-surface-600"
               )}
             />
@@ -197,7 +197,7 @@ const UserModal: React.FC<UserModalProps> = ({
                 onChange={handleChange}
                 placeholder="Enter password"
                 className={cn(
-                  "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                  "w-full px-3 py-2.5 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
                   errors.password ? "border-red-500" : "border-surface-600"
                 )}
               />
@@ -217,7 +217,7 @@ const UserModal: React.FC<UserModalProps> = ({
               onChange={handleChange}
               placeholder="Enter phone number"
               className={cn(
-                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                "w-full px-3 py-2.5 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
                 errors.phoneNumber ? "border-red-500" : "border-surface-600"
               )}
             />
@@ -234,7 +234,7 @@ const UserModal: React.FC<UserModalProps> = ({
               value={formData.role}
               onChange={handleChange}
               className={cn(
-                "w-full h-10 px-3 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                "w-full px-3 py-2.5 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
                 errors.role ? "border-red-500" : "border-surface-600"
               )}
             >
@@ -248,10 +248,10 @@ const UserModal: React.FC<UserModalProps> = ({
             )}
           </div>
 
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-surface-700 -mx-6 -mb-4 mt-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 p-4 md:p-6 border-t border-surface-700 -mx-4 md:-mx-6 -mb-4 mt-6">
             <button
               type="button"
-              className="px-4 py-2 rounded-lg bg-surface-700 hover:bg-surface-600 text-slate-200 font-medium transition-colors duration-200"
+              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-surface-700 hover:bg-surface-600 text-slate-200 font-medium transition-colors duration-200"
               onClick={onClose}
               disabled={isLoading}
             >
@@ -259,7 +259,7 @@ const UserModal: React.FC<UserModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-medium transition-colors duration-200 disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-medium transition-colors duration-200 disabled:opacity-50"
               disabled={isLoading}
             >
               {isLoading ? "Saving..." : "Save User"}

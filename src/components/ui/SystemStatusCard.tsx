@@ -4,16 +4,50 @@ import { cn } from "../../lib/utils";
 
 interface SystemStatusCardProps {
   className?: string;
+  services?: ServiceItem[];
+  isRefreshing?: boolean;
+  lastUpdatedAt?: Date | string | null;
 }
 
-type ServiceStatus = "operational" | "degraded" | "down";
+export type ServiceStatus = "operational" | "degraded" | "down";
 
-interface ServiceItem {
+export interface ServiceItem {
   name: string;
   status: ServiceStatus;
   icon: React.ReactNode;
   responseTime?: string;
+  details?: string;
 }
+
+const defaultServices: ServiceItem[] = [
+  {
+    name: "API Service",
+    status: "operational",
+    icon: <Server className="w-5 h-5" />,
+    responseTime: "45ms",
+  },
+  {
+    name: "Database",
+    status: "operational",
+    icon: <Database className="w-5 h-5" />,
+    responseTime: "12ms",
+  },
+  {
+    name: "Payment Gateway",
+    status: "operational",
+    icon: <Globe className="w-5 h-5" />,
+    responseTime: "120ms",
+  },
+];
+
+const formatLastUpdated = (value?: Date | string | null) => {
+  if (!value) return "Waiting for first sync";
+
+  const dateValue = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(dateValue.getTime())) return "Waiting for first sync";
+
+  return dateValue.toLocaleTimeString();
+};
 
 const getStatusColor = (status: ServiceStatus) => {
   switch (status) {
@@ -48,35 +82,17 @@ const getStatusLabel = (status: ServiceStatus) => {
   }
 };
 
-const SystemStatusCard: React.FC<SystemStatusCardProps> = ({ className }) => {
-  // In a real app, this would come from actual health check endpoints
-  const services: ServiceItem[] = [
-    {
-      name: "API Service",
-      status: "operational",
-      icon: <Server className="w-5 h-5" />,
-      responseTime: "45ms",
-    },
-    {
-      name: "Database",
-      status: "operational",
-      icon: <Database className="w-5 h-5" />,
-      responseTime: "12ms",
-    },
-    {
-      name: "Payment Gateway",
-      status: "operational",
-      icon: <Globe className="w-5 h-5" />,
-      responseTime: "120ms",
-    },
-  ];
-
-  const allOperational = services.every((s) => s.status === "operational");
-  const overallStatus: ServiceStatus = allOperational
-    ? "operational"
-    : services.some((s) => s.status === "down")
+const SystemStatusCard: React.FC<SystemStatusCardProps> = ({
+  className,
+  services = defaultServices,
+  isRefreshing = false,
+  lastUpdatedAt = null,
+}) => {
+  const overallStatus: ServiceStatus = services.some((s) => s.status === "down")
+    ? "down"
+    : services.some((s) => s.status === "degraded")
       ? "degraded"
-      : "degraded";
+      : "operational";
 
   return (
     <div
@@ -93,7 +109,9 @@ const SystemStatusCard: React.FC<SystemStatusCardProps> = ({ className }) => {
           </div>
           <div>
             <h2 className="text-lg font-bold text-white">System Status</h2>
-            <p className="text-xs text-slate-400">Real-time service monitoring</p>
+            <p className="text-xs text-slate-400">
+              {isRefreshing ? "Refreshing service status..." : "Real-time service monitoring"}
+            </p>
           </div>
         </div>
         <div
@@ -109,9 +127,9 @@ const SystemStatusCard: React.FC<SystemStatusCardProps> = ({ className }) => {
 
       {/* Services List */}
       <div className="space-y-3">
-        {services.map((service, index) => (
+        {services.map((service) => (
           <div
-            key={index}
+            key={service.name}
             className="flex items-center justify-between p-3 rounded-lg bg-surface-900/50 hover:bg-surface-900 transition-colors"
           >
             <div className="flex items-center gap-3">
@@ -122,6 +140,9 @@ const SystemStatusCard: React.FC<SystemStatusCardProps> = ({ className }) => {
                   <p className="text-xs text-slate-500">
                     Response: {service.responseTime}
                   </p>
+                )}
+                {service.details && (
+                  <p className="text-xs text-slate-500">{service.details}</p>
                 )}
               </div>
             </div>
@@ -141,7 +162,7 @@ const SystemStatusCard: React.FC<SystemStatusCardProps> = ({ className }) => {
       {/* Footer Info */}
       <div className="mt-4 pt-4 border-t border-surface-700">
         <p className="text-xs text-slate-500 text-center">
-          Last updated: {new Date().toLocaleTimeString()}
+          Last updated: {formatLastUpdated(lastUpdatedAt)}
         </p>
       </div>
     </div>

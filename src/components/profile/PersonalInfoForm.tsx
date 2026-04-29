@@ -57,7 +57,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
         <label className="block text-sm font-medium text-slate-300">First Name *</label>
         <input
           type="text"
-          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
+          className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.firstName}
           onChange={(e) =>
             setFormData({ ...formData, firstName: e.target.value })
@@ -73,7 +73,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
         <label className="block text-sm font-medium text-slate-300">Last Name *</label>
         <input
           type="text"
-          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
+          className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           value={formData.lastName}
           onChange={(e) =>
             setFormData({ ...formData, lastName: e.target.value })
@@ -86,7 +86,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-slate-300">Email</label>
         <div className="relative">
-          <input type="email" className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50" value={user.email} disabled />
+          <input type="email" className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50" value={user.email} disabled />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔒</span>
         </div>
       </div>
@@ -94,7 +94,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-slate-300">UIN (User ID)</label>
         <div className="relative">
-          <input type="text" className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50" value={user.uin} disabled />
+          <input type="text" className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50" value={user.uin} disabled />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔒</span>
         </div>
       </div>
@@ -103,7 +103,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
         <label className="block text-sm font-medium text-slate-300">Phone Number</label>
         <input
           type="tel"
-          className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
+          className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200 disabled:opacity-50"
           placeholder="+234 801 234 5678"
           value={formData.phoneNumber}
           onChange={(e) =>
@@ -130,7 +130,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
           <div className="relative">
             <input
               type="text"
-              className="w-full h-10 px-3 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50"
+              className="w-full px-3 py-2.5 rounded-lg bg-surface-800 border border-surface-600 text-white opacity-60 disabled:opacity-50"
               value={user.schoolName}
               disabled
             />
@@ -141,7 +141,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
 
       <button
         type="submit"
-        className="w-full h-10 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50"
+        className="w-full bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 py-2.5"
         disabled={isLoading}
       >
         {isLoading ? "Updating..." : "Update Profile"}

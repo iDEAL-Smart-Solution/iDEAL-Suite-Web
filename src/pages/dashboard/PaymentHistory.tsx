@@ -4,6 +4,8 @@ import { useAuthStore } from "../../stores/useAuthStore";
 import { usePaymentStore } from "../../stores/usePaymentStore";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 import PaymentModal from "../../components/subscriptions/PaymentModal";
+import PageHeader from "../../components/layout/PageHeader";
+import BrandLoader from "../../components/ui/BrandLoader";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -20,7 +22,16 @@ const getStatusBadge = (status: string) => {
 
 const PaymentHistory: React.FC = () => {
   const user = useAuthStore((s) => s.user);
-  const { payments, isLoading, error, fetchPayments, clearMessages } =
+  const {
+    payments,
+    billingSummary,
+    isLoading,
+    isInitializing,
+    error,
+    fetchPayments,
+    fetchBillingSummary,
+    clearMessages,
+  } =
     usePaymentStore();
   const { currentSubscription, fetchCurrentSubscription } =
     useSubscriptionStore();
@@ -32,9 +43,10 @@ const PaymentHistory: React.FC = () => {
   useEffect(() => {
     if (schoolId) {
       fetchPayments(schoolId);
+      fetchBillingSummary(schoolId);
       fetchCurrentSubscription(schoolId);
     }
-  }, [schoolId, fetchPayments, fetchCurrentSubscription]);
+  }, [schoolId, fetchPayments, fetchBillingSummary, fetchCurrentSubscription]);
 
   if (!schoolId) {
     return (
@@ -60,19 +72,34 @@ const PaymentHistory: React.FC = () => {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Payments</h1>
-          <p className="text-slate-400 mt-1">
-            View payment history and make new payments
-          </p>
-        </div>
+      <PageHeader
+        title="Payments"
+        subtitle="View payment history and make new payments"
+        action={
+          <button
+            className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-medium transition-all inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => setIsPaymentOpen(true)}
+            disabled={isInitializing}
+          >
+            <CreditCard className="w-4 h-4" />
+            {isInitializing ? "Preparing payment..." : "Make Payment"}
+          </button>
+        }
+      />
+
+      <div className="flex justify-end">
         <button
-          className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2"
-          onClick={() => setIsPaymentOpen(true)}
+          type="button"
+          className="text-sm text-slate-300 hover:text-white transition-colors disabled:opacity-50"
+          onClick={() => {
+            if (!schoolId) return;
+            fetchPayments(schoolId);
+            fetchBillingSummary(schoolId);
+            fetchCurrentSubscription(schoolId);
+          }}
+          disabled={isLoading}
         >
-          <CreditCard className="w-4 h-4" />
-          Make Payment
+          {isLoading ? "Refreshing..." : "Refresh data"}
         </button>
       </div>
 
@@ -80,22 +107,18 @@ const PaymentHistory: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-surface-800 border border-surface-700 rounded-xl p-5">
           <p className="text-sm text-slate-400 mb-1">Total Payments</p>
-          <p className="text-2xl font-bold text-white">{payments.length}</p>
+          <p className="text-2xl font-bold text-white">{billingSummary.totalPayments}</p>
         </div>
         <div className="bg-surface-800 border border-surface-700 rounded-xl p-5">
           <p className="text-sm text-slate-400 mb-1">Successful</p>
           <p className="text-2xl font-bold text-green-400">
-            {payments.filter((p) => p.status === "success").length}
+            {billingSummary.successfulPayments}
           </p>
         </div>
         <div className="bg-surface-800 border border-surface-700 rounded-xl p-5">
           <p className="text-sm text-slate-400 mb-1">Total Paid</p>
           <p className="text-2xl font-bold text-brand-400">
-            ₦
-            {payments
-              .filter((p) => p.status === "success")
-              .reduce((sum, p) => sum + p.amount, 0)
-              .toLocaleString()}
+            ₦{billingSummary.totalPaidAmount.toLocaleString()}
           </p>
         </div>
       </div>
@@ -103,7 +126,7 @@ const PaymentHistory: React.FC = () => {
       {/* Payment Table */}
       <div className="bg-surface-800 rounded-xl border border-surface-700 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[700px]">
+          <table className="w-full min-w-[620px]">
             <thead>
               <tr className="bg-surface-900 border-b border-surface-700">
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
@@ -131,7 +154,7 @@ const PaymentHistory: React.FC = () => {
                     className="px-4 py-8 text-center text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-6 h-6 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
+                      <BrandLoader size="sm" />
                       Loading payments...
                     </div>
                   </td>

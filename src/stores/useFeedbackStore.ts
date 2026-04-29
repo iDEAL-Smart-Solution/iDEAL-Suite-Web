@@ -68,21 +68,56 @@ export const useFeedbackStore = create<FeedbackState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const res = await api.get("/Feedback/all");
+      console.log("fetchFeedback response", {
+        status: res?.status,
+        data: res?.data,
+      });
+
       if (res.status === 204 || !res.data) {
         set({ feedback: [], totalFeedback: 0, isLoading: false });
         return;
       }
-      const { feedback: allFeedback, total } = extractFeedbackPayload(res.data);
+
+      let allFeedback: Feedback[] = [];
+      let total = 0;
+      try {
+        const extracted = extractFeedbackPayload(res.data);
+        allFeedback = Array.isArray(extracted.feedback) ? extracted.feedback : [];
+        total = Number.isFinite(extracted.total) ? extracted.total : allFeedback.length;
+      } catch (parseError) {
+        console.error("fetchFeedback parse error", {
+          parseError,
+          payload: res?.data,
+        });
+        allFeedback = [];
+        total = 0;
+      }
+
       const start = (page - 1) * limit;
       const paginated = allFeedback.slice(start, start + limit);
 
       set({ feedback: paginated, totalFeedback: total, isLoading: false });
     } catch (err: any) {
       let message = "Failed to fetch feedback";
-      if (err.response?.status === 404) {
-        message = "Backend feedback endpoint is not available. Expected GET /api/Feedback/all.";
+      console.error("fetchFeedback error", {
+        status: err?.response?.status,
+        code: err?.code,
+        backend: err?.response?.data,
+        message: err?.message,
+      });
+
+      if (err.response?.status === 500) {
+        message =
+          err.response?.data?.message ||
+          "Server error while fetching feedback. Please try again shortly.";
       } else if (err.response?.data?.message) {
         message = err.response.data.message;
+      } else if (err.response?.data?.error) {
+        message = err.response.data.error;
+      } else if (err.response?.status === 404) {
+        message = "Backend feedback endpoint is not available. Expected GET /api/Feedback/all.";
+      } else if (!err.response || err.code === "ERR_NETWORK") {
+        message = "Network error while fetching feedback";
       } else if (err.message) {
         message = err.message;
       }

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Zap, Users, TrendingUp, BarChart3 } from "lucide-react";
+import logo from "../../assets/logo.png";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -32,8 +33,12 @@ const Landing = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-brand-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="text-2xl font-black text-gradient">
-            iDEAL-Suite
+          <div className="flex items-center">
+            <img
+              src={logo}
+              alt="iDEAL Suite"
+              className="h-11 w-auto object-contain drop-shadow-sm sm:h-12"
+            />
           </div>
           <nav className="flex gap-3 items-center">
             <button
@@ -45,7 +50,7 @@ const Landing = () => {
           </nav>
         </div>
       </header>
-
+              
       {/* Hero Section */}
       <section className="flex-1 flex items-center justify-center px-6 py-20 bg-gradient-to-b from-white via-brand-50/50 to-white relative overflow-hidden">
         {/* Decorative gradients */}
@@ -78,7 +83,7 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">
-              Why Choose iDEAL-Suite?
+              Why Choose Ideal Suite?
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Everything you need to manage your school efficiently in one platform
@@ -108,7 +113,7 @@ const Landing = () => {
       {/* Footer */}
       <footer className="bg-white border-t border-brand-100 py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-6 text-center text-slate-600 text-sm">
-          <p>&copy; 2025 iDEAL-Suite. All rights reserved.</p>
+          <p>&copy; 2025 Ideal Suite. All rights reserved.</p>
         </div>
       </footer>
     </div>

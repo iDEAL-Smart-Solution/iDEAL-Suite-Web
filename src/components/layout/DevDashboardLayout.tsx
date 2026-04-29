@@ -15,6 +15,8 @@ import {
   MessageSquare,
   Users,
 } from "lucide-react";
+import logo from "../../assets/logo.png";
+import Container from "./Container";
 
 interface DevDashboardLayoutProps {
   children: React.ReactNode;
@@ -24,7 +26,8 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isTabletSidebarCollapsed, setIsTabletSidebarCollapsed] = useState(false);
 
   const menuItems = [
     { label: "Overview", path: "/dev/dashboard", icon: <LayoutDashboard size={18} /> },
@@ -46,27 +49,43 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
 
   const initial = user?.fullName?.charAt(0)?.toUpperCase() ?? "?";
 
+  const handleToggleSidebar = () => {
+    if (window.innerWidth < 768) {
+      setMobileSidebarOpen((s) => !s);
+      return;
+    }
+    if (window.innerWidth < 1024) {
+      setIsTabletSidebarCollapsed((s) => !s);
+    }
+  };
+
   return (
-    <div className="flex h-screen bg-surface-950">
+    <div className="flex min-h-screen bg-surface-950 overflow-x-hidden">
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-white transition-all duration-300 flex flex-col border-r border-brand-100 shadow-sm",
-          sidebarOpen ? "w-64" : "w-20"
+          "fixed left-0 top-0 h-screen bg-white transition-all duration-300 flex flex-col border-r border-brand-100 shadow-sm z-40",
+          "w-64 md:translate-x-0",
+          isTabletSidebarCollapsed ? "md:w-20" : "md:w-64",
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
         aria-label="Platform navigation"
       >
         {/* Header */}
         <div className="p-5 border-b border-brand-100 flex items-center justify-between">
-          {sidebarOpen && (
-            <span className="text-xl font-bold text-gradient">iDEAL-Suite</span>
+          {!isTabletSidebarCollapsed && (
+            <img
+              src={logo}
+              alt="iDEAL logo"
+              className="h-9 w-auto max-w-[150px] object-contain"
+            />
           )}
           <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-slate-500 hover:text-brand-700 transition-colors duration-200"
-            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            onClick={handleToggleSidebar}
+            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:text-brand-700 hover:bg-brand-50 transition-colors duration-200"
+            aria-label="Toggle sidebar"
           >
-            {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileSidebarOpen || !isTabletSidebarCollapsed ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
 
@@ -85,14 +104,14 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
               )}
             >
               {item.icon}
-              {sidebarOpen && <span>{item.label}</span>}
+              {!isTabletSidebarCollapsed && <span>{item.label}</span>}
             </button>
           ))}
         </nav>
 
         {/* User section */}
         <div className="p-5 border-t border-brand-100">
-          {sidebarOpen ? (
+          {!isTabletSidebarCollapsed ? (
             <div className="mb-3 flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold shrink-0">
                 {initial}
@@ -113,23 +132,45 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
             aria-label="Logout"
           >
             <LogOut size={18} />
-            {sidebarOpen && <span>Logout</span>}
+            {!isTabletSidebarCollapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>
 
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-hidden
+        />
+      )}
+
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div
+        className={cn(
+          "flex-1 flex flex-col overflow-hidden transition-all duration-300",
+          isTabletSidebarCollapsed ? "md:pl-20" : "md:pl-64",
+          "lg:pl-64"
+        )}
+      >
         {/* Top Bar */}
-        <header className="bg-white border-b border-brand-100 px-6 h-16 flex items-center shadow-sm">
-          <h1 className="text-lg font-semibold text-slate-800">Platform Admin Dashboard</h1>
+        <header className="bg-white border-b border-brand-100 px-4 md:px-6 h-16 flex items-center gap-3 shadow-sm">
+          <button
+            type="button"
+            className="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-700 hover:bg-brand-50"
+            onClick={handleToggleSidebar}
+            aria-label="Toggle sidebar"
+          >
+            <Menu size={20} />
+          </button>
+          <h1 className="text-base md:text-lg font-semibold text-slate-800">Platform Admin Dashboard</h1>
         </header>
 
         {/* Content Area */}
         <main className="flex-1 overflow-auto bg-surface-950">
-          <div className="px-4 py-6 sm:px-6 lg:px-8">
+          <Container className="p-4 md:p-6">
             {children}
-          </div>
+          </Container>
         </main>
       </div>
     </div>

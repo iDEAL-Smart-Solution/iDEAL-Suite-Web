@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useFeedbackStore } from "../../stores/useFeedbackStore";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { MessageSquare, Star, User, Mail, Calendar, Package, AlertCircle } from "lucide-react";
+import PageHeader from "../../components/layout/PageHeader";
+import BrandLoader from "../../components/ui/BrandLoader";
 
 const FeedbackPage: React.FC = () => {
   const user = useAuthStore((s) => s.user);
@@ -91,24 +93,20 @@ const FeedbackPage: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <MessageSquare size={32} className="text-brand-400" />
-            User Feedback
-          </h1>
-          <p className="text-slate-400 mt-2">View and manage feedback submitted by users</p>
-        </div>
-      </div>
+      <PageHeader
+        title="User Feedback"
+        subtitle="View and manage feedback submitted by users"
+        action={<MessageSquare size={28} className="text-brand-400 hidden sm:block" />}
+      />
 
       {/* Filter Bar */}
       <div className="bg-surface-800 border border-surface-700 rounded-lg p-4">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <label className="text-sm text-slate-400 font-medium">Filter by Rating:</label>
           <select
             value={filterRating}
             onChange={(e) => setFilterRating(e.target.value === "all" ? "all" : Number(e.target.value))}
-            className="px-4 py-2 bg-surface-900 border border-surface-700 rounded-lg text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
+            className="w-full sm:w-auto px-4 py-2 bg-surface-900 border border-surface-700 rounded-lg text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20"
           >
             <option value="all">All Ratings</option>
             <option value="5">5 Stars</option>
@@ -123,7 +121,7 @@ const FeedbackPage: React.FC = () => {
       {/* Loading State */}
       {isLoading && (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-4 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
+          <BrandLoader size="md" />
         </div>
       )}
 
@@ -144,7 +142,7 @@ const FeedbackPage: React.FC = () => {
       {!isLoading && filteredFeedback.length > 0 && (
         <div className="bg-surface-800 border border-surface-700 rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[640px]">
               <thead className="bg-surface-900 border-b border-surface-700">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -156,13 +154,13 @@ const FeedbackPage: React.FC = () => {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Rating
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <th className="hidden sm:table-cell px-4 sm:px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Product
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <th className="hidden md:table-cell px-4 sm:px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <th className="hidden lg:table-cell px-4 sm:px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     Date
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -173,7 +171,7 @@ const FeedbackPage: React.FC = () => {
               <tbody className="divide-y divide-surface-700">
                 {filteredFeedback.map((item) => (
                   <tr key={item.id} className="hover:bg-surface-750 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-white font-medium">
                           <User size={14} className="text-slate-500" />
@@ -185,7 +183,7 @@ const FeedbackPage: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <div className="text-white font-medium max-w-xs truncate">
                         {item.subject}
                       </div>
@@ -195,12 +193,12 @@ const FeedbackPage: React.FC = () => {
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center gap-1">
                         {renderStars(item.rating)}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="hidden sm:table-cell px-4 sm:px-6 py-4">
                       {item.productName ? (
                         <div className="flex items-center gap-2 text-slate-300">
                           <Package size={14} className="text-slate-500" />
@@ -210,16 +208,16 @@ const FeedbackPage: React.FC = () => {
                         <span className="text-slate-500 text-sm">N/A</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="hidden md:table-cell px-4 sm:px-6 py-4">
                       {getStatusBadge(item.status)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="hidden lg:table-cell px-4 sm:px-6 py-4">
                       <div className="flex items-center gap-2 text-slate-300 text-sm">
                         <Calendar size={14} className="text-slate-500" />
                         {formatDate(item.createdAt)}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <div className="text-slate-300 max-w-md line-clamp-2">
                         {item.message}
                       </div>
@@ -232,15 +230,15 @@ const FeedbackPage: React.FC = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="bg-surface-900 px-6 py-4 flex items-center justify-between border-t border-surface-700">
+            <div className="bg-surface-900 px-4 sm:px-6 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-surface-700">
               <div className="text-sm text-slate-400">
                 Showing {startItem} to {endItem} of {totalFeedback} feedback
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-surface-800 border border-surface-700 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-700 transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-surface-800 border border-surface-700 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-700 transition-colors"
                 >
                   Previous
                 </button>
@@ -250,7 +248,7 @@ const FeedbackPage: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-surface-800 border border-surface-700 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-700 transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-surface-800 border border-surface-700 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-700 transition-colors"
                 >
                   Next
                 </button>
