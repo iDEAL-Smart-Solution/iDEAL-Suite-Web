@@ -4,7 +4,6 @@ import { useAuthStore } from "../../stores/useAuthStore";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 import CurrentSubscriptionCard from "../../components/subscriptions/CurrentSubscriptionCard";
 import CreateSubscriptionModal from "../../components/subscriptions/CreateSubscriptionModal";
-import SubscriptionHistoryTable from "../../components/subscriptions/SubscriptionHistoryTable";
 import PaymentModal from "../../components/subscriptions/PaymentModal";
 import PageHeader from "../../components/layout/PageHeader";
 
@@ -12,14 +11,12 @@ const SubscriptionManagement: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const {
     currentSubscription,
-    subscriptionHistory,
     daysRemaining,
     isLoading,
     isSubmitting,
     error,
     successMessage,
     fetchCurrentSubscription,
-    fetchSubscriptionHistory,
     createSubscription,
     clearMessages,
   } = useSubscriptionStore();
@@ -33,9 +30,8 @@ const SubscriptionManagement: React.FC = () => {
   useEffect(() => {
     if (schoolId) {
       fetchCurrentSubscription(schoolId);
-      fetchSubscriptionHistory(schoolId);
     }
-  }, [schoolId, fetchCurrentSubscription, fetchSubscriptionHistory]);
+  }, [schoolId, fetchCurrentSubscription]);
 
   useEffect(() => {
     if (successMessage) {
@@ -49,7 +45,6 @@ const SubscriptionManagement: React.FC = () => {
     setIsModalOpen(false);
     if (schoolId) {
       fetchCurrentSubscription(schoolId);
-      fetchSubscriptionHistory(schoolId);
     }
   };
 
@@ -99,11 +94,6 @@ const SubscriptionManagement: React.FC = () => {
         onMakePayment={() => setIsPaymentOpen(true)}
         isLoading={isLoading}
       />
-
-      <div className="space-y-4">
-        <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-white">Subscription History</h2>
-        <SubscriptionHistoryTable subscriptions={subscriptionHistory} isLoading={isLoading} />
-      </div>
 
       <CreateSubscriptionModal
         isOpen={isModalOpen}

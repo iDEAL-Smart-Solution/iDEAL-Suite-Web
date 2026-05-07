@@ -53,6 +53,33 @@ const extractUsersPayload = (resData: any): { users: User[]; total: number } => 
   return { users: [], total: 0 };
 };
 
+const getUserApiErrorMessage = (
+  err: any,
+  fallbackMessage: string,
+): string => {
+  if (err?.response?.status === 404) {
+    return "User records are not available at the moment. Please try again shortly.";
+  }
+
+  if (err?.response?.status >= 500) {
+    return "Something went wrong while loading users. Please try again later.";
+  }
+
+  if (!err?.response) {
+    return "Unable to connect right now. Please check your internet and try again.";
+  }
+
+  if (typeof err?.response?.data?.message === "string" && err.response.data.message.trim()) {
+    return err.response.data.message;
+  }
+
+  if (typeof err?.message === "string" && err.message.trim()) {
+    return err.message;
+  }
+
+  return fallbackMessage;
+};
+
 interface UserState {
   users: User[];
   totalUsers: number;
@@ -93,14 +120,7 @@ export const useUserStore = create<UserState>((set) => ({
       set({ users, totalUsers: total, isLoading: false });
     } catch (err: any) {
       console.error("fetchUsers error:", err);
-      let message = "Failed to fetch users";
-      if (err.response?.status === 404) {
-        message = "⚠️ Backend API Missing: The endpoint GET /api/User/school/{schoolId} is not implemented. Please add this endpoint to your backend to enable user management.";
-      } else if (err.response?.data?.message) {
-        message = err.response.data.message;
-      } else if (err.message) {
-        message = err.message;
-      }
+      const message = getUserApiErrorMessage(err, "Failed to fetch users");
       set({ users: [], totalUsers: 0, error: message, isLoading: false });
     }
   },
@@ -119,14 +139,7 @@ export const useUserStore = create<UserState>((set) => ({
       set({ users, totalUsers: total, isLoading: false });
     } catch (err: any) {
       console.error("searchUsers error:", err);
-      let message = "Failed to search users";
-      if (err.response?.status === 404) {
-        message = "⚠️ Backend API Missing: The endpoint GET /api/User/school/{schoolId}/search is not implemented.";
-      } else if (err.response?.data?.message) {
-        message = err.response.data.message;
-      } else if (err.message) {
-        message = err.message;
-      }
+      const message = getUserApiErrorMessage(err, "Failed to search users");
       set({ users: [], totalUsers: 0, error: message, isLoading: false });
     }
   },

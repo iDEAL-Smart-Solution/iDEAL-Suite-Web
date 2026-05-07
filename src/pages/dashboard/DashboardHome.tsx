@@ -1,6 +1,6 @@
 ﻿import { useEffect } from "react";
 import MetricCard from "../../components/ui/MetricCard";
-import { Users, UserCheck, Ticket } from "lucide-react";
+ import { Users, UserCheck, Ticket } from "lucide-react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { useDashboardStore } from "../../stores/useDashboardStore";
 import MetricCardSkeleton from "../../components/ui/MetricCardSkeleton";
@@ -18,13 +18,11 @@ const DashboardHome = () => {
     stats,
     usageData,
     productEngagementMySchool,
-    subscriptionOverview,
     isLoading,
     error,
     fetchStats,
     fetchUinUsage,
     fetchProductEngagementMySchool,
-    fetchSubscriptionOverview,
   } = useDashboardStore();
 
   useEffect(() => {
@@ -32,14 +30,12 @@ const DashboardHome = () => {
       fetchStats(user.schoolId);
       fetchUinUsage();
       fetchProductEngagementMySchool();
-      fetchSubscriptionOverview();
     }
   }, [
     user?.schoolId,
     fetchStats,
     fetchUinUsage,
     fetchProductEngagementMySchool,
-    fetchSubscriptionOverview,
   ]);
 
   if (isLoading) {
@@ -89,16 +85,6 @@ const DashboardHome = () => {
           usedSlots={stats.totalRegisteredStudents}
         />
       </div>
-
-      {subscriptionOverview && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          <MetricCard title="All Subscriptions" value={subscriptionOverview.totalSubscriptions} icon={<Ticket size={20} />} />
-          <MetricCard title="Active" value={subscriptionOverview.activeSubscriptions} icon={<Ticket size={20} />} />
-          <MetricCard title="Pending" value={subscriptionOverview.pendingSubscriptions} icon={<Ticket size={20} />} />
-          <MetricCard title="Deactivated" value={subscriptionOverview.deactivatedSubscriptions} icon={<Ticket size={20} />} />
-          <MetricCard title="Expiring Soon" value={subscriptionOverview.expiringSoon} icon={<Ticket size={20} />} />
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <SubscriptionStatusCard

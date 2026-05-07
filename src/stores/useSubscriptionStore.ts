@@ -115,35 +115,9 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
     }
   },
 
-  fetchSubscriptionHistory: async (schoolId, page = 1, limit = 10) => {
-    set({ isLoading: true, error: null });
-    try {
-      const res = await api.get(`/Subscription/history/${schoolId}`, {
-        params: { page, limit },
-      });
-      console.log("fetchSubscriptionHistory response:", res.data);
-      
-      if (res.status === 204 || !res.data) {
-        set({ subscriptionHistory: [], isLoading: false });
-        return;
-      }
-      const list = res.data?.data ?? res.data;
-      const history = Array.isArray(list) ? list : [];
-      console.log("subscription history extracted:", history);
-      
-      set({ subscriptionHistory: history, isLoading: false });
-    } catch (err: any) {
-      console.error("fetchSubscriptionHistory error:", err);
-      let message = "Failed to fetch subscription history";
-      if (err.response?.status === 404) {
-        message = "⚠️ Backend API Missing: The endpoint GET /api/Subscription/history/{schoolId} is not implemented. Please add this endpoint to your backend to view subscription history.";
-      } else if (err.response?.data?.message) {
-        message = err.response.data.message;
-      } else if (err.message) {
-        message = err.message;
-      }
-      set({ subscriptionHistory: [], error: message, isLoading: false });
-    }
+  fetchSubscriptionHistory: async (_schoolId, _page = 1, _limit = 10) => {
+    set({ subscriptionHistory: [], error: null, isLoading: false });
+    return;
   },
 
   fetchReportingSubscriptions: async () => {
