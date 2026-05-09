@@ -65,6 +65,7 @@ const normalizePaymentRecord = (record: any, index = 0): PaymentRecord => ({
   id: String(record?.id ?? record?.paymentId ?? `payment-${index}`),
   subscriptionId: String(record?.subscriptionId ?? ""),
   schoolId: String(record?.schoolId ?? ""),
+  schoolName: String(record?.schoolName ?? record?.school?.name ?? "").trim() || undefined,
   amount: Number.isFinite(Number(record?.amount)) ? Number(record?.amount) : 0,
   reference: String(record?.reference ?? record?.paymentReference ?? ""),
   status: normalizePaymentStatus(record?.status),
@@ -72,6 +73,20 @@ const normalizePaymentRecord = (record: any, index = 0): PaymentRecord => ({
   paidAt: record?.paidAt ?? record?.paymentDate,
   createdAt: String(record?.createdAt ?? record?.paidAt ?? new Date().toISOString()),
 });
+
+const summarizePayments = (payments: PaymentRecord[]): BillingSummary =>
+  payments.reduce(
+    (summary, payment) => ({
+      totalPayments: summary.totalPayments + 1,
+      successfulPayments:
+        summary.successfulPayments + (payment.status === "success" ? 1 : 0),
+      pendingPayments:
+        summary.pendingPayments + (payment.status === "pending" ? 1 : 0),
+      failedPayments: summary.failedPayments + (payment.status === "failed" ? 1 : 0),
+      totalPaidAmount: summary.totalPaidAmount + payment.amount,
+    }),
+    { ...emptyBillingSummary }
+  );
 
 const normalizePaymentRecords = (payload: any): PaymentRecord[] =>
   extractPaymentRecords(payload).map((record, index) =>
@@ -141,11 +156,25 @@ const resolveErrorMessage = (
   }
 
   if (!err?.response || err?.code === "ERR_NETWORK") {
+    // Could be a network failure or blocked by CORS (no Access-Control-Allow-Origin header).
+    // Provide actionable guidance for developers and users.
+    const msg =
+      (err?.message && String(err.message)) ||
+      "Network error. Please check your connection and try again.";
+    if (String(msg).toLowerCase().includes("cors") || String(msg).toLowerCase().includes("network error")) {
+      return (
+        "Request blocked or network error. If you're developing locally, enable a dev proxy or ask the API team to add your origin to CORS (Access-Control-Allow-Origin). Otherwise check your network and retry."
+      );
+    }
+
     return "Network error. Please check your connection and try again.";
   }
 
   if (status === 500) {
-    return payloadMessage || `${endpointLabel} failed due to a server error.`;
+    return (
+      payloadMessage ||
+      `${endpointLabel} is temporarily unavailable. Please try again in a moment.`
+    );
   }
 
   if (status === 404) {
@@ -176,6 +205,7 @@ interface PaymentState {
 
   initializePayment: (data: InitializePaymentRequest) => Promise<string | null>;
   fetchPayments: (schoolId?: string) => Promise<void>;
+  fetchReportingPayments: () => Promise<void>;
   fetchBillingSummary: (schoolId?: string) => Promise<void>;
   fetchPaymentByReference: (reference: string) => Promise<PaymentRecord | null>;
   clearMessages: () => void;
@@ -309,6 +339,54 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
         "Payment history"
       );
       set({ payments: [], error: message, isLoading: false });
+    }
+  },
+
+  fetchReportingPayments: async () => {
+    const requestId = ++paymentsRequestSeq;
+    set({ isLoading: true, error: null });
+
+    const endpoints = [
+      "/Reporting/payments",
+      "/Reporting/payments/all",
+      "/Reporting/payment-history",
+    ];
+
+    for (const endpoint of endpoints) {
+      try {
+        const res = await api.get(endpoint);
+
+        if (requestId !== paymentsRequestSeq) {
+          return;
+        }
+
+        if (res.status === 204 || !res.data) {
+          set({ payments: [], billingSummary: emptyBillingSummary, isLoading: false, error: null });
+          return;
+        }
+
+        const data = normalizePaymentRecords(res.data);
+        set({
+          payments: data,
+          billingSummary: summarizePayments(data),
+          isLoading: false,
+          error: null,
+        });
+        return;
+      } catch (err: any) {
+        if (requestId !== paymentsRequestSeq) {
+          return;
+        }
+
+        const status = err?.response?.status;
+        if (status === 404 && endpoint !== endpoints[endpoints.length - 1]) {
+          continue;
+        }
+
+        const message = resolveErrorMessage(err, "Failed to fetch payments report.", "Payments report");
+        set({ payments: [], billingSummary: emptyBillingSummary, error: message, isLoading: false });
+        return;
+      }
     }
   },
 

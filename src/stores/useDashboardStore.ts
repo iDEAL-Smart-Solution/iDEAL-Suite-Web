@@ -77,6 +77,18 @@ const normalizeSubscriptionOverview = (payload: unknown): ReportingSubscriptionO
   };
 };
 
+const getReportingErrorMessage = (label: string, err: any) => {
+  if (err.response?.status === 403) {
+    return `${label} is blocked by the backend (403 Forbidden).`;
+  }
+
+  if (err.response?.status === 429) {
+    return `${label} is rate limited by the backend (429 Too Many Requests).`;
+  }
+
+  return err.response?.data?.message || `Failed to load ${label.toLowerCase()}`;
+};
+
 interface DashboardState {
   stats: DashboardStats | null;
   usageData: UsageChartData[];
@@ -85,6 +97,8 @@ interface DashboardState {
   subscriptionOverview: ReportingSubscriptionOverview | null;
   isLoading: boolean;
   error: string | null;
+  errors: Record<string, string | null>;
+  loadingState: Record<string, boolean>;
 
   fetchStats: (schoolId: string) => Promise<void>;
   fetchUinUsage: () => Promise<void>;
@@ -102,70 +116,124 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   subscriptionOverview: null,
   isLoading: false,
   error: null,
+  errors: {},
+  loadingState: {},
 
   fetchStats: async (schoolId) => {
-    set({ isLoading: true, error: null });
+    set((state) => ({
+      loadingState: { ...state.loadingState, stats: true },
+      error: null,
+    }));
     try {
       const res = await api.get(`${DASHBOARD_SCHOOL_METRICS_ENDPOINT}/${schoolId}`);
       const stats: DashboardStats = res.data?.data ?? res.data;
       if (!stats || res.status === 204) {
-        set({ stats: null, error: "No dashboard data available", isLoading: false });
+        set((state) => ({
+          stats: null,
+          loadingState: { ...state.loadingState, stats: false },
+          errors: { ...state.errors, stats: "No dashboard data available" },
+        }));
         return;
       }
-      set({ stats, isLoading: false });
+      set((state) => ({
+        stats,
+        loadingState: { ...state.loadingState, stats: false },
+        errors: { ...state.errors, stats: null },
+      }));
     } catch (err: any) {
-      set({
-        error: err.response?.data?.message || "Failed to load dashboard data",
-        isLoading: false,
-      });
+      const errorMsg =
+        err.response?.status === 403
+          ? "You don't have permission to view dashboard data"
+          : err.response?.data?.message || "Failed to load dashboard data";
+      set((state) => ({
+        loadingState: { ...state.loadingState, stats: false },
+        errors: { ...state.errors, stats: errorMsg },
+      }));
     }
   },
 
   fetchUinUsage: async () => {
+    set((state) => ({
+      loadingState: { ...state.loadingState, usage: true },
+    }));
     try {
       const res = await api.get("/Reporting/uin-usage");
-      set({ usageData: normalizeUsageChartData(res.data) });
+      set((state) => ({
+        usageData: normalizeUsageChartData(res.data),
+        loadingState: { ...state.loadingState, usage: false },
+        errors: { ...state.errors, usage: null },
+      }));
     } catch (err: any) {
-      set({
-        error: err.response?.data?.message || "Failed to load UIN usage report",
-      });
+      set((state) => ({
+        loadingState: { ...state.loadingState, usage: false },
+        errors: { ...state.errors, usage: getReportingErrorMessage("UIN usage report", err) },
+      }));
     }
   },
 
   fetchProductEngagementMySchool: async () => {
+    set((state) => ({
+      loadingState: { ...state.loadingState, engagement: true },
+    }));
     try {
       const res = await api.get("/Reporting/product-engagement/my-school");
-      set({ productEngagementMySchool: normalizeProductEngagement(res.data) });
+      set((state) => ({
+        productEngagementMySchool: normalizeProductEngagement(res.data),
+        loadingState: { ...state.loadingState, engagement: false },
+        errors: { ...state.errors, engagement: null },
+      }));
     } catch (err: any) {
-      set({
-        error:
-          err.response?.data?.message || "Failed to load product engagement report",
-      });
+      set((state) => ({
+        loadingState: { ...state.loadingState, engagement: false },
+        errors: {
+          ...state.errors,
+          engagement: getReportingErrorMessage("Product engagement report", err),
+        },
+      }));
     }
   },
 
   fetchProductEngagementAll: async () => {
+    set((state) => ({
+      loadingState: { ...state.loadingState, engagementAll: true },
+    }));
     try {
       const res = await api.get("/Reporting/product-engagement/all");
-      set({ productEngagementAll: normalizeProductEngagement(res.data) });
+      set((state) => ({
+        productEngagementAll: normalizeProductEngagement(res.data),
+        loadingState: { ...state.loadingState, engagementAll: false },
+        errors: { ...state.errors, engagementAll: null },
+      }));
     } catch (err: any) {
-      set({
-        error:
-          err.response?.data?.message ||
-          "Failed to load platform product engagement report",
-      });
+      set((state) => ({
+        loadingState: { ...state.loadingState, engagementAll: false },
+        errors: {
+          ...state.errors,
+          engagementAll: getReportingErrorMessage("Platform product engagement report", err),
+        },
+      }));
     }
   },
 
   fetchSubscriptionOverview: async () => {
+    set((state) => ({
+      loadingState: { ...state.loadingState, subscriptions: true },
+    }));
     try {
       const res = await api.get("/Reporting/subscriptions");
-      set({ subscriptionOverview: normalizeSubscriptionOverview(res.data) });
+      set((state) => ({
+        subscriptionOverview: normalizeSubscriptionOverview(res.data),
+        loadingState: { ...state.loadingState, subscriptions: false },
+        errors: { ...state.errors, subscriptions: null },
+      }));
     } catch (err: any) {
-      set({
-        error:
-          err.response?.data?.message || "Failed to load subscriptions report",
-      });
+      set((state) => ({
+        loadingState: { ...state.loadingState, subscriptions: false },
+        errors: {
+          ...state.errors,
+          subscriptions: getReportingErrorMessage("Subscriptions report", err),
+        },
+      }));
     }
   },
 
@@ -177,5 +245,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       productEngagementAll: [],
       subscriptionOverview: null,
       error: null,
+      errors: {},
+      loadingState: {},
     }),
 }));

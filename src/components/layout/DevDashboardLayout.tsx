@@ -33,7 +33,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
     { label: "Overview", path: "/dev/dashboard", icon: <LayoutDashboard size={18} /> },
     { label: "Schools Management", path: "/dev/schools", icon: <Building2 size={18} /> },
     { label: "Subscriptions", path: "/dev/subscriptions", icon: <CreditCard size={18} /> },
-    { label: "Payments", path: "/dev/payments", icon: <Wallet size={18} /> },
+    { label: "Payments Report", path: "/dev/payments", icon: <Wallet size={18} /> },
     { label: "Products", path: "/dev/products", icon: <Package size={18} /> },
     { label: "Students", path: "/dev/students", icon: <Users size={18} /> },
     { label: "Feedback", path: "/dev/feedback", icon: <MessageSquare size={18} /> },
@@ -121,7 +121,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
                   {user?.fullName}
                 </p>
                 <span className="inline-block mt-0.5 text-[11px] font-medium text-brand-700 bg-brand-100 px-2 py-0.5 rounded-md">
-                  Platform Admin
+                  Dev
                 </span>
               </div>
             </div>
@@ -163,7 +163,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
           >
             <Menu size={20} />
           </button>
-          <h1 className="text-base md:text-lg font-semibold text-slate-800">Platform Admin Dashboard</h1>
+          <h1 className="text-base md:text-lg font-semibold text-slate-800">Dev Dashboard</h1>
         </header>
 
         {/* Content Area */}

@@ -80,6 +80,7 @@ export type PaymentRecord = {
   id: string;
   subscriptionId: string;
   schoolId: string;
+  schoolName?: string;
   amount: number;
   reference: string;
   status: "pending" | "success" | "failed";

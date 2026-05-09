@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CreditCard } from "lucide-react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { usePaymentStore } from "../../stores/usePaymentStore";
@@ -22,6 +22,7 @@ const getStatusBadge = (status: string) => {
 
 const PaymentHistory: React.FC = () => {
   const user = useAuthStore((s) => s.user);
+  const isDevDashboard = user?.role === 0;
   const {
     payments,
     billingSummary,
@@ -29,6 +30,7 @@ const PaymentHistory: React.FC = () => {
     isInitializing,
     error,
     fetchPayments,
+    fetchReportingPayments,
     fetchBillingSummary,
     clearMessages,
   } =
@@ -37,53 +39,111 @@ const PaymentHistory: React.FC = () => {
     useSubscriptionStore();
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const initialLoadKeyRef = useRef<string | null>(null);
 
   const schoolId = user?.schoolId;
+  const initialLoadKey = isDevDashboard ? "dev-payments" : schoolId ?? null;
 
   useEffect(() => {
+    if (!initialLoadKey) return;
+
+    // Prevent duplicate development requests from React StrictMode.
+    if (initialLoadKeyRef.current === initialLoadKey) {
+      return;
+    }
+
+    initialLoadKeyRef.current = initialLoadKey;
+    if (isDevDashboard) {
+      fetchReportingPayments();
+      return;
+    }
+
     if (schoolId) {
       fetchPayments(schoolId);
       fetchBillingSummary(schoolId);
       fetchCurrentSubscription(schoolId);
     }
-  }, [schoolId, fetchPayments, fetchBillingSummary, fetchCurrentSubscription]);
+  }, [
+    isDevDashboard,
+    initialLoadKey,
+    schoolId,
+    fetchPayments,
+    fetchReportingPayments,
+    fetchBillingSummary,
+    fetchCurrentSubscription,
+  ]);
 
   if (!schoolId) {
-    return (
-      <div>
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
-          Unable to load payment data. Please login again.
+    if (!isDevDashboard) {
+      return (
+        <div>
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
+            Unable to load payment data. Please login again.
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
+
+  const handleRefresh = () => {
+    if (isDevDashboard) {
+      fetchReportingPayments();
+      return;
+    }
+
+    if (!schoolId) return;
+    fetchPayments(schoolId);
+    fetchBillingSummary(schoolId);
+    fetchCurrentSubscription(schoolId);
+  };
+
+  const pageTitle = isDevDashboard ? "Payments Report" : "Payments";
+  const pageSubtitle = isDevDashboard
+    ? "View payments made by other schools across the platform."
+    : "View payment history and make new payments";
 
   return (
     <div className="space-y-8">
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400 flex justify-between items-center">
-          {error}
-          <button
-            onClick={clearMessages}
-            className="text-xl font-bold hover:opacity-70"
-          >
-            ×
-          </button>
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 md:p-5 text-amber-100">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-1">
+              <p className="font-semibold text-amber-50">Payments service unavailable</p>
+              <p className="text-sm text-amber-100/90">{error}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-300"
+              >
+                Retry
+              </button>
+              <button
+                onClick={clearMessages}
+                className="rounded-lg border border-amber-400/30 px-3 py-2 text-sm font-semibold text-amber-100 transition-colors hover:bg-amber-500/10"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       <PageHeader
-        title="Payments"
-        subtitle="View payment history and make new payments"
+        title={pageTitle}
+        subtitle={pageSubtitle}
         action={
-          <button
-            className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-medium transition-all inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => setIsPaymentOpen(true)}
-            disabled={isInitializing}
-          >
-            <CreditCard className="w-4 h-4" />
-            {isInitializing ? "Preparing payment..." : "Make Payment"}
-          </button>
+          !isDevDashboard ? (
+            <button
+              className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-medium transition-all inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setIsPaymentOpen(true)}
+              disabled={isInitializing}
+            >
+              <CreditCard className="w-4 h-4" />
+              {isInitializing ? "Preparing payment..." : "Make Payment"}
+            </button>
+          ) : undefined
         }
       />
 
@@ -91,12 +151,7 @@ const PaymentHistory: React.FC = () => {
         <button
           type="button"
           className="text-sm text-slate-300 hover:text-white transition-colors disabled:opacity-50"
-          onClick={() => {
-            if (!schoolId) return;
-            fetchPayments(schoolId);
-            fetchBillingSummary(schoolId);
-            fetchCurrentSubscription(schoolId);
-          }}
+          onClick={handleRefresh}
           disabled={isLoading}
         >
           {isLoading ? "Refreshing..." : "Refresh data"}
@@ -132,6 +187,11 @@ const PaymentHistory: React.FC = () => {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
                   Reference
                 </th>
+                {isDevDashboard && (
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                    School
+                  </th>
+                )}
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
                   Amount
                 </th>
@@ -150,7 +210,7 @@ const PaymentHistory: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={isDevDashboard ? 6 : 5}
                     className="px-4 py-8 text-center text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -162,16 +222,30 @@ const PaymentHistory: React.FC = () => {
               ) : payments.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={isDevDashboard ? 6 : 5}
                     className="px-4 py-12 text-center text-slate-400"
                   >
-                    <div className="space-y-2">
-                      <CreditCard className="w-10 h-10 mx-auto text-slate-600" />
-                      <p className="font-medium">No payments yet</p>
-                      <p className="text-sm text-slate-500">
-                        Payments will appear here after you make a payment.
-                      </p>
-                    </div>
+                    {error ? (
+                      <div className="space-y-2">
+                        <CreditCard className="w-10 h-10 mx-auto text-amber-400/70" />
+                        <p className="font-medium text-amber-100">Unable to load payment history</p>
+                        <p className="text-sm text-slate-500">
+                          The service returned an error. Try again in a moment or contact support if it persists.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <CreditCard className="w-10 h-10 mx-auto text-slate-600" />
+                        <p className="font-medium">
+                          {isDevDashboard ? "No payments reported yet" : "No payments yet"}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {isDevDashboard
+                            ? "Payments from schools will appear here after they are processed."
+                            : "Payments will appear here after you make a payment."}
+                        </p>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ) : (
@@ -185,6 +259,11 @@ const PaymentHistory: React.FC = () => {
                         {payment.reference}
                       </span>
                     </td>
+                    {isDevDashboard && (
+                      <td className="px-4 py-3 text-slate-300 text-sm">
+                        {payment.schoolName || payment.schoolId || "Unknown school"}
+                      </td>
+                    )}
                     <td className="px-4 py-3 text-white font-semibold tabular-nums">
                       ₦{payment.amount.toLocaleString()}
                     </td>
@@ -224,13 +303,15 @@ const PaymentHistory: React.FC = () => {
         </div>
       </div>
 
-      <PaymentModal
-        isOpen={isPaymentOpen}
-        onClose={() => setIsPaymentOpen(false)}
-        subscription={currentSubscription}
-        schoolId={schoolId}
-        email={user?.email || ""}
-      />
+      {!isDevDashboard && (
+        <PaymentModal
+          isOpen={isPaymentOpen}
+          onClose={() => setIsPaymentOpen(false)}
+          subscription={currentSubscription}
+          schoolId={schoolId}
+          email={user?.email || ""}
+        />
+      )}
     </div>
   );
 };
