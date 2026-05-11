@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const timeoutMs = Number(import.meta.env.VITE_API_TIMEOUT_MS || 180000);
 
 const api = axios.create({
   baseURL,
-  timeout: 20000,
-  // Safely handle empty / 204 responses so JSON.parse("") never throws
+  timeout: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 180000,
   transformResponse: [
     (data) => {
       if (typeof data === "string") {

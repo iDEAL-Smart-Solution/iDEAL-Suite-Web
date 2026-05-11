@@ -1,29 +1,22 @@
-import React, { useState, useEffect } from "react";
-import type { CreateSubscriptionRequest } from "../../types/subscription";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 import CurrentSubscriptionCard from "../../components/subscriptions/CurrentSubscriptionCard";
-import CreateSubscriptionModal from "../../components/subscriptions/CreateSubscriptionModal";
-import PaymentModal from "../../components/subscriptions/PaymentModal";
 import PageHeader from "../../components/layout/PageHeader";
 
 const SubscriptionManagement: React.FC = () => {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const {
     currentSubscription,
     daysRemaining,
     isLoading,
-    isSubmitting,
     error,
     successMessage,
     fetchCurrentSubscription,
-    createSubscription,
     clearMessages,
   } = useSubscriptionStore();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isRenewalMode, setIsRenewalMode] = useState(false);
-  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
   const schoolId = user?.schoolId;
 
@@ -40,13 +33,8 @@ const SubscriptionManagement: React.FC = () => {
     }
   }, [successMessage, clearMessages]);
 
-  const handleCreateSubscription = async (data: CreateSubscriptionRequest) => {
-    await createSubscription(data);
-    setIsModalOpen(false);
-    if (schoolId) {
-      fetchCurrentSubscription(schoolId);
-    }
-  };
+  // Subscription creation is now handled automatically on verified payment.
+  // Manual creation UI has been removed to avoid inconsistent state.
 
   if (!schoolId) {
     return (
@@ -73,45 +61,40 @@ const SubscriptionManagement: React.FC = () => {
         </div>
       )}
 
-      <PageHeader
-        title="Subscription Management"
-        action={
-          <button
-            className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-medium transition-all"
-            onClick={() => { setIsRenewalMode(false); setIsModalOpen(true); }}
-          >
-            + Create New Subscription
-          </button>
-        }
-      />
+      <PageHeader title="Subscription Management" />
 
       <CurrentSubscriptionCard
         subscription={currentSubscription}
         usedSlots={0}
         daysRemaining={daysRemaining}
-        onRenew={() => { setIsRenewalMode(true); setIsModalOpen(true); }}
-        onUpgrade={() => { setIsRenewalMode(false); setIsModalOpen(true); }}
-        onMakePayment={() => setIsPaymentOpen(true)}
+        onRenew={() => {
+          const productId = currentSubscription?.productId;
+          navigate(
+            productId
+              ? `/payments/initialize?productId=${encodeURIComponent(productId)}&action=renew`
+              : "/payments/initialize?action=renew"
+          );
+        }}
+        onUpgrade={() => {
+          const productId = currentSubscription?.productId;
+          navigate(
+            productId
+              ? `/payments/initialize?productId=${encodeURIComponent(productId)}&action=upgrade`
+              : "/payments/initialize?action=upgrade"
+          );
+        }}
+        onMakePayment={() => {
+          const productId = currentSubscription?.productId;
+          navigate(
+            productId
+              ? `/payments/initialize?productId=${encodeURIComponent(productId)}`
+              : "/payments/initialize"
+          );
+        }}
         isLoading={isLoading}
       />
 
-      <CreateSubscriptionModal
-        isOpen={isModalOpen}
-        isLoading={isSubmitting}
-        onClose={() => { setIsModalOpen(false); setIsRenewalMode(false); }}
-        onSubmit={handleCreateSubscription}
-        schoolId={schoolId}
-        isRenewal={isRenewalMode}
-        prefilledSlots={currentSubscription?.paidStudentSlots}
-      />
-
-      <PaymentModal
-        isOpen={isPaymentOpen}
-        onClose={() => setIsPaymentOpen(false)}
-        subscription={currentSubscription}
-        schoolId={schoolId}
-        email={user?.email || ""}
-      />
+      {/* Manual subscription modal removed. Subscriptions are created automatically on verified payments. */}
     </div>
   );
 };

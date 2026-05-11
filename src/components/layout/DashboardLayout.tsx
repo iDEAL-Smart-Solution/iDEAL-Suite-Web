@@ -49,6 +49,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         <Topbar
           onToggleSidebar={handleToggleSidebar}
           isSidebarCollapsed={isTabletSidebarCollapsed}
+          dashboardLabel="SchoolAdmin"
         />
 
         {/* Content Area */}

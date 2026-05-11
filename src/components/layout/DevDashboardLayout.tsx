@@ -7,7 +7,6 @@ import {
   Building2,
   CreditCard,
   Package,
-  Settings,
   LogOut,
   Menu,
   X,
@@ -37,7 +36,6 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
     { label: "Products", path: "/dev/products", icon: <Package size={18} /> },
     { label: "Students", path: "/dev/students", icon: <Users size={18} /> },
     { label: "Feedback", path: "/dev/feedback", icon: <MessageSquare size={18} /> },
-    { label: "Settings", path: "/dev/settings", icon: <Settings size={18} /> },
   ];
 
   const handleLogout = () => {
@@ -60,11 +58,11 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
   };
 
   return (
-    <div className="flex min-h-screen bg-surface-950 overflow-x-hidden">
+    <div className="flex min-h-screen bg-surface-950 overflow-x-hidden text-slate-100">
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-screen bg-white transition-all duration-300 flex flex-col border-r border-brand-100 shadow-sm z-40",
+          "fixed left-0 top-0 h-screen bg-surface-950 transition-all duration-300 flex flex-col border-r border-surface-800 shadow-sm z-40",
           "w-64 md:translate-x-0",
           isTabletSidebarCollapsed ? "md:w-20" : "md:w-64",
           mobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
@@ -72,7 +70,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
         aria-label="Platform navigation"
       >
         {/* Header */}
-        <div className="p-5 border-b border-brand-100 flex items-center justify-between">
+        <div className="p-5 border-b border-surface-800 flex items-center justify-between">
           {!isTabletSidebarCollapsed && (
             <img
               src={logo}
@@ -82,7 +80,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
           )}
           <button
             onClick={handleToggleSidebar}
-            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:text-brand-700 hover:bg-brand-50 transition-colors duration-200"
+            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-surface-800 transition-colors duration-200"
             aria-label="Toggle sidebar"
           >
             {mobileSidebarOpen || !isTabletSidebarCollapsed ? <X size={22} /> : <Menu size={22} />}
@@ -99,8 +97,8 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200",
                 isActive(item.path)
-                  ? "bg-brand-100 text-brand-700 border-l-[3px] border-brand-500"
-                  : "text-slate-700 hover:text-brand-700 hover:bg-brand-50"
+                  ? "bg-brand-500/20 text-brand-300 border-l-[3px] border-brand-500"
+                  : "text-slate-300 hover:text-white hover:bg-surface-800"
               )}
             >
               {item.icon}
@@ -110,17 +108,17 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
         </nav>
 
         {/* User section */}
-        <div className="p-5 border-t border-brand-100">
+        <div className="p-5 border-t border-surface-800">
           {!isTabletSidebarCollapsed ? (
             <div className="mb-3 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-brand-500/20 text-brand-300 flex items-center justify-center text-sm font-semibold shrink-0">
                 {initial}
               </div>
               <div className="min-w-0">
-                <p className="text-slate-700 font-medium text-sm truncate">
+                <p className="text-slate-200 font-medium text-sm truncate">
                   {user?.fullName}
                 </p>
-                <span className="inline-block mt-0.5 text-[11px] font-medium text-brand-700 bg-brand-100 px-2 py-0.5 rounded-md">
+                <span className="inline-block mt-0.5 text-[11px] font-medium text-brand-300 bg-brand-500/20 px-2 py-0.5 rounded-md">
                   Dev
                 </span>
               </div>
@@ -128,7 +126,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
           ) : null}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:text-red-500 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium"
             aria-label="Logout"
           >
             <LogOut size={18} />
@@ -154,16 +152,19 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
         )}
       >
         {/* Top Bar */}
-        <header className="bg-white border-b border-brand-100 px-4 md:px-6 h-16 flex items-center gap-3 shadow-sm">
+        <header className="bg-surface-950 border-b border-surface-800 px-4 md:px-6 h-16 flex items-center gap-3 shadow-sm">
           <button
             type="button"
-            className="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-700 hover:bg-brand-50"
+            className="lg:hidden w-10 h-10 rounded-lg flex items-center justify-center text-slate-300 hover:text-white hover:bg-surface-800"
             onClick={handleToggleSidebar}
             aria-label="Toggle sidebar"
           >
             <Menu size={20} />
           </button>
-          <h1 className="text-base md:text-lg font-semibold text-slate-800">Dev Dashboard</h1>
+          <div className="hidden sm:flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
+            <span className="h-2 w-2 rounded-full bg-brand-400" />
+            <span>Dev</span>
+          </div>
         </header>
 
         {/* Content Area */}

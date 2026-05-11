@@ -14,31 +14,37 @@ import ExpiryWarningBanner from "../../components/ui/ExpiryWarningBanner";
 
 const DashboardHome = () => {
   const user = useAuthStore((s) => s.user);
+  const isDevUser = user?.role === 4;
   const {
     stats,
     usageData,
     productEngagementMySchool,
-    isLoading,
+    loadingState,
     error,
     fetchStats,
     fetchUinUsage,
     fetchProductEngagementMySchool,
   } = useDashboardStore();
 
+  const isStatsLoading = loadingState.stats === true;
+
   useEffect(() => {
     if (user?.schoolId) {
       fetchStats(user.schoolId);
-      fetchUinUsage();
+      if (isDevUser) {
+        fetchUinUsage();
+      }
       fetchProductEngagementMySchool();
     }
   }, [
     user?.schoolId,
+    isDevUser,
     fetchStats,
     fetchUinUsage,
     fetchProductEngagementMySchool,
   ]);
 
-  if (isLoading) {
+  if (isStatsLoading) {
     return (
       <div>
         <Skeleton width="250px" height="28px" />

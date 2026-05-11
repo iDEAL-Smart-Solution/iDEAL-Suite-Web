@@ -19,9 +19,9 @@ const SubscriptionsManagement = () => {
 
   const getStatusColor = (status?: number) => {
     switch (status) {
-      case 1: return "text-green-400 bg-green-900/20";
-      case 3: return "text-red-400 bg-red-900/20";
-      case 2: return "text-yellow-400 bg-yellow-900/20";
+      case 1: return "text-green-600 bg-green-100";
+      case 3: return "text-red-600 bg-red-100";
+      case 2: return "text-amber-600 bg-amber-100";
       default: return "text-slate-400 bg-surface-800";
     }
   };
@@ -81,7 +81,7 @@ const SubscriptionsManagement = () => {
               filteredSubscriptions.map((sub) => (
                 <tr key={sub.id} className="hover:bg-surface-700/50 transition-colors">
                   <td className="px-3 sm:px-6 py-4 text-white font-medium">{sub.planType || "N/A"}</td>
-                  <td className="px-3 sm:px-6 py-4 text-slate-300">{sub.schoolId}</td>
+                  <td className="px-3 sm:px-6 py-4 text-slate-300">{sub.schoolName ?? sub.schoolId}</td>
                   <td className="hidden sm:table-cell px-3 sm:px-6 py-4 text-slate-300">{sub.startDate ? new Date(sub.startDate).toLocaleDateString() : "N/A"}</td>
                   <td className="px-3 sm:px-6 py-4 text-slate-300">{sub.expiryDate ? new Date(sub.expiryDate).toLocaleDateString() : "N/A"}</td>
                   <td className="px-3 sm:px-6 py-4">

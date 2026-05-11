@@ -1,4 +1,5 @@
 import React from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import type { User, UserRoleType } from "../../types/user";
 import { UserRole } from "../../types/user";
@@ -50,8 +51,24 @@ const UserTable: React.FC<UserTableProps> = ({
   canEdit = true,
   canDelete = true,
 }) => {
-  const getInitials = (firstName: string, lastName: string): string => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  const getInitials = (firstName?: string, lastName?: string, fallbackName?: string): string => {
+    const safeFirst = firstName?.trim();
+    const safeLast = lastName?.trim();
+
+    if (safeFirst || safeLast) {
+      return `${safeFirst?.charAt(0) ?? ""}${safeLast?.charAt(0) ?? ""}`.toUpperCase();
+    }
+
+    const fallbackParts = fallbackName?.trim().split(/\s+/).filter(Boolean) ?? [];
+    if (fallbackParts.length === 0) {
+      return "?";
+    }
+
+    return `${fallbackParts[0]?.charAt(0) ?? ""}${fallbackParts[1]?.charAt(0) ?? ""}`.toUpperCase();
+  };
+
+  const getStatus = (status?: User["status"]): "active" | "inactive" => {
+    return status === "inactive" ? "inactive" : "active";
   };
 
   if (isLoading) {
@@ -88,59 +105,65 @@ const UserTable: React.FC<UserTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="border-b border-surface-700 hover:bg-surface-700/50 transition-colors duration-200">
-                <td className="px-3 sm:px-4 py-3">
-                  <div className="w-10 h-10 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-semibold text-sm">
-                    {getInitials(user.firstName, user.lastName)}
-                  </div>
-                </td>
-                <td className="px-3 sm:px-4 py-3">
-                  <span className="text-white font-semibold">
-                    {user.firstName} {user.lastName}
-                  </span>
-                </td>
-                <td className="px-3 sm:px-4 py-3 text-slate-400">{user.email}</td>
-                <td className="hidden md:table-cell px-3 sm:px-4 py-3 text-slate-400">{user.phoneNumber}</td>
-                <td className="px-3 sm:px-4 py-3">
-                  <span className={cn("inline-block px-3 py-1 rounded-md text-xs font-semibold", getRoleColor(user.role))}>
-                    {getRoleName(user.role)}
-                  </span>
-                </td>
-                <td className="hidden sm:table-cell px-3 sm:px-4 py-3">
-                  <span className={cn(
-                    "inline-block px-3 py-1 rounded-md text-xs font-semibold",
-                    user.status === "active" 
-                      ? "bg-green-500/20 text-green-400"
-                      : "bg-red-500/20 text-red-400"
-                  )}>
-                    {user.status || "active"}
-                  </span>
-                </td>
-                <td className="px-3 sm:px-4 py-3">
-                  <div className="flex flex-wrap gap-2">
-                    {canEdit && (
-                      <button
-                        className="bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 font-semibold py-1 px-3 rounded-lg text-sm transition-colors duration-200"
-                        onClick={() => onEdit(user)}
-                        title="Edit user"
-                      >
-                        Edit
-                      </button>
-                    )}
-                    {canDelete && (
-                      <button
-                        className="bg-red-500/10 text-red-400 hover:bg-red-500/20 font-semibold py-1 px-3 rounded-lg text-sm transition-colors duration-200"
-                        onClick={() => onDelete(user)}
-                        title="Delete user"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {users.map((user) => {
+              const status = getStatus(user.status);
+
+              return (
+                <tr key={user.id} className="border-b border-surface-700 hover:bg-surface-700/50 transition-colors duration-200">
+                  <td className="px-3 sm:px-4 py-3">
+                    <div className="w-10 h-10 rounded-full bg-brand-500/20 text-brand-300 flex items-center justify-center font-semibold text-sm">
+                      {getInitials(user.firstName, user.lastName, `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim())}
+                    </div>
+                  </td>
+                  <td className="px-3 sm:px-4 py-3">
+                    <span className="text-white font-semibold">
+                      {user.firstName} {user.lastName}
+                    </span>
+                  </td>
+                  <td className="px-3 sm:px-4 py-3 text-slate-400">{user.email}</td>
+                  <td className="hidden md:table-cell px-3 sm:px-4 py-3 text-slate-400">{user.phoneNumber}</td>
+                  <td className="px-3 sm:px-4 py-3">
+                    <span className={cn("inline-block px-3 py-1 rounded-md text-xs font-semibold", getRoleColor(user.role))}>
+                      {getRoleName(user.role)}
+                    </span>
+                  </td>
+                  <td className="hidden sm:table-cell px-3 sm:px-4 py-3">
+                    <span className={cn(
+                      "inline-block px-3 py-1 rounded-md text-xs font-semibold",
+                      status === "active"
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-red-500/20 text-red-400"
+                    )}>
+                      {status}
+                    </span>
+                  </td>
+                  <td className="px-3 sm:px-4 py-3">
+                    <div className="flex flex-wrap gap-2">
+                      {canEdit && (
+                        <button
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 hover:text-brand-300 transition-colors duration-200"
+                          onClick={() => onEdit(user)}
+                          title="Edit user"
+                          aria-label="Edit user"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                      )}
+                      {canDelete && (
+                        <button
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors duration-200"
+                          onClick={() => onDelete(user)}
+                          title="Delete user"
+                          aria-label="Delete user"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

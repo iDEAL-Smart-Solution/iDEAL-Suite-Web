@@ -29,10 +29,15 @@ const normalizeReportingSubscriptions = (payload: unknown): Subscription[] => {
     const status = normalizeSubscriptionStatus(
       sub?.status ?? sub?.subscriptionStatus ?? sub?.statusCode
     );
-
+    const schoolName = sub?.schoolName ?? sub?.school?.name;
+    const productName = sub?.productName ?? sub?.product?.name;
+    const productId = sub?.productId ?? sub?.product?.id;
     return {
       id: String(sub?.id ?? sub?.subscriptionId ?? `report-sub-${index}`),
       schoolId: String(sub?.schoolId ?? sub?.schoolName ?? "N/A"),
+      schoolName: schoolName ? String(schoolName) : undefined,
+      productId: productId ? String(productId) : undefined,
+      productName: productName ? String(productName) : undefined,
       paidStudentSlots: Number(
         sub?.paidStudentSlots ?? sub?.studentSlots ?? sub?.subscribedSlots ?? 0
       ),
@@ -52,9 +57,12 @@ const normalizeReportingSubscriptions = (payload: unknown): Subscription[] => {
           : "Local",
       createdAt: sub?.createdAt,
       updatedAt: sub?.updatedAt,
+      productCount: 1,
     };
   });
 };
+
+// after normalizing, we will compute productCount per school in fetchReportingSubscriptions
 
 interface SubscriptionState {
   currentSubscription: Subscription | null;
@@ -124,8 +132,24 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const res = await api.get("/Reporting/subscriptions");
+      const normalized = normalizeReportingSubscriptions(res.data);
+
+      // compute productCount per school
+      const map = new Map<string, Set<string>>();
+      normalized.forEach((s) => {
+        const sid = s.schoolId || s.schoolName || "unknown";
+        const pid = s.productId || s.productName || s.id;
+        if (!map.has(sid)) map.set(sid, new Set());
+        map.get(sid)!.add(pid);
+      });
+
+      const withCounts = normalized.map((s) => ({
+        ...s,
+        productCount: map.get(s.schoolId || s.schoolName || "unknown")?.size ?? 0,
+      }));
+
       set({
-        subscriptionHistory: normalizeReportingSubscriptions(res.data),
+        subscriptionHistory: withCounts,
         isLoading: false,
       });
     } catch (err: any) {

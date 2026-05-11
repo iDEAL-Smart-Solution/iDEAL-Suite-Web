@@ -83,6 +83,15 @@ const DevDashboardHome = () => {
     0
   );
 
+  const resolveSchoolName = (schoolId: string, fallback?: string) => {
+    return fallback || schools.find((school) => school.id === schoolId)?.name || schoolId;
+  };
+
+  const expiringSubscriptions = subscriptionHistory.filter((sub) => {
+    const days = Math.ceil((new Date(sub.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return days <= 7 && days >= 0;
+  });
+
   const getServiceStatus = (isLoadingState: boolean, hasError: string | null): ServiceStatus => {
     if (hasError) return "down";
     if (isLoadingState) return "degraded";
@@ -168,32 +177,44 @@ const DevDashboardHome = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-700">
-                {schools.slice(0, 5).map((school) => (
-                  <tr key={school.id} className="hover:bg-surface-700/30">
-                    <td className="px-4 py-3 text-white">{school.name}</td>
-                    <td className="px-4 py-3 text-slate-300">{school.email}</td>
-                    <td className="hidden sm:table-cell px-4 py-3 text-slate-300">{school.state}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 text-xs rounded-md ${school.subscriptionStatus === "ACTIVE" ? "text-green-400 bg-green-900/20" : "text-yellow-400 bg-yellow-900/20"}`}>
-                        {school.subscriptionStatus || "N/A"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {schools.slice(0, 5).map((school) => {
+                  // compute status from subscriptionHistory
+                  const subsForSchool = subscriptionHistory.filter((sh) => (sh.schoolId === school.id) || (sh.schoolName === school.name));
+                  const now = Date.now();
+                  const hasActive = subsForSchool.some((s) => new Date(s.expiryDate).getTime() > now);
+                  const expiringSoon = subsForSchool.some((s) => {
+                    const days = Math.ceil((new Date(s.expiryDate).getTime() - now) / (1000 * 60 * 60 * 24));
+                    return days <= 7 && days >= 0;
+                  });
+                  const statusLabel = hasActive ? "ACTIVE" : expiringSoon ? "EXPIRING_SOON" : "INACTIVE";
+
+                  return (
+                    <tr key={school.id} className="hover:bg-surface-700/30">
+                      <td className="px-4 py-3 text-white">{school.name}</td>
+                      <td className="px-4 py-3 text-slate-300">{school.email}</td>
+                      <td className="hidden sm:table-cell px-4 py-3 text-slate-300">{school.state}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-0.5 text-xs rounded-md ${statusLabel === "ACTIVE" ? "text-green-400 bg-green-900/20" : statusLabel === "EXPIRING_SOON" ? "text-yellow-400 bg-yellow-900/20" : "text-red-400 bg-red-900/20"}`}>
+                          {statusLabel}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
       </div>
 
-      {subscriptionHistory.length > 0 && (
+      {expiringSubscriptions.length > 0 && (
         <div className="bg-yellow-900/10 border border-yellow-500/30 rounded-lg p-4 md:p-6">
           <h2 className="text-lg md:text-xl font-bold text-yellow-400 mb-4">⚠️ Expiring Subscriptions</h2>
           <div className="space-y-3">
-            {subscriptionHistory.map((sub) => (
+            {expiringSubscriptions.map((sub) => (
               <div key={sub.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-surface-800 p-4 rounded-lg">
                 <div>
-                  <p className="text-white font-medium">{sub.schoolId || "Unknown School"}</p>
+                  <p className="text-white font-medium">{resolveSchoolName(sub.schoolId, sub.schoolName)}</p>
                   <p className="text-slate-400 text-sm">Expires: {new Date(sub.expiryDate).toLocaleDateString()}</p>
                 </div>
                 <span className="text-yellow-400 text-sm font-medium">{sub.status === 1 ? "Active" : sub.status === 2 ? "Pending" : "Deactivated"}</span>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "../../lib/utils";
 import type { CreateSubscriptionRequest } from "../../types/subscription";
+import { useProductStore } from "../../stores/useProductStore";
 import { SubscriptionStatus, PaymentMethod } from "../../types/subscription";
 
 interface CreateSubscriptionModalProps {
@@ -26,6 +27,7 @@ const CreateSubscriptionModal: React.FC<CreateSubscriptionModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<CreateSubscriptionRequest>({
     schoolId,
+    productId: "",
     paidStudentSlots: prefilledSlots || 100,
     startDate: prefilledStartDate || new Date().toISOString().split("T")[0],
     expiryDate: "",
@@ -79,9 +81,20 @@ const CreateSubscriptionModal: React.FC<CreateSubscriptionModalProps> = ({
       newErrors.paymentMethod = "Payment method is required";
     }
 
+    if (!formData.productId || !formData.productId.trim()) {
+      newErrors.productId = "Product selection is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const { products, fetchProducts } = useProductStore();
+
+  useEffect(() => {
+    // Ensure product list is loaded (fallback to master list if school has none)
+    fetchProducts(schoolId).catch(() => {});
+  }, [fetchProducts, schoolId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -132,6 +145,29 @@ const CreateSubscriptionModal: React.FC<CreateSubscriptionModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
+          <div>
+            <label htmlFor="productId" className="block text-sm font-medium text-slate-300 mb-1.5">Product *</label>
+            <select
+              id="productId"
+              name="productId"
+              value={formData.productId}
+              onChange={handleChange}
+              className={cn(
+                "w-full px-3 py-2.5 rounded-lg bg-surface-800 border text-white focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-colors duration-200",
+                errors.productId ? "border-red-500" : "border-surface-600"
+              )}
+            >
+              <option value="">Select a product</option>
+              {products.map((p) => (
+                <option key={p.productId} value={p.productId}>
+                  {p.productName || p.productCode}
+                </option>
+              ))}
+            </select>
+            {errors.productId && (
+              <span className="text-xs font-medium text-red-400 mt-1 block">{errors.productId}</span>
+            )}
+          </div>
           <div>
             <label htmlFor="paidStudentSlots" className="block text-sm font-medium text-slate-300 mb-1.5">Student Slots *</label>
             <input

@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 const getDefaultRouteForRole = (role?: number) => {
-  if (role === 0) return "/dev/dashboard";
+  if (role === 4) return "/dev/dashboard";
   if (role === 1 || role === 2 || role === 3) return "/dashboard";
   return "/login";
 };

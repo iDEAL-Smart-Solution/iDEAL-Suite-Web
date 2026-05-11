@@ -129,7 +129,7 @@ const FeedbackPage: React.FC = () => {
       {!isLoading && filteredFeedback.length === 0 && (
         <div className="bg-surface-800 border border-surface-700 rounded-lg p-12 text-center">
           <MessageSquare size={48} className="mx-auto text-slate-600 mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">No Feedback Yet</h3>
+          <h3 className="text-xl font-semibold text-slate-900 mb-2">No Feedback Yet</h3>
           <p className="text-slate-400">
             {filterRating === "all" 
               ? "There is no feedback to display at the moment."
@@ -170,7 +170,7 @@ const FeedbackPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-surface-700">
                 {filteredFeedback.map((item) => (
-                  <tr key={item.id} className="hover:bg-surface-750 transition-colors">
+                  <tr key={item.id} className="hover:bg-surface-700/50 transition-colors">
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-white font-medium">

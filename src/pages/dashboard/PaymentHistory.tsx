@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CreditCard } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { usePaymentStore } from "../../stores/usePaymentStore";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
-import PaymentModal from "../../components/subscriptions/PaymentModal";
 import PageHeader from "../../components/layout/PageHeader";
 import BrandLoader from "../../components/ui/BrandLoader";
 
@@ -21,8 +21,9 @@ const getStatusBadge = (status: string) => {
 };
 
 const PaymentHistory: React.FC = () => {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
-  const isDevDashboard = user?.role === 0;
+  const isDevDashboard = user?.role === 4;
   const {
     payments,
     billingSummary,
@@ -38,7 +39,6 @@ const PaymentHistory: React.FC = () => {
   const { currentSubscription, fetchCurrentSubscription } =
     useSubscriptionStore();
 
-  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const initialLoadKeyRef = useRef<string | null>(null);
 
   const schoolId = user?.schoolId;
@@ -97,10 +97,54 @@ const PaymentHistory: React.FC = () => {
     fetchCurrentSubscription(schoolId);
   };
 
+  const handleRowClick = (payment: typeof payments[number]) => {
+    if (payment.status === "pending") {
+      navigate(`/payments/success?reference=${encodeURIComponent(payment.reference)}`);
+    }
+  };
+
+  // Filters for dev dashboard
+  const [filterSchool, setFilterSchool] = useState<string>("");
+  const [filterProduct, setFilterProduct] = useState<string>("");
+
+  const schoolOptions = Array.from(
+    payments.reduce((m, p) => m.set(p.schoolId, p.schoolName ?? p.schoolId), new Map<string, string>()),
+    ([id, name]) => ({ id, name })
+  );
+
+  const productOptions = Array.from(new Set(payments.map((p) => p.productCode).filter(Boolean))).map((c) => ({ code: String(c) }));
+
+  const filteredPayments = payments.filter((p) => {
+    if (filterSchool && p.schoolId !== filterSchool) return false;
+    if (filterProduct && String(p.productCode) !== filterProduct) return false;
+    return true;
+  });
+
+  const computeSummary = (list: typeof payments) =>
+    list.reduce(
+      (s, payment) => ({
+        totalPayments: s.totalPayments + 1,
+        successfulPayments: s.successfulPayments + (payment.status === "success" ? 1 : 0),
+        pendingPayments: s.pendingPayments + (payment.status === "pending" ? 1 : 0),
+        failedPayments: s.failedPayments + (payment.status === "failed" ? 1 : 0),
+        totalPaidAmount: s.totalPaidAmount + (payment.status === "success" ? payment.amount : 0),
+        totalPendingAmount: s.totalPendingAmount + (payment.status === "pending" ? payment.amount : 0),
+      }),
+      { totalPayments: 0, successfulPayments: 0, pendingPayments: 0, failedPayments: 0, totalPaidAmount: 0, totalPendingAmount: 0 }
+    );
+
+  // Compute summary from the displayed payments so the summary cards always
+  // reflect the table rows (including filters). Fall back to billingSummary
+  // only when there are no payments to show.
+  const displaySummary =
+    filteredPayments.length > 0 ? computeSummary(filteredPayments) : billingSummary;
+
   const pageTitle = isDevDashboard ? "Payments Report" : "Payments";
   const pageSubtitle = isDevDashboard
     ? "View payments made by other schools across the platform."
     : "View payment history and make new payments";
+
+  const visibleColumns = isDevDashboard ? 7 : 6;
 
   return (
     <div className="space-y-8">
@@ -137,7 +181,14 @@ const PaymentHistory: React.FC = () => {
           !isDevDashboard ? (
             <button
               className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-medium transition-all inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => setIsPaymentOpen(true)}
+              onClick={() => {
+                const productId = currentSubscription?.productId;
+                navigate(
+                  productId
+                    ? `/payments/initialize?productId=${encodeURIComponent(productId)}`
+                    : "/payments/initialize"
+                );
+              }}
               disabled={isInitializing}
             >
               <CreditCard className="w-4 h-4" />
@@ -158,22 +209,64 @@ const PaymentHistory: React.FC = () => {
         </button>
       </div>
 
+      {isDevDashboard && (
+        <div className="flex flex-wrap gap-3 justify-end items-center">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-slate-400">School</label>
+            <select
+              className="bg-surface-800 border border-surface-700 text-sm text-white rounded-lg px-3 py-1"
+              value={filterSchool}
+              onChange={(e) => setFilterSchool(e.target.value)}
+            >
+              <option value="">All schools</option>
+              {schoolOptions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-slate-400">Product</label>
+            <select
+              className="bg-surface-800 border border-surface-700 text-sm text-white rounded-lg px-3 py-1"
+              value={filterProduct}
+              onChange={(e) => setFilterProduct(e.target.value)}
+            >
+              <option value="">All products</option>
+              {productOptions.map((p) => (
+                <option key={p.code} value={p.code}>
+                  {p.code}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-surface-800 border border-surface-700 rounded-xl p-5">
           <p className="text-sm text-slate-400 mb-1">Total Payments</p>
-          <p className="text-2xl font-bold text-white">{billingSummary.totalPayments}</p>
+          <p className="text-2xl font-bold text-white">{displaySummary.totalPayments}</p>
         </div>
         <div className="bg-surface-800 border border-surface-700 rounded-xl p-5">
           <p className="text-sm text-slate-400 mb-1">Successful</p>
           <p className="text-2xl font-bold text-green-400">
-            {billingSummary.successfulPayments}
+            {displaySummary.successfulPayments}
           </p>
         </div>
         <div className="bg-surface-800 border border-surface-700 rounded-xl p-5">
           <p className="text-sm text-slate-400 mb-1">Total Paid</p>
           <p className="text-2xl font-bold text-brand-400">
-            ₦{billingSummary.totalPaidAmount.toLocaleString()}
+            ₦{displaySummary.totalPaidAmount.toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-surface-800 border border-surface-700 rounded-xl p-5">
+          <p className="text-sm text-slate-400 mb-1">Pending Amount</p>
+          <p className="text-2xl font-bold text-yellow-400">
+            ₦{displaySummary.totalPendingAmount.toLocaleString()}
           </p>
         </div>
       </div>
@@ -204,13 +297,16 @@ const PaymentHistory: React.FC = () => {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
                   Date
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
                   <td
-                    colSpan={isDevDashboard ? 6 : 5}
+                    colSpan={visibleColumns}
                     className="px-4 py-8 text-center text-slate-400"
                   >
                     <div className="flex flex-col items-center gap-2">
@@ -219,10 +315,10 @@ const PaymentHistory: React.FC = () => {
                     </div>
                   </td>
                 </tr>
-              ) : payments.length === 0 ? (
+              ) : filteredPayments.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={isDevDashboard ? 6 : 5}
+                    colSpan={visibleColumns}
                     className="px-4 py-12 text-center text-slate-400"
                   >
                     {error ? (
@@ -249,10 +345,20 @@ const PaymentHistory: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                payments.map((payment) => (
+                filteredPayments.map((payment) => (
                   <tr
                     key={payment.id}
-                    className="border-b border-surface-700 hover:bg-surface-700/50 transition-colors duration-200"
+                    onClick={() => handleRowClick(payment)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && payment.status === "pending") {
+                        handleRowClick(payment);
+                      }
+                    }}
+                    role={payment.status === "pending" ? "button" : undefined}
+                    tabIndex={payment.status === "pending" ? 0 : undefined}
+                    className={`border-b border-surface-700 transition-colors duration-200 ${
+                      payment.status === "pending" ? "hover:bg-surface-700/50 cursor-pointer" : "hover:bg-surface-700/50"
+                    }`}
                   >
                     <td className="px-4 py-3">
                       <span className="text-white font-mono text-sm">
@@ -295,6 +401,22 @@ const PaymentHistory: React.FC = () => {
                             }
                           )}
                     </td>
+                    <td className="px-4 py-3">
+                      {payment.status === "pending" ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/payments/success?reference=${encodeURIComponent(payment.reference)}`);
+                          }}
+                          className="inline-flex items-center gap-2 bg-surface-700 hover:bg-surface-600 text-slate-100 px-3 py-1 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Verify
+                        </button>
+                      ) : (
+                        <span className="text-sm text-slate-400">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}
@@ -302,16 +424,6 @@ const PaymentHistory: React.FC = () => {
           </table>
         </div>
       </div>
-
-      {!isDevDashboard && (
-        <PaymentModal
-          isOpen={isPaymentOpen}
-          onClose={() => setIsPaymentOpen(false)}
-          subscription={currentSubscription}
-          schoolId={schoolId}
-          email={user?.email || ""}
-        />
-      )}
     </div>
   );
 };

@@ -25,6 +25,10 @@ export type PlanTypeValue = (typeof PlanType)[keyof typeof PlanType];
 export type Subscription = {
   id: string;
   schoolId: string;
+  schoolName?: string;
+  productId?: string;
+  productName?: string;
+  productCount?: number;
   paidStudentSlots: number;
   startDate: string;
   expiryDate: string;
@@ -37,6 +41,7 @@ export type Subscription = {
 
 export type CreateSubscriptionRequest = {
   schoolId: string;
+  productId: string;
   paidStudentSlots: number;
   startDate: string;
   expiryDate: string;
@@ -61,9 +66,12 @@ export type SubscriptionHistoryResponse = {
 export type InitializePaymentRequest = {
   subscriptionId: string;
   schoolId: string;
-  amount: number;
+  productId?: string;
+  intendedAmount?: number;
+  amount?: number;
   email: string;
   callbackUrl?: string;
+  action?: string;
 };
 
 export type InitializePaymentResponse = {
@@ -81,6 +89,8 @@ export type PaymentRecord = {
   subscriptionId: string;
   schoolId: string;
   schoolName?: string;
+  productId?: string;
+  productCode?: string;
   amount: number;
   reference: string;
   status: "pending" | "success" | "failed";
@@ -95,9 +105,34 @@ export type BillingSummary = {
   pendingPayments: number;
   failedPayments: number;
   totalPaidAmount: number;
+  totalPendingAmount: number;
 };
 
 export type PaymentReferenceResponse = {
   payment: PaymentRecord | null;
   message?: string;
+};
+
+export type PaystackVerificationResult = {
+  reference: string;
+  paystackResponseStatus: boolean;
+  paystackMessage: string;
+  transactionStatus: string;
+  amountInKobo: number;
+  paidAt?: string;
+  localPaymentProcessed: boolean;
+};
+
+export type PaymentInitializationInfo = {
+  costPerStudent: number;
+  activeStudentCount: number;
+  minimumPayableAmount: number;
+  isFirstTimeSubscription: boolean;
+  isRenewalAllowed: boolean;
+  productName: string;
+  productCode: string;
+  schoolName: string;
+  currentPaidSlots: number;
+  renewalMessage?: string;
+  message: string;
 };

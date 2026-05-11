@@ -18,13 +18,40 @@ const normalizeRole = (role: unknown): UserRoleType => {
   return UserRole.Student;
 };
 
-/** Ensure every user object coming from the API has a numeric role */
+const splitFullName = (fullName: unknown): { firstName: string; lastName: string } => {
+  if (typeof fullName !== "string" || !fullName.trim()) {
+    return { firstName: "", lastName: "" };
+  }
+
+  const parts = fullName.trim().split(/\s+/);
+  return {
+    firstName: parts[0] ?? "",
+    lastName: parts.slice(1).join(" ") || "",
+  };
+};
+
+/** Ensure every user object coming from the API has the frontend shape */
 const normalizeUsers = (raw: any[]): User[] => {
   if (!Array.isArray(raw)) {
     console.warn("normalizeUsers: expected array, got:", raw);
     return [];
   }
-  return raw.map((u) => ({ ...u, role: normalizeRole(u.role) }));
+
+  return raw.map((u) => {
+    const name = splitFullName(u.fullName ?? u.FullName);
+    return {
+      id: String(u.id ?? u.Id ?? ""),
+      firstName: String(u.firstName ?? u.FirstName ?? name.firstName),
+      lastName: String(u.lastName ?? u.LastName ?? name.lastName),
+      email: String(u.email ?? u.Email ?? ""),
+      phoneNumber: String(u.phoneNumber ?? u.PhoneNumber ?? ""),
+      role: normalizeRole(u.role ?? u.Role),
+      schoolId: String(u.schoolId ?? u.SchoolId ?? ""),
+      status: u.status ?? u.Status,
+      createdAt: u.createdAt ?? u.CreatedAt,
+      updatedAt: u.updatedAt ?? u.UpdatedAt,
+    } as User;
+  });
 };
 
 /** Extract the users array + total from any likely response shape */

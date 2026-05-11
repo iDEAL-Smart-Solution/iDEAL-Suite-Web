@@ -35,9 +35,8 @@ const UserManagement: React.FC = () => {
   const schoolId = user?.schoolId;
   const userRole = user?.role;
 
-  const canAddUser = userRole === 0 || userRole === 1 || userRole === 2;
-  const canEditUser = userRole === 0 || userRole === 1;
-  const canDeleteUser = userRole === 0 || userRole === 1;
+  const canEditUser = userRole === 4 || userRole === 1;
+  const canDeleteUser = userRole === 4 || userRole === 1;
 
   useEffect(() => {
     if (!schoolId) return;
@@ -67,11 +66,6 @@ const UserManagement: React.FC = () => {
     students: users.filter((u) => u.role === UserRole.Student).length,
     admins: users.filter((u) => u.role === UserRole.SuperAdmin).length,
   });
-
-  const handleAddUser = () => {
-    setSelectedUser(undefined);
-    setIsModalOpen(true);
-  };
 
   const handleEditUser = (u: User) => {
     if (!canEditUser) return;
@@ -129,16 +123,6 @@ const UserManagement: React.FC = () => {
 
       <PageHeader
         title="User Management"
-        action={
-          canAddUser ? (
-            <button
-              className="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-medium transition-all"
-              onClick={handleAddUser}
-            >
-              + Add New User
-            </button>
-          ) : null
-        }
       />
 
       <PageSection>

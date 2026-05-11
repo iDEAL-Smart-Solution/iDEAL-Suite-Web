@@ -4,7 +4,9 @@ import { useAuthStore } from "./useAuthStore";
 import type {
   BillingSummary,
   InitializePaymentRequest,
+  PaystackVerificationResult,
   PaymentRecord,
+  PaymentInitializationInfo,
 } from "../types/subscription";
 
 type StoreError = {
@@ -24,6 +26,7 @@ let initializeRequestSeq = 0;
 let paymentsRequestSeq = 0;
 let billingRequestSeq = 0;
 let referenceRequestSeq = 0;
+let verifyPaystackRequestSeq = 0;
 
 const extractAuthorizationUrl = (payload: any): string | null => {
   const value = payload?.data ?? payload;
@@ -66,12 +69,14 @@ const normalizePaymentRecord = (record: any, index = 0): PaymentRecord => ({
   subscriptionId: String(record?.subscriptionId ?? ""),
   schoolId: String(record?.schoolId ?? ""),
   schoolName: String(record?.schoolName ?? record?.school?.name ?? "").trim() || undefined,
-  amount: Number.isFinite(Number(record?.amount)) ? Number(record?.amount) : 0,
+  amount: Number.isFinite(Number(record?.amount ?? record?.intendedAmount ?? record?.IntendedAmount)) ? Number(record?.amount ?? record?.intendedAmount ?? record?.IntendedAmount) : 0,
   reference: String(record?.reference ?? record?.paymentReference ?? ""),
-  status: normalizePaymentStatus(record?.status),
+  productCode: String(record?.productCode ?? record?.ProductCode ?? record?.product?.code ?? "").trim() || undefined,
+  productId: String(record?.productId ?? record?.ProductId ?? record?.product?.id ?? "").trim() || undefined,
+  status: (record?.isProcessed ?? record?.IsProcessed) === true ? "success" : (record?.status ? normalizePaymentStatus(record?.status) : "pending"),
   paymentMethod: String(record?.paymentMethod ?? record?.method ?? "PayStack"),
   paidAt: record?.paidAt ?? record?.paymentDate,
-  createdAt: String(record?.createdAt ?? record?.paidAt ?? new Date().toISOString()),
+  createdAt: String(record?.createdAt ?? record?.CreatedAt ?? record?.paidAt ?? new Date().toISOString()),
 });
 
 const summarizePayments = (payments: PaymentRecord[]): BillingSummary =>
@@ -83,7 +88,8 @@ const summarizePayments = (payments: PaymentRecord[]): BillingSummary =>
       pendingPayments:
         summary.pendingPayments + (payment.status === "pending" ? 1 : 0),
       failedPayments: summary.failedPayments + (payment.status === "failed" ? 1 : 0),
-      totalPaidAmount: summary.totalPaidAmount + payment.amount,
+      totalPaidAmount: summary.totalPaidAmount + (payment.status === "success" ? payment.amount : 0),
+      totalPendingAmount: summary.totalPendingAmount + (payment.status === "pending" ? payment.amount : 0),
     }),
     { ...emptyBillingSummary }
   );
@@ -93,31 +99,13 @@ const normalizePaymentRecords = (payload: any): PaymentRecord[] =>
     normalizePaymentRecord(record, index)
   );
 
-const extractSinglePaymentRecord = (payload: any): PaymentRecord | null => {
-  const value = payload?.data ?? payload;
-  if (!value) return null;
-
-  if (Array.isArray(value)) {
-    return value.length > 0 ? normalizePaymentRecord(value[0], 0) : null;
-  }
-
-  if (value.payment && typeof value.payment === "object") {
-    return normalizePaymentRecord(value.payment, 0);
-  }
-
-  if (typeof value === "object") {
-    return normalizePaymentRecord(value, 0);
-  }
-
-  return null;
-};
-
 const emptyBillingSummary: BillingSummary = {
   totalPayments: 0,
   successfulPayments: 0,
   pendingPayments: 0,
   failedPayments: 0,
   totalPaidAmount: 0,
+  totalPendingAmount: 0,
 };
 
 const normalizeBillingSummary = (payload: any): BillingSummary => {
@@ -135,7 +123,10 @@ const normalizeBillingSummary = (payload: any): BillingSummary => {
     ),
     failedPayments: Number(value?.failedPayments ?? value?.failedCount ?? 0),
     totalPaidAmount: Number(
-      value?.totalPaidAmount ?? value?.totalPaid ?? value?.amountPaid ?? 0
+      value?.totalPaidAmount ?? value?.totalPaid ?? value?.amountPaid ?? value?.TotalAmountPaid ?? 0
+    ),
+    totalPendingAmount: Number(
+      value?.totalPendingAmount ?? value?.totalPending ?? value?.amountPending ?? value?.TotalAmountPending ?? 0
     ),
   };
 };
@@ -195,9 +186,11 @@ interface PaymentState {
   payments: PaymentRecord[];
   billingSummary: BillingSummary;
   paymentByReference: PaymentRecord | null;
+  paymentInitInfo: PaymentInitializationInfo | null;
   isLoading: boolean;
   isInitializing: boolean;
   isVerifyingReference: boolean;
+  isLoadingInitInfo: boolean;
   error: string | null;
   successMessage: string | null;
   lastInitializedReference: string | null;
@@ -207,7 +200,9 @@ interface PaymentState {
   fetchPayments: (schoolId?: string) => Promise<void>;
   fetchReportingPayments: () => Promise<void>;
   fetchBillingSummary: (schoolId?: string) => Promise<void>;
-  fetchPaymentByReference: (reference: string) => Promise<PaymentRecord | null>;
+  fetchPaymentByReference: (reference: string, action?: string) => Promise<PaymentRecord | null>;
+  verifyPaymentWithPaystack: (reference: string, action?: string) => Promise<PaystackVerificationResult | null>;
+  fetchPaymentInitializationInfo: (schoolId: string, productId: string, action?: string) => Promise<PaymentInitializationInfo | null>;
   clearMessages: () => void;
   reset: () => void;
 }
@@ -216,9 +211,11 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
   payments: [],
   billingSummary: emptyBillingSummary,
   paymentByReference: null,
+  paymentInitInfo: null,
   isLoading: false,
   isInitializing: false,
   isVerifyingReference: false,
+  isLoadingInitInfo: false,
   error: null,
   successMessage: null,
   lastInitializedReference: null,
@@ -227,6 +224,7 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
   initializePayment: async (data) => {
     const payloadSchoolId = data?.schoolId?.trim();
     const payloadEmail = data?.email?.trim();
+    const requestedAmount = Number(data?.intendedAmount ?? data?.amount ?? 0);
 
     if (!isValidSchoolId(payloadSchoolId)) {
       set({ error: "School context is missing. Please log in again." });
@@ -238,8 +236,8 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
       return null;
     }
 
-    if (!Number.isFinite(data?.amount) || data.amount < 1000) {
-      set({ error: "Payment amount must be at least N1,000." });
+    if (!Number.isFinite(requestedAmount) || requestedAmount <= 0) {
+      set({ error: "Payment amount must be greater than zero." });
       return null;
     }
 
@@ -346,47 +344,33 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     const requestId = ++paymentsRequestSeq;
     set({ isLoading: true, error: null });
 
-    const endpoints = [
-      "/Reporting/payments",
-      "/Reporting/payments/all",
-      "/Reporting/payment-history",
-    ];
+    try {
+      const endpoint = "/Payments/dev/all-schools/history";
+      const res = await api.get(endpoint);
 
-    for (const endpoint of endpoints) {
-      try {
-        const res = await api.get(endpoint);
-
-        if (requestId !== paymentsRequestSeq) {
-          return;
-        }
-
-        if (res.status === 204 || !res.data) {
-          set({ payments: [], billingSummary: emptyBillingSummary, isLoading: false, error: null });
-          return;
-        }
-
-        const data = normalizePaymentRecords(res.data);
-        set({
-          payments: data,
-          billingSummary: summarizePayments(data),
-          isLoading: false,
-          error: null,
-        });
-        return;
-      } catch (err: any) {
-        if (requestId !== paymentsRequestSeq) {
-          return;
-        }
-
-        const status = err?.response?.status;
-        if (status === 404 && endpoint !== endpoints[endpoints.length - 1]) {
-          continue;
-        }
-
-        const message = resolveErrorMessage(err, "Failed to fetch payments report.", "Payments report");
-        set({ payments: [], billingSummary: emptyBillingSummary, error: message, isLoading: false });
+      if (requestId !== paymentsRequestSeq) {
         return;
       }
+
+      if (res.status === 204 || !res.data) {
+        set({ payments: [], billingSummary: emptyBillingSummary, isLoading: false, error: null });
+        return;
+      }
+
+      const data = normalizePaymentRecords(res.data);
+      set({
+        payments: data,
+        billingSummary: summarizePayments(data),
+        isLoading: false,
+        error: null,
+      });
+    } catch (err: any) {
+      if (requestId !== paymentsRequestSeq) {
+        return;
+      }
+
+      const message = resolveErrorMessage(err, "Failed to fetch payments report.", "Payments report");
+      set({ payments: [], billingSummary: emptyBillingSummary, error: message, isLoading: false });
     }
   },
 
@@ -431,7 +415,7 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     }
   },
 
-  fetchPaymentByReference: async (reference) => {
+  fetchPaymentByReference: async (reference: string, action?: string) => {
     const normalizedReference = reference?.trim();
 
     if (!normalizedReference) {
@@ -447,7 +431,9 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     set({ isVerifyingReference: true, error: null });
 
     try {
-      const endpoint = `/Payments/reference/${encodeURIComponent(normalizedReference)}`;
+      // The read-only payment-by-reference endpoint was removed; use the verify endpoint
+      // and map the verification result into a PaymentRecord for UI consumption.
+      const endpoint = `/Payments/reference/${encodeURIComponent(normalizedReference)}/verify` + (action ? `?action=${encodeURIComponent(action)}` : "");
       const res = await api.get(endpoint);
 
       if (requestId !== referenceRequestSeq) {
@@ -463,7 +449,23 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
         return null;
       }
 
-      const payment = extractSinglePaymentRecord(res.data);
+      const verification = res.data?.data ?? res.data;
+
+      const payment: PaymentRecord = {
+        id: `payment-${normalizedReference}`,
+        subscriptionId: "",
+        schoolId: "",
+        schoolName: undefined,
+        productId: undefined,
+        productCode: undefined,
+        amount: Number.isFinite(Number((verification?.amountInKobo ?? 0) / 100)) ? Number((verification?.amountInKobo ?? 0) / 100) : 0,
+        reference: String(verification?.reference ?? normalizedReference),
+        status: (verification?.localPaymentProcessed ?? false) ? "success" : (String(verification?.transactionStatus ?? "").toLowerCase() === "success" ? "success" : "pending"),
+        paymentMethod: "PayStack",
+        paidAt: verification?.paidAt ?? undefined,
+        createdAt: new Date().toISOString(),
+      };
+
       set({
         paymentByReference: payment,
         lastVerifiedReference: normalizedReference,
@@ -487,15 +489,142 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     }
   },
 
+  verifyPaymentWithPaystack: async (reference: string, action?: string) => {
+    const normalizedReference = reference?.trim();
+
+    if (!normalizedReference) {
+      set({ paymentByReference: null });
+      return null;
+    }
+
+    const requestId = ++verifyPaystackRequestSeq;
+    set({ isVerifyingReference: true, error: null });
+
+    try {
+      const endpoint = `/Payments/reference/${encodeURIComponent(normalizedReference)}/verify` + (action ? `?action=${encodeURIComponent(action)}` : "");
+      const res = await api.get(endpoint);
+
+      if (requestId !== verifyPaystackRequestSeq) {
+        return null;
+      }
+
+      if (res.status === 204 || !res.data) {
+        set({
+          paymentByReference: null,
+          isVerifyingReference: false,
+        });
+        return null;
+      }
+
+      const verification = res.data?.data ?? res.data;
+      const result: PaystackVerificationResult = {
+        reference: String(verification?.reference ?? normalizedReference),
+        paystackResponseStatus: Boolean(verification?.paystackResponseStatus ?? verification?.PaystackResponseStatus ?? false),
+        paystackMessage: String(verification?.paystackMessage ?? verification?.PaystackMessage ?? ""),
+        transactionStatus: String(verification?.transactionStatus ?? verification?.TransactionStatus ?? "unknown"),
+        amountInKobo: Number(verification?.amountInKobo ?? verification?.AmountInKobo ?? 0),
+        paidAt: verification?.paidAt ?? verification?.PaidAt ?? undefined,
+        localPaymentProcessed: Boolean(verification?.localPaymentProcessed ?? verification?.LocalPaymentProcessed ?? false),
+      };
+
+      set({
+        isVerifyingReference: false,
+        error: null,
+      });
+      return result;
+    } catch (err: any) {
+      if (requestId !== verifyPaystackRequestSeq) {
+        return null;
+      }
+
+      const message = resolveErrorMessage(
+        err,
+        "Failed to verify payment with Paystack.",
+        "Paystack verification"
+      );
+
+      set({ paymentByReference: null, error: message, isVerifyingReference: false });
+      return null;
+    }
+  },
+
+  fetchPaymentInitializationInfo: async (schoolId, productId, action) => {
+    const normalizedSchoolId = schoolId?.trim();
+    const normalizedProductId = productId?.trim();
+
+    if (!normalizedSchoolId || !normalizedProductId) {
+      set({ error: "School and product information is required." });
+      return null;
+    }
+
+    set({ isLoadingInitInfo: true, error: null, paymentInitInfo: null });
+
+    try {
+      const res = await api.get("/SubscriptionPayment/initialize-info", {
+        params: {
+          schoolId: normalizedSchoolId,
+          productId: normalizedProductId,
+          action,
+        },
+      });
+
+      if (res.status === 204 || !res.data) {
+        set({
+          paymentInitInfo: null,
+          error: "No payment information available.",
+          isLoadingInitInfo: false,
+        });
+        return null;
+      }
+
+      const data = res.data?.data ?? res.data;
+      const normalizedInfo: PaymentInitializationInfo = {
+        costPerStudent: Number(data?.costPerStudent ?? 0),
+        activeStudentCount: Number(data?.activeStudentCount ?? 0),
+        minimumPayableAmount: Number(data?.minimumPayableAmount ?? 0),
+        isFirstTimeSubscription: Boolean(data?.isFirstTimeSubscription ?? false),
+        isRenewalAllowed: Boolean(data?.isRenewalAllowed ?? true),
+        productName: String(data?.productName ?? ""),
+        productCode: String(data?.productCode ?? ""),
+        schoolName: String(data?.schoolName ?? ""),
+        currentPaidSlots: Number(data?.currentPaidSlots ?? 0),
+        renewalMessage: data?.renewalMessage ? String(data.renewalMessage) : undefined,
+        message: String(data?.message ?? ""),
+      };
+
+      set({
+        paymentInitInfo: normalizedInfo,
+        isLoadingInitInfo: false,
+        error: null,
+      });
+
+      return normalizedInfo;
+    } catch (err: any) {
+      const message = resolveErrorMessage(
+        err,
+        "Failed to load payment information.",
+        "Payment initialization"
+      );
+      set({
+        paymentInitInfo: null,
+        error: message,
+        isLoadingInitInfo: false,
+      });
+      return null;
+    }
+  },
+
   clearMessages: () => set({ error: null, successMessage: null }),
   reset: () =>
     set({
       payments: [],
       billingSummary: emptyBillingSummary,
       paymentByReference: null,
+      paymentInitInfo: null,
       isLoading: false,
       isInitializing: false,
       isVerifyingReference: false,
+      isLoadingInitInfo: false,
       error: null,
       successMessage: null,
       lastInitializedReference: null,

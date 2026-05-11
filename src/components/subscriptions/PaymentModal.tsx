@@ -96,6 +96,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         subscriptionId: subscription.id,
         schoolId,
         amount,
+        productId: subscription.productId,
         email: email.trim(),
         callbackUrl: `${window.location.origin}/payments/success`,
       });

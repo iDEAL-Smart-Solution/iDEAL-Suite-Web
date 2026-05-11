@@ -93,7 +93,13 @@ export const useStudentStore = create<StudentState>((set) => ({
       const data = res.data.data ?? res.data ?? [];
       const displayStudents = Array.isArray(data)
         ? data.map((student: any) => ({
-            schoolName: String(student?.schoolName ?? "N/A"),
+            schoolName: String(
+              student?.schoolName ??
+              student?.school?.name ??
+              student?.SchoolName ??
+              student?.School?.Name ??
+              "N/A"
+            ),
             uin: String(student?.uin ?? "N/A"),
             firstName: String(student?.firstName ?? ""),
             lastName: String(student?.lastName ?? ""),

@@ -14,11 +14,11 @@
   --color-brand-600: oklch(0.58 0.18 255);
   --color-brand-700: oklch(0.51 0.16 256);
 
-  --color-surface-950: oklch(0.99 0.005 255);
-  --color-surface-900: oklch(0.975 0.01 255);
-  --color-surface-800: oklch(1 0 0);
-  --color-surface-700: oklch(0.93 0.025 252);
-  --color-surface-600: oklch(0.88 0.035 252);
+  --color-surface-950: #020617;
+  --color-surface-900: #0f172a;
+  --color-surface-800: #1e293b;
+  --color-surface-700: #334155;
+  --color-surface-600: #475569;
 
   --radius-card: 12px;
   --radius-btn: 8px;
@@ -29,7 +29,7 @@
 /* ── Base layer ────────────────────────────────────────────── */
 @layer base {
   :root {
-    color-scheme: light;
+    color-scheme: dark;
   }
 
   html {
@@ -38,6 +38,7 @@
 
   body {
     @apply bg-surface-950 text-slate-800 antialiased font-sans;
+    color: #e2e8f0;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -95,18 +96,6 @@
 @layer utilities {
   .text-gradient {
     @apply bg-gradient-to-r from-brand-700 to-brand-500 bg-clip-text text-transparent;
-  }
-
-  /* Legacy dark-theme text utility compatibility for light rebrand */
-  .text-white,
-  .text-slate-50,
-  .text-slate-100 {
-    @apply text-slate-900;
-  }
-
-  .text-slate-300,
-  .text-slate-400 {
-    @apply text-slate-600;
   }
 
   .bg-brand-500.text-white,

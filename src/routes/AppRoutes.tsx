@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import BrandLoader from "../components/ui/BrandLoader";
 
-/* ── Lazy-loaded pages ─────────────────────────────── */
 const Landing = lazy(() => import("../pages/public/Landing"));
 const Login = lazy(() => import("../pages/public/Login"));
 
@@ -21,10 +20,10 @@ const ProductMonitoring = lazy(() => import("../pages/dashboard/ProductMonitorin
 const ProfileSettings = lazy(() => import("../pages/dashboard/ProfileSettings"));
 const PaymentHistory = lazy(() => import("../pages/dashboard/PaymentHistory"));
 const PaymentSuccess = lazy(() => import("../pages/dashboard/PaymentSuccess"));
+const PaymentInitialization = lazy(() => import("../pages/dashboard/PaymentInitialization"));
 const FeedbackPage = lazy(() => import("../pages/dashboard/FeedbackPage"));
 const StudentListPage = lazy(() => import("../pages/dashboard/StudentListPage"));
 
-/* ── Suspense fallback ─────────────────────────────── */
 const PageLoader = () => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-surface-950 gap-4">
     <BrandLoader size="lg" />
@@ -43,7 +42,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/dashboard"
           element={
-            <ProtectedRoute allowedRoles={[0]}>
+            <ProtectedRoute allowedRoles={[4]}>
               <DevDashboardLayout>
                 <DevDashboardHome />
               </DevDashboardLayout>
@@ -54,7 +53,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/schools"
           element={
-            <ProtectedRoute allowedRoles={[0]}>
+            <ProtectedRoute allowedRoles={[4]}>
               <DevDashboardLayout>
                 <SchoolsManagement />
               </DevDashboardLayout>
@@ -65,7 +64,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/subscriptions"
           element={
-            <ProtectedRoute allowedRoles={[0]}>
+            <ProtectedRoute allowedRoles={[4]}>
               <DevDashboardLayout>
                 <SubscriptionsManagement />
               </DevDashboardLayout>
@@ -76,7 +75,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/products"
           element={
-            <ProtectedRoute allowedRoles={[0]}>
+            <ProtectedRoute allowedRoles={[4]}>
               <DevDashboardLayout>
                 <ProductsManagement />
               </DevDashboardLayout>
@@ -87,7 +86,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/payments"
           element={
-            <ProtectedRoute allowedRoles={[0]}>
+            <ProtectedRoute allowedRoles={[4]}>
               <DevDashboardLayout>
                 <PaymentHistory />
               </DevDashboardLayout>
@@ -96,20 +95,9 @@ const AppRoutes = () => {
         />
 
         <Route
-          path="/dev/settings"
-          element={
-            <ProtectedRoute allowedRoles={[0]}>
-              <DevDashboardLayout>
-                <ProfileSettings />
-              </DevDashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
           path="/dev/feedback"
           element={
-            <ProtectedRoute allowedRoles={[0]}>
+            <ProtectedRoute allowedRoles={[4]}>
               <DevDashboardLayout>
                 <FeedbackPage />
               </DevDashboardLayout>
@@ -120,7 +108,7 @@ const AppRoutes = () => {
         <Route
           path="/dev/students"
           element={
-            <ProtectedRoute allowedRoles={[0]}>
+            <ProtectedRoute allowedRoles={[4]}>
               <DevDashboardLayout>
                 <StudentListPage />
               </DevDashboardLayout>
@@ -189,6 +177,28 @@ const AppRoutes = () => {
             <ProtectedRoute allowedRoles={[1]}>
               <DashboardLayout>
                 <PaymentSuccess />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payments/success."
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DashboardLayout>
+                <PaymentSuccess />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payments/initialize"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DashboardLayout>
+                <PaymentInitialization />
               </DashboardLayout>
             </ProtectedRoute>
           }

@@ -28,7 +28,7 @@ const ProductMonitoring = () => {
     clearMessages,
   } = useProductStore();
 
-  const isAdmin = user?.role === 0 || user?.role === 1 || user?.role === 2;
+  const isAdmin = user?.role === 4 || user?.role === 1 || user?.role === 2;
 
   useEffect(() => {
     if (user?.schoolId) fetchProducts(user.schoolId);

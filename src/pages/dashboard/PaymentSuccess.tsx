@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { CheckCircle2, CreditCard, RefreshCw } from "lucide-react";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { usePaymentStore } from "../../stores/usePaymentStore";
@@ -7,6 +7,7 @@ import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 
 const PaymentSuccess: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const {
     payments,
@@ -17,6 +18,7 @@ const PaymentSuccess: React.FC = () => {
     fetchPayments,
     fetchBillingSummary,
     fetchPaymentByReference,
+    verifyPaymentWithPaystack,
     clearMessages,
   } = usePaymentStore();
   const { currentSubscription, fetchCurrentSubscription } = useSubscriptionStore();
@@ -28,8 +30,13 @@ const PaymentSuccess: React.FC = () => {
     [location.search]
   );
   const status = searchParams.get("status") || "success";
+  const action = searchParams.get("action") || undefined;
   const amount = searchParams.get("amount");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<"idle" | "verifying" | "success" | "failed">("idle");
+  const [verificationNote, setVerificationNote] = useState<string>("Verifying your payment with the backend...");
+  const verificationStartedRef = useRef<string | null>(null);
+  const redirectTimerRef = useRef<number | null>(null);
 
   const runPostPaymentRefresh = async () => {
     if (!schoolId) return;
@@ -55,30 +62,74 @@ const PaymentSuccess: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
 
-    const verifyReference = async () => {
-      if (!reference) return;
+    const verifyOnce = async () => {
+      if (!reference || verificationStartedRef.current === reference || !schoolId) return;
 
-      const maxAttempts = 3;
-      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-        const payment = await fetchPaymentByReference(reference);
+      verificationStartedRef.current = reference;
+      setVerificationStatus("verifying");
+
+      const localPayment = await fetchPaymentByReference(reference);
+      if (!isMounted) return;
+
+      if (localPayment?.status === "success") {
+        setVerificationStatus("success");
+        setVerificationNote("Payment verified successfully. Redirecting to payment history...");
+        return;
+      }
+
+      const verificationResult = await verifyPaymentWithPaystack(reference, action);
+      if (!isMounted) return;
+
+      const backendConfirmed = Boolean(
+        verificationResult?.localPaymentProcessed ||
+        (verificationResult?.paystackResponseStatus && verificationResult?.transactionStatus?.toLowerCase() === "success")
+      );
+
+      if (backendConfirmed) {
+        await fetchPayments(schoolId);
+        await fetchBillingSummary(schoolId);
+        await fetchCurrentSubscription(schoolId);
+
+        const refreshedPayment = await fetchPaymentByReference(reference);
         if (!isMounted) return;
 
-        if (payment && payment.status !== "pending") {
-          break;
-        }
-
-        if (attempt < maxAttempts - 1) {
-          await new Promise((resolve) => window.setTimeout(resolve, 1500));
+        if (refreshedPayment?.status === "success") {
+          setVerificationStatus("success");
+          setVerificationNote("Payment verified successfully. Redirecting to payment history...");
+          return;
         }
       }
+
+      setVerificationStatus("failed");
+      setVerificationNote("Payment is still being confirmed. Please refresh payment history in a moment.");
     };
 
-    void verifyReference();
+    void verifyOnce();
 
     return () => {
       isMounted = false;
     };
-  }, [reference, fetchPaymentByReference]);
+  }, [reference, schoolId, fetchPaymentByReference, verifyPaymentWithPaystack, fetchPayments, fetchBillingSummary, fetchCurrentSubscription]);
+
+  useEffect(() => {
+    if (verificationStatus !== "success") {
+      return;
+    }
+
+    if (redirectTimerRef.current) {
+      window.clearTimeout(redirectTimerRef.current);
+    }
+
+    redirectTimerRef.current = window.setTimeout(() => {
+      navigate("/payments", { replace: true });
+    }, 1400);
+
+    return () => {
+      if (redirectTimerRef.current) {
+        window.clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, [verificationStatus, navigate]);
 
   if (!schoolId) {
     return (
@@ -100,8 +151,21 @@ const PaymentSuccess: React.FC = () => {
   const latestPayment = (reference && paymentByReference?.reference === reference)
     ? paymentByReference
     : payments[0];
-  const resolvedStatus = latestPayment?.status || status;
+  const resolvedStatus = verificationStatus === "success"
+    ? "success"
+    : latestPayment?.status || status;
   const isFailed = String(resolvedStatus).toLowerCase() === "failed";
+  const isVerifying = verificationStatus === "verifying" || (resolvedStatus === "pending" && verificationStatus !== "success");
+  const titleText = verificationStatus === "success"
+    ? "Payment successful"
+    : isFailed
+      ? "Payment failed"
+      : "Payment verifying";
+  const descriptionText = verificationStatus === "success"
+    ? "Your payment has been verified by the backend. Redirecting to payment history..."
+    : isFailed
+      ? "Your payment did not complete successfully. You can refresh the status or review your payment history below."
+      : verificationNote;
 
   return (
     <div className="space-y-8">
@@ -112,12 +176,10 @@ const PaymentSuccess: React.FC = () => {
           </div>
           <div className="space-y-2">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-              {isFailed ? "Payment failed" : "Payment successful"}
+              {titleText}
             </h1>
             <p className="text-slate-300 max-w-2xl">
-              {isFailed
-                ? "Your payment did not complete successfully. You can retry payment or review your payment history below."
-                : "Your Paystack payment has been completed. The backend webhook will update your subscription and payment history automatically."}
+              {descriptionText}
             </p>
           </div>
         </div>
@@ -125,7 +187,9 @@ const PaymentSuccess: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           <div className="bg-surface-800/70 border border-surface-700 rounded-xl p-4">
             <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">Status</p>
-            <p className="text-white font-semibold capitalize">{resolvedStatus}</p>
+            <p className="text-white font-semibold capitalize">
+              {isVerifying ? "Verifying" : resolvedStatus}
+            </p>
           </div>
           <div className="bg-surface-800/70 border border-surface-700 rounded-xl p-4">
             <p className="text-xs uppercase tracking-wide text-slate-500 mb-1">Reference</p>
@@ -164,7 +228,7 @@ const PaymentSuccess: React.FC = () => {
             className="inline-flex items-center gap-2 bg-surface-700 hover:bg-surface-600 text-slate-100 px-5 py-3 rounded-lg font-medium transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${(isRefreshing || isLoading || isVerifyingReference) ? "animate-spin" : ""}`} />
-            {isRefreshing || isLoading || isVerifyingReference ? "Refreshing..." : "Refresh status"}
+            {isRefreshing || isLoading || isVerifyingReference ? "Verifying..." : "Refresh status"}
           </button>
         </div>
       </div>
@@ -218,7 +282,7 @@ const PaymentSuccess: React.FC = () => {
               </div>
               <div className="flex justify-between gap-4">
                 <span className="text-slate-400">Status</span>
-                <span className="text-white">Updated after backend webhook</span>
+                <span className="text-white">{verificationStatus === "success" ? "Updated" : "Verifying"}</span>
               </div>
             </div>
           ) : (

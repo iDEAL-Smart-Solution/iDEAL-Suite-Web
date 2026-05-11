@@ -18,8 +18,8 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
   cn(
     "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200",
     isActive
-      ? "bg-brand-100 text-brand-700 border-l-[3px] border-brand-500"
-      : "text-slate-700 hover:text-brand-700 hover:bg-brand-50"
+      ? "bg-brand-500/20 text-brand-300 border-l-[3px] border-brand-500"
+      : "text-slate-300 hover:text-white hover:bg-surface-800"
   );
 
 const Sidebar = ({
@@ -38,7 +38,7 @@ const Sidebar = ({
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-screen bg-white border-r border-brand-100 shadow-sm flex flex-col z-40 transition-all duration-300",
+        "fixed left-0 top-0 h-screen bg-surface-950 border-r border-surface-800 shadow-sm flex flex-col z-40 transition-all duration-300",
         "w-64 md:translate-x-0",
         isCollapsed ? "md:w-20" : "md:w-64",
         isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
@@ -46,7 +46,7 @@ const Sidebar = ({
       aria-label="Main navigation"
     >
       {/* Sidebar Header */}
-      <div className="flex justify-between items-center p-5 border-b border-brand-100">
+      <div className="flex justify-between items-center p-5 border-b border-surface-800">
         {!isCollapsed && (
           <img
             src={logo}
@@ -55,7 +55,7 @@ const Sidebar = ({
           />
         )}
         <button
-          className="md:hidden text-slate-500 hover:text-brand-700 transition-colors duration-200"
+          className="md:hidden text-slate-400 hover:text-white transition-colors duration-200"
           onClick={onClose}
           aria-label="Close sidebar"
         >
@@ -110,17 +110,17 @@ const Sidebar = ({
       </nav>
 
       {/* User section */}
-      <div className="p-5 border-t border-brand-100">
+      <div className="p-5 border-t border-surface-800">
         {!isCollapsed ? (
           <div className="mb-3 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-semibold shrink-0">
+            <div className="w-9 h-9 rounded-full bg-brand-500/20 text-brand-300 flex items-center justify-center text-sm font-semibold shrink-0">
               {initial}
             </div>
             <div className="min-w-0">
-              <p className="text-slate-700 font-medium text-sm truncate">
+              <p className="text-slate-200 font-medium text-sm truncate">
                 {user?.fullName || user?.email || "Signed in user"}
               </p>
-              <span className="inline-block mt-0.5 text-[11px] font-medium text-brand-700 bg-brand-100 px-2 py-0.5 rounded-md">
+              <span className="inline-block mt-0.5 text-[11px] font-medium text-brand-300 bg-brand-500/20 px-2 py-0.5 rounded-md">
                 Signed in
               </span>
             </div>
@@ -129,7 +129,7 @@ const Sidebar = ({
         <button
           onClick={logout}
           className={cn(
-            "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:text-red-500 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium",
+            "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-200 text-sm font-medium",
             isCollapsed && "justify-center px-3"
           )}
           aria-label="Logout"

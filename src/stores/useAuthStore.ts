@@ -37,10 +37,11 @@ const TOKEN_KEY = "ideal_token";
 const USER_KEY = "ideal_user";
 
 const roleMap: Record<string, number> = {
-  Dev: 0,
+  SuperAdmin: 1,
   SchoolAdmin: 1,
   Staff: 2,
   Student: 3,
+  Dev: 4,
 };
 
 const mapRole = (role: string): number => roleMap[role] ?? 1;

@@ -83,7 +83,7 @@ const StudentTable = ({ students = [], isLoading = false }: StudentTableProps) =
                     className="hover:bg-surface-700/50 transition-colors duration-200"
                   >
                     <td className="hidden sm:table-cell px-3 sm:px-6 py-4 text-sm font-medium text-white">
-                      {student.schoolName}
+                      {student.schoolName || "N/A"}
                     </td>
                     <td className="px-3 sm:px-6 py-4 text-sm text-slate-300">
                       {student.uin}

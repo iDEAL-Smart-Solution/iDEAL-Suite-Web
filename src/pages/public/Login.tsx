@@ -27,7 +27,7 @@ const Login = () => {
             const raw = sessionStorage.getItem("ideal_user");
             const user = raw ? JSON.parse(raw) : null;
 
-            if (user?.role === 0) {
+            if (user?.role === 4) {
                 navigate("/dev/dashboard");
                 return;
             }
@@ -46,26 +46,26 @@ const Login = () => {
     const displayError = error || storeError;
 
     return (
-        <div className="min-h-[100svh] bg-gradient-to-br from-brand-50 via-white to-brand-100/60 flex items-center justify-center px-4 py-4 sm:py-6 relative overflow-hidden">
+        <div className="min-h-[100svh] bg-gradient-to-br from-surface-950 via-surface-900 to-surface-950 flex items-center justify-center px-4 py-4 sm:py-6 relative overflow-hidden">
             <div className="absolute -top-20 -right-24 h-72 w-72 rounded-full bg-brand-300/20 blur-3xl" />
             <div className="absolute -bottom-20 -left-24 h-72 w-72 rounded-full bg-brand-500/10 blur-3xl" />
 
-            <div className="w-full max-w-sm rounded-2xl bg-white border border-brand-100 shadow-2xl shadow-brand-500/10 p-6 sm:p-8 relative z-10">
+            <div className="w-full max-w-sm rounded-2xl bg-surface-800 border border-surface-700 shadow-2xl shadow-black/20 p-6 sm:p-8 relative z-10">
                 <div className="text-center mb-6 sm:mb-7">
-                    <div className="mx-auto mb-4 inline-flex items-center justify-center rounded-xl bg-brand-50 border border-brand-100 px-4 py-3 shadow-sm">
+                    <div className="mx-auto mb-4 inline-flex items-center justify-center rounded-xl bg-surface-700 border border-surface-600 px-4 py-3 shadow-sm">
                         <img
                             src={logo}
                             alt="Ideal Suite"
                             className="h-10 sm:h-11 w-auto object-contain"
                         />
                     </div>
-                    <p className="text-xs sm:text-sm font-semibold tracking-[0.24em] text-brand-600 uppercase">
+                    <p className="text-xs sm:text-sm font-semibold tracking-[0.24em] text-brand-300 uppercase">
                         School Management Platform
                     </p>
-                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-black text-white mt-2 tracking-tight">
                         Welcome Back
                     </h1>
-                    <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                    <p className="text-sm text-slate-400 mt-2 leading-relaxed">
                         Sign in to continue to your secure school dashboard.
                     </p>
                 </div>
@@ -84,8 +84,8 @@ const Login = () => {
                     }}
                 >
                     <div className="space-y-1.5">
-                        <label htmlFor="login-email" className="block text-sm font-medium text-slate-700 flex items-center gap-2">
-                            <Mail className="w-4 h-4 text-brand-600" />
+                        <label htmlFor="login-email" className="block text-sm font-medium text-slate-300 flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-brand-300" />
                             Email Address
                         </label>
                         <input
@@ -95,13 +95,13 @@ const Login = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="admin@school.com"
                             autoComplete="email"
-                            className="w-full h-11 px-3.5 rounded-xl bg-white border border-brand-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 transition-all"
+                            className="w-full h-11 px-3.5 rounded-xl bg-surface-700 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 transition-all"
                         />
                     </div>
 
                     <div className="space-y-1.5">
-                        <label htmlFor="login-password" className="block text-sm font-medium text-slate-700 flex items-center gap-2">
-                            <Lock className="w-4 h-4 text-brand-600" />
+                        <label htmlFor="login-password" className="block text-sm font-medium text-slate-300 flex items-center gap-2">
+                            <Lock className="w-4 h-4 text-brand-300" />
                             Password
                         </label>
                         <input
@@ -111,7 +111,7 @@ const Login = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
                             autoComplete="current-password"
-                            className="w-full h-11 px-3.5 rounded-xl bg-white border border-brand-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 transition-all"
+                            className="w-full h-11 px-3.5 rounded-xl bg-surface-700 border border-surface-600 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 transition-all"
                         />
                     </div>
 

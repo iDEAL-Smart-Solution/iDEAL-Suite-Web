@@ -66,44 +66,78 @@ export const useProductStore = create<ProductState>((set, get) => ({
   fetchProducts: async (schoolId) => {
     set({ isLoading: true, error: null });
     try {
-      const authSchoolId = useAuthStore.getState().user?.schoolId;
+      const auth = useAuthStore.getState().user;
+      const authSchoolId = auth?.schoolId;
       const resolvedSchoolId = schoolId || authSchoolId;
 
-      if (!resolvedSchoolId) {
-        console.error("fetchProducts aborted: schoolId is missing", {
-          schoolIdArg: schoolId,
-          authSchoolId,
-        });
-        set({
-          products: [],
-          filteredProducts: [],
-          error: "School context is missing. Please log in again.",
-          isLoading: false,
-        });
-        return;
+      // If the logged-in user is a dev (role === 4), fetch master product list directly
+      let payload: any;
+      if (auth?.role === 4) {
+        console.debug("fetchProducts: dev user detected, fetching master product list");
+        const allRes = await api.get(`/Product/all`);
+        payload = allRes?.data;
+      } else {
+        if (!resolvedSchoolId) {
+          console.error("fetchProducts aborted: schoolId is missing", {
+            schoolIdArg: schoolId,
+            authSchoolId,
+          });
+          set({
+            products: [],
+            filteredProducts: [],
+            error: "School context is missing. Please log in again.",
+            isLoading: false,
+          });
+          return;
+        }
+
+        const endpoint = `/ProductMonitoring/school/${resolvedSchoolId}`;
+        const res = await api.get<GetProductsResponse>(endpoint);
+        console.debug("fetchProducts response", res?.data);
+
+        payload = res?.data;
       }
-
-      const endpoint = `/ProductMonitoring/school/${resolvedSchoolId}`;
-      const token = sessionStorage.getItem("ideal_token");
-      console.log("fetchProducts request", {
-        schoolId: resolvedSchoolId,
-        endpoint,
-        baseURL: api.defaults.baseURL,
-        hasToken: !!token,
-        authHeaderViaInterceptor: true,
-      });
-
-      const res = await api.get<GetProductsResponse>(endpoint);
-      console.log("fetchProducts response", res?.data);
-
-      const payload: any = res?.data;
-      const products: Product[] = Array.isArray(payload?.data)
+      let rawProducts: any[] = Array.isArray(payload?.data)
         ? payload.data
         : Array.isArray(payload?.products)
           ? payload.products
           : Array.isArray(payload)
             ? payload
             : [];
+
+      // Fallback: if we fetched a school-specific list and it's empty, fetch master product list
+      if ((auth?.role !== 4) && (!rawProducts || rawProducts.length === 0)) {
+        try {
+          const allRes = await api.get(`/Product/all`);
+          const allPayload: any = allRes?.data;
+          console.debug("fetchProducts fallback /Product/all response", allPayload);
+          rawProducts = Array.isArray(allPayload?.data)
+            ? allPayload.data
+            : Array.isArray(allPayload?.products)
+              ? allPayload.products
+              : Array.isArray(allPayload)
+                ? allPayload
+                : [];
+        } catch (fallbackErr) {
+          console.warn("Fallback fetch /Product/all failed", fallbackErr);
+        }
+      }
+
+      // Normalize incoming product shapes to frontend `Product` type
+      const products: Product[] = (rawProducts || []).map((p: any) => ({
+        productId: String(p?.id ?? p?.Id ?? p?.productId ?? p?.ProductId ?? "").trim(),
+        productName: String(p?.name ?? p?.Name ?? p?.productName ?? p?.ProductName ?? p?.productName ?? "").trim(),
+        productCode: String(p?.code ?? p?.Code ?? p?.productCode ?? p?.ProductCode ?? "").trim(),
+        description: String(p?.description ?? p?.Description ?? "").trim(),
+        isActive: typeof p?.isActive === "boolean" ? p.isActive : (typeof p?.IsActive === "boolean" ? p.IsActive : true),
+        requiresSubscription: typeof p?.requiresSubscription === "boolean" ? p.requiresSubscription : (typeof p?.RequiresSubscription === "boolean" ? p.RequiresSubscription : false),
+        usageCount: Number.isFinite(Number(p?.usageCount ?? p?.UsageCount ?? 0)) ? Number(p?.usageCount ?? p?.UsageCount ?? 0) : 0,
+        lastUsed: p?.lastUsed ?? p?.LastUsed ?? undefined,
+        activeSince: p?.activeSince ?? p?.ActiveSince ?? undefined,
+        category: p?.category ?? p?.Category ?? undefined,
+        version: p?.version ?? p?.Version ?? undefined,
+        features: Array.isArray(p?.features) ? p.features : Array.isArray(p?.Features) ? p.Features : undefined,
+      }));
 
       const { searchQuery, filterOption } = get();
       set({

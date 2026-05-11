@@ -3,22 +3,37 @@ import { Search, RefreshCw } from "lucide-react";
 import { useStudentStore } from "../../stores/useStudentStore";
 import StudentTable from "../../components/ui/StudentTable";
 import PageHeader from "../../components/layout/PageHeader";
+import Select from "../../components/ui/Select";
 
 const StudentListPage = () => {
   const { displayStudents, isLoading, error, fetchDisplayStudents, clearMessages } = useStudentStore();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSchool, setSelectedSchool] = useState("");
 
   useEffect(() => {
     fetchDisplayStudents();
   }, [fetchDisplayStudents]);
 
+  const schoolOptions = Array.from(
+    new Set(
+      displayStudents
+        .map((student) => student.schoolName?.trim())
+        .filter((schoolName): schoolName is string => Boolean(schoolName) && schoolName !== "N/A")
+    )
+  )
+    .sort((left, right) => left.localeCompare(right))
+    .map((schoolName) => ({ label: schoolName, value: schoolName }));
+
   const filteredStudents = displayStudents.filter(
     (student) =>
-      (student.firstName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (student.lastName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (student.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (student.uin || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (student.schoolName || "").toLowerCase().includes(searchTerm.toLowerCase())
+      (!selectedSchool || student.schoolName.toLowerCase() === selectedSchool.toLowerCase()) &&
+      (
+        (student.firstName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (student.lastName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (student.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (student.uin || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (student.schoolName || "").toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   const handleRefresh = () => {
@@ -35,8 +50,8 @@ const StudentListPage = () => {
       />
 
       {/* Search and Actions */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-        <div className="relative flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
           <input
             type="text"
@@ -46,6 +61,16 @@ const StudentListPage = () => {
             className="w-full pl-10 pr-4 py-2.5 bg-surface-800 border border-surface-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all duration-200"
           />
         </div>
+        <Select
+          label="Filter by School"
+          value={selectedSchool}
+          onChange={(e) => setSelectedSchool(e.target.value)}
+          options={schoolOptions}
+          placeholder="All schools"
+        />
+      </div>
+
+      <div className="flex items-center justify-end">
         <button
           onClick={handleRefresh}
           disabled={isLoading}
