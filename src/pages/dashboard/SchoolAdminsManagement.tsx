@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import type { ChangeEvent, FormEvent } from "react";
-import { Shield } from "lucide-react";
+import type { ChangeEvent } from "react";
 import PageHeader from "../../components/layout/PageHeader";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -8,26 +7,8 @@ import CreateAdminModal from "../../components/users/CreateAdminModal";
 import { useSchoolStore } from "../../stores/useSchoolStore";
 import api from "../../services/api";
 
-type SchoolAdminFormState = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  schoolId: string;
-};
-
-const initialFormState: SchoolAdminFormState = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phoneNumber: "",
-  schoolId: "",
-};
-
 const SchoolAdminsManagement = () => {
-  const { schools, isLoading: schoolsLoading, fetchAllSchools } = useSchoolStore();
-  const [formData, setFormData] = useState<SchoolAdminFormState>(initialFormState);
-  const [localError, setLocalError] = useState<string | null>(null);
+  const { schools, fetchAllSchools } = useSchoolStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [admins, setAdmins] = useState<any[]>([]);
@@ -49,11 +30,6 @@ const SchoolAdminsManagement = () => {
     const timer = window.setTimeout(() => setSuccessMessage(null), 4000);
     return () => window.clearTimeout(timer);
   }, [successMessage]);
-
-  const schoolOptions = schools.map((school) => ({
-    label: `${school.name} (${school.state || "No state"})`,
-    value: school.id,
-  }));
 
   const handleCreateSuccess = (msg?: string) => {
     setSuccessMessage(msg ?? "School admin created successfully.");
