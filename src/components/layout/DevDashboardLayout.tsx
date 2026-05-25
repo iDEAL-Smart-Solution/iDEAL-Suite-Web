@@ -13,6 +13,7 @@ import {
   Wallet,
   MessageSquare,
   Users,
+  Shield,
 } from "lucide-react";
 import logo from "../../assets/logo.png";
 import Container from "./Container";
@@ -35,6 +36,7 @@ const DevDashboardLayout = ({ children }: DevDashboardLayoutProps) => {
     { label: "Payments Report", path: "/dev/payments", icon: <Wallet size={18} /> },
     { label: "Products", path: "/dev/products", icon: <Package size={18} /> },
     { label: "Students", path: "/dev/students", icon: <Users size={18} /> },
+    { label: "School Admins", path: "/dev/school-admins", icon: <Shield size={18} /> },
     { label: "Feedback", path: "/dev/feedback", icon: <MessageSquare size={18} /> },
   ];
 

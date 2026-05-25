@@ -15,6 +15,7 @@ const SchoolsManagement = lazy(() => import("../pages/dashboard/SchoolsManagemen
 const ProductsManagement = lazy(() => import("../pages/dashboard/ProductsManagement"));
 const SubscriptionsManagement = lazy(() => import("../pages/dashboard/SubscriptionsManagement"));
 const UserManagement = lazy(() => import("../pages/dashboard/UserManagement"));
+const SchoolAdminsManagement = lazy(() => import("../pages/dashboard/SchoolAdminsManagement"));
 const SubscriptionManagement = lazy(() => import("../pages/dashboard/SubscriptionManagement"));
 const ProductMonitoring = lazy(() => import("../pages/dashboard/ProductMonitoring"));
 const ProfileSettings = lazy(() => import("../pages/dashboard/ProfileSettings"));
@@ -111,6 +112,17 @@ const AppRoutes = () => {
             <ProtectedRoute allowedRoles={[4]}>
               <DevDashboardLayout>
                 <StudentListPage />
+              </DevDashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dev/school-admins"
+          element={
+            <ProtectedRoute allowedRoles={[4]}>
+              <DevDashboardLayout>
+                <SchoolAdminsManagement />
               </DevDashboardLayout>
             </ProtectedRoute>
           }
