@@ -52,6 +52,37 @@ const applyFilters = (
   return filtered;
 };
 
+const mapBackendProductToProduct = (p: any): Product => ({
+  productId: String(p?.id ?? p?.Id ?? p?.productId ?? p?.ProductId ?? "").trim(),
+  productName: String(p?.name ?? p?.Name ?? p?.productName ?? p?.ProductName ?? "").trim(),
+  productCode: String(p?.code ?? p?.Code ?? p?.productCode ?? p?.ProductCode ?? "").trim(),
+  description: String(p?.description ?? p?.Description ?? "").trim(),
+  isActive:
+    typeof p?.isActive === "boolean"
+      ? p.isActive
+      : typeof p?.IsActive === "boolean"
+        ? p.IsActive
+        : true,
+  requiresSubscription:
+    typeof p?.requiresSubscription === "boolean"
+      ? p.requiresSubscription
+      : typeof p?.RequiresSubscription === "boolean"
+        ? p.RequiresSubscription
+        : false,
+  usageCount: Number.isFinite(Number(p?.usageCount ?? p?.UsageCount ?? 0))
+    ? Number(p?.usageCount ?? p?.UsageCount ?? 0)
+    : 0,
+  lastUsed: p?.lastUsed ?? p?.LastUsed ?? undefined,
+  activeSince: p?.activeSince ?? p?.ActiveSince ?? undefined,
+  category: p?.category ?? p?.Category ?? undefined,
+  version: p?.version ?? p?.Version ?? undefined,
+  features: Array.isArray(p?.features)
+    ? p.features
+    : Array.isArray(p?.Features)
+      ? p.Features
+      : undefined,
+});
+
 export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
   filteredProducts: [],
@@ -190,9 +221,17 @@ export const useProductStore = create<ProductState>((set, get) => ({
   createProduct: async (data) => {
     set({ actionLoading: true, error: null });
     try {
-      const res = await api.post("/Product", data);
-      const newProduct: Product = res.data.data ?? res.data;
-      const updated = [newProduct, ...get().products];
+      const payload = {
+        Name: data.productName.trim(),
+        Description: data.description.trim(),
+        Code: data.productCode.trim(),
+        RequiresSubscription: data.requiresSubscription,
+        IsActive: true,
+      };
+
+      const res = await api.post("/Product/create", payload);
+      const createdProduct = mapBackendProductToProduct(res.data?.data ?? res.data);
+      const updated = [createdProduct, ...get().products];
       const { searchQuery, filterOption } = get();
       set({
         products: updated,

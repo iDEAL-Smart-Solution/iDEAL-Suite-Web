@@ -101,8 +101,10 @@ const ProductsManagement = () => {
       <AddProductModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onSuccess={() => {
-          if (user?.schoolId) fetchProducts(user.schoolId);
+        onSuccess={async () => {
+          if (user?.schoolId) {
+            await fetchProducts(user.schoolId);
+          }
         }}
       />
     </div>

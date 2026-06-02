@@ -7,7 +7,7 @@ import type { CreateProductRequest } from "../../types/product";
 interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: () => void | Promise<void>;
 }
 
 const inputClass =
@@ -92,7 +92,7 @@ const AddProductModal: React.FC<AddProductModalProps> = ({
 
     try {
       await createProduct(formData);
-      onSuccess?.();
+      await onSuccess?.();
       onClose();
       resetForm();
     } catch {
