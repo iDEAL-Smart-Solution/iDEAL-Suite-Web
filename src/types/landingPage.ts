@@ -35,6 +35,7 @@ export type LandingPageContactRequest = {
 
 export type LandingPageRequest = {
   logoUrl: string;
+  domainName: string;
   themeColor: string;
   secondaryColor: string;
   accentColor: string;
@@ -100,6 +101,7 @@ export type LandingPageResponse = {
   id: string;
   schoolId: string;
   logoUrl: string;
+  domainName: string;
   themeColor: string;
   secondaryColor: string;
   accentColor: string;

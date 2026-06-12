@@ -37,6 +37,7 @@ const emptyCoreValue  = (): LandingPageCoreValueRequest => ({ value: "", display
 
 const defaultForm = (): LandingPageRequest => ({
   logoUrl: "",
+  domainName: "",
   themeColor: "#00AEEF",
   secondaryColor: "#1A1A2E",
   accentColor: "#FF6B35",
@@ -164,6 +165,7 @@ const LandingPageManagement = () => {
     if (landingPage) {
       setForm({
         logoUrl:          landingPage.logoUrl          ?? "",
+        domainName:       landingPage.domainName       ?? "",
         themeColor:       landingPage.themeColor       ?? "#00AEEF",
         secondaryColor:   landingPage.secondaryColor   ?? "#1A1A2E",
         accentColor:      landingPage.accentColor      ?? "#FF6B35",
@@ -235,6 +237,7 @@ const LandingPageManagement = () => {
 
   const validate = (): boolean => {
     if (!form.logoUrl.trim())         { setValidationError("Logo URL is required."); return false; }
+    if (!form.domainName.trim())      { setValidationError("Domain name is required."); return false; }
     if (!form.themeColor.trim())      { setValidationError("Theme colour is required."); return false; }
     if (!form.tagline.trim())         { setValidationError("Tagline is required."); return false; }
     if (!form.heroTitle.trim())       { setValidationError("Hero title is required."); return false; }
@@ -322,6 +325,20 @@ const LandingPageManagement = () => {
               onChange={(e) => setField("logoUrl", e.target.value)}
               placeholder="https://example.com/logo.png"
             />
+          </div>
+          <div className="md:col-span-2">
+            <Input
+              label="Domain Name"
+              value={form.domainName}
+              onChange={(e) => setField("domainName", e.target.value)}
+              placeholder="myschool"
+            />
+            <p className="mt-1.5 text-xs text-slate-500">
+              This is the unique identifier used in the public URL, e.g.{" "}
+              <span className="text-slate-400 font-mono">
+                /api/LandingPage/public/<strong>{form.domainName || "myschool"}</strong>
+              </span>. Use a short, lowercase, hyphen-separated value — no spaces.
+            </p>
           </div>
           <ColorInput label="Theme Colour"      value={form.themeColor}      onChange={(v) => setField("themeColor", v)} />
           <ColorInput label="Secondary Colour"  value={form.secondaryColor}  onChange={(v) => setField("secondaryColor", v)} />
