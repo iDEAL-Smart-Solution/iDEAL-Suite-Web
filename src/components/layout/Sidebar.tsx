@@ -9,6 +9,7 @@ import {
   Wallet,
   MessageSquare,
   LogOut,
+  Globe,
 } from "lucide-react";
 import logo from "../../assets/logo.png";
 import { cn } from "../../lib/utils";
@@ -92,6 +93,11 @@ const Sidebar = ({
             <NavLink to="/products" className={navLinkClasses} aria-label="Products">
               <Package size={18} />
               {!isCollapsed && "Products"}
+            </NavLink>
+
+            <NavLink to="/landing-page" className={navLinkClasses} aria-label="Landing Page">
+              <Globe size={18} />
+              {!isCollapsed && "Landing Page"}
             </NavLink>
           </>
         )}

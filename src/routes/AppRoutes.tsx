@@ -24,6 +24,7 @@ const PaymentSuccess = lazy(() => import("../pages/dashboard/PaymentSuccess"));
 const PaymentInitialization = lazy(() => import("../pages/dashboard/PaymentInitialization"));
 const FeedbackPage = lazy(() => import("../pages/dashboard/FeedbackPage"));
 const StudentListPage = lazy(() => import("../pages/dashboard/StudentListPage"));
+const LandingPageManagement = lazy(() => import("../pages/dashboard/LandingPageManagement"));
 
 const PageLoader = () => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-surface-950 gap-4">
@@ -244,6 +245,17 @@ const AppRoutes = () => {
             <ProtectedRoute allowedRoles={[1, 2]}>
               <DashboardLayout>
                 <FeedbackPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/landing-page"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DashboardLayout>
+                <LandingPageManagement />
               </DashboardLayout>
             </ProtectedRoute>
           }
