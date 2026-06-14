@@ -42,17 +42,24 @@ const FeedbackPage: React.FC = () => {
       />
     ));
   };
+  
+  const formatDate = (dateString?: string) => {
+  if (!dateString) return "N/A";
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) {
+    return "Invalid Date";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+};
 
   const getStatusBadge = (status?: string) => {
     if (!status) return null;
