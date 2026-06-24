@@ -44,7 +44,10 @@ export type LandingPageRequest = {
   tagline: string;
   heroTitle: string;
   heroDescription: string;
+  heroImage?: string;
   about: string;
+  aboutImage?: string;
+  secondaryImage?: string;
   mission?: string;
   vision?: string;
   portalLink?: string;
@@ -55,6 +58,14 @@ export type LandingPageRequest = {
   statistics: LandingPageStatisticRequest[];
   coreValues: LandingPageCoreValueRequest[];
   contact?: LandingPageContactRequest;
+  cta?: LandingPageCtaRequest;
+};
+
+export type LandingPageCtaRequest = {
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+  buttonUrl?: string;
 };
 
 // ── Response types ─────────────────────────────────────────────────────────────
@@ -97,6 +108,14 @@ export type LandingPageContactResponse = {
   description?: string;
 };
 
+export type LandingPageCtaResponse = {
+  id: string;
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+  buttonUrl?: string;
+};
+
 export type LandingPageResponse = {
   id: string;
   schoolId: string;
@@ -110,7 +129,10 @@ export type LandingPageResponse = {
   tagline: string;
   heroTitle: string;
   heroDescription: string;
+  heroImage?: string;
   about: string;
+  aboutImage?: string;
+  secondaryImage?: string;
   mission?: string;
   vision?: string;
   portalLink?: string;
@@ -121,6 +143,7 @@ export type LandingPageResponse = {
   statistics: LandingPageStatisticResponse[];
   coreValues: LandingPageCoreValueResponse[];
   contact?: LandingPageContactResponse;
+  cta?: LandingPageCtaResponse;
   createdAt: string;
   lastUpdated: string;
 };

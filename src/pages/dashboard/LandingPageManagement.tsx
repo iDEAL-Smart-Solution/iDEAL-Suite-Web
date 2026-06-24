@@ -13,6 +13,7 @@ import {
   BookOpen,
   Save,
   AlertTriangle,
+  MousePointerClick,
 } from "lucide-react";
 import PageHeader from "../../components/layout/PageHeader";
 import Button from "../../components/ui/Button";
@@ -26,6 +27,7 @@ import type {
   LandingPageStatisticRequest,
   LandingPageCoreValueRequest,
   LandingPageContactRequest,
+  LandingPageCtaRequest,
 } from "../../types/landingPage";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -46,7 +48,10 @@ const defaultForm = (): LandingPageRequest => ({
   tagline: "",
   heroTitle: "",
   heroDescription: "",
+  heroImage: "",
   about: "",
+  aboutImage: "",
+  secondaryImage: "",
   mission: "",
   vision: "",
   portalLink: "",
@@ -57,6 +62,7 @@ const defaultForm = (): LandingPageRequest => ({
   statistics: [emptyStatistic()],
   coreValues: [emptyCoreValue()],
   contact: { email: "", phone: "", address: "", portalUrl: "", description: "" },
+  cta: { title: "", subtitle: "", buttonText: "", buttonUrl: "" },
 });
 
 // ── sub-components ────────────────────────────────────────────────────────────
@@ -174,7 +180,10 @@ const LandingPageManagement = () => {
         tagline:          landingPage.tagline          ?? "",
         heroTitle:        landingPage.heroTitle        ?? "",
         heroDescription:  landingPage.heroDescription  ?? "",
+        heroImage:        landingPage.heroImage        ?? "",
         about:            landingPage.about            ?? "",
+        aboutImage:       landingPage.aboutImage       ?? "",
+        secondaryImage:   landingPage.secondaryImage   ?? "",
         mission:          landingPage.mission          ?? "",
         vision:           landingPage.vision           ?? "",
         portalLink:       landingPage.portalLink       ?? "",
@@ -187,6 +196,9 @@ const LandingPageManagement = () => {
         contact: landingPage.contact
           ? { email: landingPage.contact.email ?? "", phone: landingPage.contact.phone ?? "", address: landingPage.contact.address ?? "", portalUrl: landingPage.contact.portalUrl ?? "", description: landingPage.contact.description ?? "" }
           : { email: "", phone: "", address: "", portalUrl: "", description: "" },
+        cta: landingPage.cta
+          ? { title: landingPage.cta.title ?? "", subtitle: landingPage.cta.subtitle ?? "", buttonText: landingPage.cta.buttonText ?? "", buttonUrl: landingPage.cta.buttonUrl ?? "" }
+          : { title: "", subtitle: "", buttonText: "", buttonUrl: "" },
       });
     }
   }, [landingPage]);
@@ -207,6 +219,10 @@ const LandingPageManagement = () => {
 
   const setContact = useCallback((key: keyof LandingPageContactRequest, val: string) => {
     setForm((f) => ({ ...f, contact: { ...f.contact, [key]: val } }));
+  }, []);
+
+  const setCta = useCallback((key: keyof LandingPageCtaRequest, val: string) => {
+    setForm((f) => ({ ...f, cta: { ...f.cta, [key]: val } }));
   }, []);
 
   // features
@@ -370,6 +386,12 @@ const LandingPageManagement = () => {
             placeholder="A brief compelling description shown in the hero section"
             rows={3}
           />
+          <Input
+            label="Hero Image URL (optional)"
+            value={form.heroImage ?? ""}
+            onChange={(e) => setField("heroImage", e.target.value)}
+            placeholder="https://example.com/hero.jpg"
+          />
         </div>
       </SectionCard>
 
@@ -397,6 +419,20 @@ const LandingPageManagement = () => {
             placeholder="Our vision is..."
             rows={3}
           />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="About Image URL (optional)"
+              value={form.aboutImage ?? ""}
+              onChange={(e) => setField("aboutImage", e.target.value)}
+              placeholder="https://example.com/about.jpg"
+            />
+            <Input
+              label="Secondary Image URL (optional)"
+              value={form.secondaryImage ?? ""}
+              onChange={(e) => setField("secondaryImage", e.target.value)}
+              placeholder="https://example.com/secondary.jpg"
+            />
+          </div>
         </div>
       </SectionCard>
 
@@ -520,6 +556,40 @@ const LandingPageManagement = () => {
           <Button variant="secondary" size="sm" onClick={addProgram}>
             <Plus size={14} /> Add Program
           </Button>
+        </div>
+      </SectionCard>
+
+      {/* ── CTA ──────────────────────────────────────────────────────────── */}
+      <SectionCard icon={<MousePointerClick size={18} />} title="Call to Action (CTA)">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="CTA Title (optional)"
+            value={form.cta?.title ?? ""}
+            onChange={(e) => setCta("title", e.target.value)}
+            placeholder="Ready to Get Started?"
+          />
+          <Input
+            label="Button Text (optional)"
+            value={form.cta?.buttonText ?? ""}
+            onChange={(e) => setCta("buttonText", e.target.value)}
+            placeholder="Enroll Now"
+          />
+          <div className="md:col-span-2">
+            <Input
+              label="CTA Subtitle (optional)"
+              value={form.cta?.subtitle ?? ""}
+              onChange={(e) => setCta("subtitle", e.target.value)}
+              placeholder="Join thousands of students already learning with us."
+            />
+          </div>
+          <div className="md:col-span-2">
+            <Input
+              label="Button URL (optional)"
+              value={form.cta?.buttonUrl ?? ""}
+              onChange={(e) => setCta("buttonUrl", e.target.value)}
+              placeholder="https://portal.yourschool.edu/enroll"
+            />
+          </div>
         </div>
       </SectionCard>
 
