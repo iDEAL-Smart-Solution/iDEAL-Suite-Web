@@ -26,6 +26,15 @@ export interface RegisterSchoolPayload {
   planType: number;
 }
 
+export interface UpdateSchoolPayload {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  state: string;
+  planType: number;
+}
+
 interface SchoolState {
   schools: School[];
   totalSchools: number;
@@ -35,6 +44,8 @@ interface SchoolState {
 
   fetchAllSchools: (page?: number, limit?: number) => Promise<void>;
   registerSchool: (data: RegisterSchoolPayload) => Promise<string>; // returns schoolId
+  deleteSchool: (id: string) => Promise<void>;
+  updateSchool: (id: string, data: UpdateSchoolPayload) => Promise<void>;
   clearMessages: () => void;
   reset: () => void;
 }
@@ -82,4 +93,53 @@ export const useSchoolStore = create<SchoolState>((set) => ({
 
   clearMessages: () => set({ error: null, successMessage: null }),
   reset: () => set({ schools: [], totalSchools: 0, error: null, successMessage: null }),
+
+  updateSchool: async (id, data) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.put(`/Admin/schools/${id}`, data);
+      set((state) => ({
+        schools: state.schools.map((s) =>
+          s.id === id
+            ? {
+                ...s,
+                name: data.name,
+                email: data.email,
+                phoneNumber: data.phoneNumber,
+                address: data.address,
+                state: data.state,
+                planType: data.planType === 1 ? "Local" : "Remote",
+              }
+            : s
+        ),
+        isLoading: false,
+        successMessage: "School updated successfully.",
+      }));
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.message || "Failed to update school",
+        isLoading: false,
+      });
+      throw err;
+    }
+  },
+
+  deleteSchool: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/Admin/schools/${id}`);
+      set((state) => ({
+        schools: state.schools.filter((s) => s.id !== id),
+        totalSchools: Math.max(0, state.totalSchools - 1),
+        isLoading: false,
+        successMessage: "School deleted successfully.",
+      }));
+    } catch (err: any) {
+      set({
+        error: err.response?.data?.message || "Failed to delete school",
+        isLoading: false,
+      });
+      throw err;
+    }
+  },
 }));
