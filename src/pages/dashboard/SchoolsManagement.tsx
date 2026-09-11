@@ -1,17 +1,22 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Edit, Trash2, X, ChevronRight } from "lucide-react";
+import { Search, Plus, Edit, Trash2, X, ChevronRight, AlertTriangle } from "lucide-react";
 import { useSchoolStore } from "../../stores/useSchoolStore";
 import { useSubscriptionStore } from "../../stores/useSubscriptionStore";
 import AddSchoolModal from "../../components/schools/AddSchoolModal";
+import EditSchoolModal from "../../components/schools/EditSchoolModal";
 import PageHeader from "../../components/layout/PageHeader";
 import type { School } from "../../stores/useSchoolStore";
 
 const SchoolsManagement = () => {
-  const { schools, isLoading, error, fetchAllSchools } = useSchoolStore();
+  const { schools, isLoading, error, fetchAllSchools, deleteSchool } = useSchoolStore();
   const { subscriptionHistory, fetchReportingSubscriptions } = useSubscriptionStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
+  const [schoolToEdit, setSchoolToEdit] = useState<School | null>(null);
+  const [schoolToDelete, setSchoolToDelete] = useState<School | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAllSchools();
@@ -48,6 +53,20 @@ const SchoolsManagement = () => {
       case "EXPIRED":
       case "INACTIVE": return "text-red-400 bg-red-900/20";
       default: return "text-slate-400 bg-surface-800";
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!schoolToDelete) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteSchool(schoolToDelete.id);
+      setSchoolToDelete(null);
+    } catch (err: any) {
+      setDeleteError(err.response?.data?.message || "Failed to delete school. Please try again.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -132,8 +151,20 @@ const SchoolsManagement = () => {
                     </td>
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <button className="p-2 text-brand-400 hover:bg-brand-500/10 rounded transition-colors"><Edit size={16} /></button>
-                        <button className="p-2 text-red-400 hover:bg-red-900/20 rounded transition-colors"><Trash2 size={16} /></button>
+                        <button
+                          onClick={() => setSchoolToEdit(school)}
+                          className="p-2 text-brand-400 hover:bg-brand-500/10 rounded transition-colors"
+                          title="Edit school"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => { setDeleteError(null); setSchoolToDelete(school); }}
+                          className="p-2 text-red-400 hover:bg-red-900/20 rounded transition-colors"
+                          title="Delete school"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -150,6 +181,83 @@ const SchoolsManagement = () => {
         onClose={() => setIsAddOpen(false)}
         onSuccess={() => fetchAllSchools()}
       />
+
+      <EditSchoolModal
+        school={schoolToEdit}
+        onClose={() => setSchoolToEdit(null)}
+        onSuccess={() => fetchAllSchools()}
+      />
+
+      {/* Delete Confirmation Modal */}
+      {schoolToDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => !isDeleting && setSchoolToDelete(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-xl border border-surface-700 bg-surface-800 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 border-b border-surface-700 px-6 py-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/10">
+                <AlertTriangle size={20} className="text-red-400" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-white">Delete School</h2>
+                <p className="text-sm text-slate-400">This action is permanent and cannot be undone.</p>
+              </div>
+            </div>
+
+            <div className="px-6 py-5 space-y-3">
+              <p className="text-sm text-slate-300">
+                You are about to permanently delete{" "}
+                <span className="font-semibold text-white">{schoolToDelete.name}</span> and{" "}
+                <span className="font-semibold text-red-400">all associated data</span>, including:
+              </p>
+              <ul className="text-sm text-slate-400 list-disc list-inside space-y-1 pl-1">
+                <li>All users and school admins</li>
+                <li>All students</li>
+                <li>All subscriptions and school products</li>
+                <li>All payment records</li>
+                <li>Landing page content</li>
+              </ul>
+
+              {deleteError && (
+                <div className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
+                  {deleteError}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 border-t border-surface-700 px-6 py-4">
+              <button
+                onClick={() => setSchoolToDelete(null)}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-surface-700 rounded-lg transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} />
+                    Delete Permanently
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedSchool && (() => {
         const { statusLabel, productCount, products } = getSchoolSubscriptionSummary(selectedSchool.id, selectedSchool.name);
