@@ -83,7 +83,7 @@ const PaymentInitialization = () => {
       ? actionParam === "renew"
         ? Math.max(paymentInitInfo.activeStudentCount, paymentInitInfo.currentPaidSlots)
         : paymentInitInfo.isFirstTimeSubscription
-          ? 20
+          ? 50
           : paymentInitInfo.activeStudentCount
       : 0;
     const amount = slotValue * (paymentInitInfo?.costPerStudent || 0);
@@ -97,7 +97,7 @@ const PaymentInitialization = () => {
             actionParam === "renew"
               ? `Minimum slot count for renewal is ${minimumSlots}.`
               : paymentInitInfo.isFirstTimeSubscription
-                ? `For first-time payment, school must purchase minimum 20 student slots. You requested ${slotValue} students. Please increase to at least 20 students.`
+                ? `For first-time payment, school must purchase minimum 50 student slots. You requested ${slotValue} students. Please increase to at least 50 students.`
                 : `Minimum slot count is ${minimumSlots} for your current active students.`
           );
         } else {
@@ -130,7 +130,7 @@ const PaymentInitialization = () => {
     const minimumSlots = actionParam === "renew"
       ? Math.max(paymentInitInfo.activeStudentCount, paymentInitInfo.currentPaidSlots)
       : paymentInitInfo.isFirstTimeSubscription
-        ? 20
+        ? 50
         : paymentInitInfo.activeStudentCount;
 
     if (!slotCount || slotValue <= 0) {
@@ -148,7 +148,7 @@ const PaymentInitialization = () => {
         actionParam === "renew"
           ? `Minimum slot count for renewal is ${minimumSlots}.`
           : paymentInitInfo.isFirstTimeSubscription
-            ? `For first-time payment, school must purchase minimum 20 student slots. You requested ${slotValue} students. Please increase to at least 20 students.`
+            ? `For first-time payment, school must purchase minimum 50 student slots. You requested ${slotValue} students. Please increase to at least 50 students.`
             : `You must select at least ${minimumSlots} slot(s) for the current active students.`
       );
       return;
@@ -379,24 +379,24 @@ const PaymentInitialization = () => {
             <div className="space-y-4 border-t border-surface-700 pt-4">
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Number of Slots * {paymentInitInfo.isFirstTimeSubscription && <span className="text-yellow-400 text-xs">(Minimum: 20)</span>}
+                  Number of Slots * {paymentInitInfo.isFirstTimeSubscription && <span className="text-yellow-400 text-xs">(Minimum: 50)</span>}
                 </label>
                 <input
                   type="number"
-                  min={paymentInitInfo.isFirstTimeSubscription ? 20 : paymentInitInfo.activeStudentCount}
+                  min={paymentInitInfo.isFirstTimeSubscription ? 50 : paymentInitInfo.activeStudentCount}
                   step={1}
                   value={slotCount}
                   onChange={(e) => setSlotCount(e.target.value)}
                   placeholder={
                     paymentInitInfo.isFirstTimeSubscription
-                      ? "Enter number of slots (minimum 20)"
+                      ? "Enter number of slots (minimum 50)"
                       : `Minimum slots: ${paymentInitInfo.activeStudentCount}`
                   }
                   className="w-full px-4 py-3 bg-surface-800 border border-surface-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all"
                 />
                 <p className="text-xs text-slate-500 mt-1">
                   {paymentInitInfo.isFirstTimeSubscription
-                    ? "First-time subscribers must purchase at least 20 slots. The amount will be calculated automatically."
+                    ? "First-time subscribers must purchase at least 50 slots. The amount will be calculated automatically."
                     : `You cannot select fewer than ${paymentInitInfo.activeStudentCount} slot(s). The amount will be calculated automatically.`}
                 </p>
                 {amountError && (
@@ -443,7 +443,7 @@ const PaymentInitialization = () => {
                 <ul className="list-disc list-inside mt-2 space-y-1 text-slate-400">
                   <li>
                     {paymentInitInfo.isFirstTimeSubscription
-                      ? `I am starting a new subscription. I have ${paymentInitInfo.activeStudentCount} registered student(s) and must purchase a minimum of 20 student slots`
+                      ? `I am starting a new subscription. I have ${paymentInitInfo.activeStudentCount} registered student(s) and must purchase a minimum of 50 student slots`
                       : "The payment amount cannot be less than the minimum required for my current active students"}
                   </li>
                   <li>Paystack fees will be added to my payment amount</li>
@@ -512,7 +512,7 @@ const PaymentInitialization = () => {
                       ? "Renewal is open now. The minimum shown above will be enforced before checkout."
                       : paymentInitInfo.renewalMessage || "Renewal is not available yet."
                     : paymentInitInfo.isFirstTimeSubscription
-                      ? "First-time subscription: You must purchase at least 20 student slots. You will be redirected to Paystack to complete your payment."
+                      ? "First-time subscription: You must purchase at least 50 student slots. You will be redirected to Paystack to complete your payment."
                       : "Renewal: You must pay at least the minimum shown above before Paystack opens."}
               </p>
             </div>
